@@ -9,6 +9,20 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://banktif.github.io/jayaclean-salespage/og-image.jpg">
   <meta property="og:url" content="https://banktif.github.io/jayaclean-salespage/">
+  <link rel="canonical" href="https://banktif.github.io/jayaclean-salespage/">
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name":"Jaya Bina Services",
+    "description":"Servis cuci tangki air profesional di Lembah Klang. Harga telus RM300. Deposit RM150.",
+    "url":"https://banktif.github.io/jayaclean-salespage/",
+    "areaServed":{"@type":"City","name":"Lembah Klang"},
+    "priceRange":"RM300",
+    "address":{"@type":"PostalAddress","addressLocality":"Kuala Lumpur","addressRegion":"Selangor","addressCountry":"MY"},
+    "openingHours":"Mo-Sa 09:00-18:00"
+  }
+  </script>
   <title>Servis Cuci Tangki Air Profesional Lembah Klang | Jaya Bina Services</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,14 +235,16 @@
     footer p{font-size:.78rem}
 
     /* ANIMATIONS */
-    .fade-up{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease}
-    .fade-up.on{opacity:1;transform:translateY(0)}
+    .fade-up{transform:translateY(28px);transition:opacity .55s ease,transform .55s ease}
+    .js-ready .fade-up{opacity:0}
+    .fade-up.on,.no-js .fade-up{opacity:1;transform:translateY(0)}
 
     /* WA */
     .wa{position:fixed;bottom:22px;right:22px;z-index:100;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.35);cursor:pointer;transition:transform .2s}
     .wa:hover{transform:scale(1.08)}
     .wa svg{width:28px;height:28px;fill:#fff}
   </style>
+  <noscript><style>.fade-up{opacity:1!important;transform:translateY(0)!important}</style></noscript>
 </head>
 <body>
 
@@ -501,6 +517,7 @@
 </a>
 
 <script>
+document.documentElement.classList.add('js-ready');
 // MOBILE MENU
 document.getElementById('hamburger').addEventListener('click',function(){var m=document.getElementById('mobileMenu'),h=this;var isOpen=m.classList.toggle('active');h.setAttribute('aria-expanded',isOpen);m.setAttribute('aria-hidden',!isOpen)});
 
