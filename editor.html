@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrapesJS Editor — Jaya Bina Services Sales Page</title>
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;overflow:hidden;font-family:'Poppins',sans-serif}
+    #gjs{height:100%;width:100%}
+    .gjs-one-bg{background:#2E7D32}
+    .gjs-two-color{color:#2E7D32}
+    .gjs-three-bg{background:#1B5E20;color:#fff}
+    .gjs-four-color,.gjs-four-color-h:hover{color:#FFC107}
+    .toolbar{position:fixed;top:0;left:0;right:0;z-index:100;background:#1a1a1a;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-size:.85rem;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+    .toolbar .brand{font-weight:700;color:#4CAF50;font-size:1rem;display:flex;align-items:center;gap:8px}
+    .toolbar .actions{display:flex;gap:10px}
+    .toolbar button{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:.82rem;transition:all .15s}
+    .btn-save{background:#2E7D32;color:#fff}
+    .btn-save:hover{background:#1B5E20}
+    .btn-reload{background:#555;color:#fff}
+    .btn-reload:hover{background:#666}
+    .btn-help{background:transparent;color:#FFC107;border:1px solid #FFC107!important}
+    .btn-help:hover{background:rgba(255,193,7,.1)}
+    .status{font-size:.75rem;color:#aaa;padding:4px 10px;background:#333;border-radius:4px}
+    .status.saved{color:#4CAF50}
+    @media(max-width:768px){.toolbar .brand{font-size:.8rem}.toolbar button{padding:6px 12px;font-size:.75rem}}
+    .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .3s}
+    .overlay.hidden{opacity:0;pointer-events:none}
+    .overlay h2{color:#4CAF50;font-size:1.8rem}
+    .overlay p{color:#aaa;max-width:500px;text-align:center;line-height:1.7}
+    .overlay code{background:#333;padding:3px 8px;border-radius:4px;color:#FFC107;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="12" r="10" stroke="#4CAF50" stroke-width="2"/><path d="M7 13c1.5-3 3-4.5 5-4.5s3.5 1.5 5 4.5" stroke="#4CAF50" stroke-width="2" stroke-linecap="round"/></svg>
+      Editor — Jaya Bina Services
+    </div>
+    <div class="actions">
+      <span class="status" id="status">Ready</span>
+      <button class="btn-reload" onclick="reloadPage()">&#8635; Muat Semula</button>
+      <button class="btn-help" onclick="showHelp()">Bantuan</button>
+      <button class="btn-save" onclick="exportHTML()">&#128190; Export HTML</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="helpOverlay" style="display:none">
+    <h2>&#128218; Cara Guna Editor</h2>
+    <p><strong>Double-click</strong> mana-mana teks untuk edit.<br><strong>Drag & drop</strong> block dari panel kanan.<br><strong>Klik</strong> elemen untuk tukar style (warna, font, spacing).<br><strong>Right-click</strong> untuk delete / duplicate block.</p>
+    <p>Tekan <code>Export HTML</code> untuk download sales page yang dah diedit.</p>
+    <button class="btn-save" onclick="document.getElementById('helpOverlay').style.display='none'" style="margin-top:8px">Faham &#10003;</button>
+  </div>
+
+  <div id="gjs"></div>
+
+  <script src="https://unpkg.com/grapesjs/dist/grapes.min.js"></script>
+  <script src="https://unpkg.com/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.js"></script>
+  <script>
+  var SALES_PAGE_HTML = `<nav id=\"nav\">\n  <div class=\"container\">\n    <a href=\"#\" class=\"nav-logo\">\n      <svg viewBox=\"0 0 30 30\" fill=\"none\"><circle cx=\"15\" cy=\"15\" r=\"13\" stroke=\"#2E7D32\" stroke-width=\"2.2\"/><path d=\"M9 17c2-3.5 3.5-5.5 6-5.5s4 2 6 5.5\" stroke=\"#2E7D32\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>\n      Jaya Bina\n    </a>\n    <ul class=\"nav-links\" id=\"navLinks\">\n      <li><a href=\"#home\" class=\"active\">Utama</a></li>\n      <li><a href=\"#masalah\">Masalah</a></li>\n      <li><a href=\"#proses\">Proses</a></li>\n      <li><a href=\"#harga\">Harga</a></li>\n      <li><a href=\"#tempah\">Tempah</a></li>\n    </ul>\n    <button class=\"nav-cta\" onclick=\"document.getElementById(\\'tempah\\').scrollIntoView({behavior:\\'smooth\\'})\">Tempah &rarr;</button>\n    <button class=\"hamburger\" id=\"hamburger\" aria-label=\"Menu\"><span></span><span></span><span></span></button>\n  </div>\n  <div class=\"mobile-menu\" id=\"mobileMenu\">\n    <a href=\"#home\">Utama</a><a href=\"#masalah\">Masalah</a><a href=\"#proses\">Proses</a><a href=\"#harga\">Harga</a><a href=\"#tempah\">Tempah</a><a href=\"#faq\">FAQ</a>\n    <button class=\"nav-cta\" onclick=\"document.getElementById(\\'tempah\\').scrollIntoView({behavior:\\'smooth\\'});document.getElementById(\\'mobileMenu\\').classList.remove(\\'active\\')\">Tempah Slot</button>\n  </div>\n</nav>\n\n<!-- HERO -->\n<section class=\"hero\" id=\"home\">\n  <div class=\"container\">\n    <div class=\"hero-grid fade-up\">\n      <div class=\"hero-text\">\n        <div class=\"hero-badge\">&#128205; Lembah Klang &mdash; KL &amp; Selangor</div>\n        <h1>Kau Ambil Wudhu\\' Pakai Air Tu Setiap Hari. <span class=\"hl\">Tapi Kau Pernah Tengok Tak Dalam Tangki Rumah Kau?</span></h1>\n        <p>Air nampak jernih bila keluar paip. Tapi cuba naik atas, buka penutup tangki — tengok sendiri apa yang ada dalam tu. Kami bukan nak takutkan. Kami nak bagi kau realiti.</p>\n        <div class=\"hero-btns\">\n          <button class=\"btn btn-primary\" onclick=\"document.getElementById(\\'tempah\\').scrollIntoView({behavior:\\'smooth\\'})\">&#128467;&#65039; Tempah Slot &mdash; RM150 Deposit</button>\n          <button class=\"btn btn-outline\" onclick=\"document.getElementById(\\'proses\\').scrollIntoView({behavior:\\'smooth\\'})\">Macam Mana Kami Cuci? &darr;</button>\n        </div>\n        <div class=\"hero-stats\">\n          <div class=\"hero-stat\"><div class=\"sn\">RM300</div><div class=\"sl\">Satu Servis</div></div>\n          <div class=\"hero-stat\"><div class=\"sn\">RM150</div><div class=\"sl\">Deposit Je</div></div>\n          <div class=\"hero-stat\"><div class=\"sn\">4 Slot</div><div class=\"sl\">Sehari Max</div></div>\n          <div class=\"hero-stat\"><div class=\"sn\">1-2 Jam</div><div class=\"sl\">Proses</div></div>\n        </div>\n      </div>\n      <div class=\"hero-visual\">\n        <div class=\"img-ph no-img\">\n          <span class=\"ph-icon\">&#128704;</span>\n          <span class=\"ph-label\">[GAMBAR 1]<br>Orang sedang ambil wudhu\\' — air nampak jernih dari paip</span>\n        </div>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- SHOCK IMAGE + MASALAH -->\n<section class=\"shock-section\" id=\"masalah\">\n  <div class=\"container fade-up\">\n    <div class=\"section-badge\">Bersedia Untuk Realiti</div>\n    <h2 class=\"section-title\" style=\"text-align:center\">Ini rupa air yang kau guna <em>setiap hari</em>.</h2>\n    <div class=\"shock-img-wrap\">\n      <div class=\"img-ph no-img\" style=\"min-height:320px;border-color:#EF9A9A\">\n        <span class=\"ph-icon\">&#128314;</span>\n        <span class=\"ph-label\">[GAMBAR 2]<br>Close-up dalam tangki air KOTOR — kelodak, karat, air keruh</span>\n      </div>\n    </div>\n    <p class=\"shock-headline\">Bayangkan kau kumur-kumur lepas ambil wudhu\\'... <span>tapi air tu datang dari tangki macam ni.</span></p>\n    <p class=\"section-sub\" style=\"text-align:center;margin:0 auto 36px\">Kami serius. Bila kau tengok sendiri, kau akan faham kenapa kau tak boleh tangguh lagi.</p>\n\n    <div class=\"grid2\" style=\"max-width:860px;margin:0 auto\">\n      <div class=\"prob-card\"><div class=\"pc-icon\">&#129442;</div><h4>Kelodak & Enap Cemar</h4><p>Bertahun mendapan berkumpul kat dasar. Air kau lalu celah tu setiap kali paip dibuka.</p></div>\n      <div class=\"prob-card\"><div class=\"pc-icon\">&#128000;</div><h4>Najis & Kumbahan Haiwan</h4><p>Tikus, cicak, merpati — semua boleh masuk. Tinggal najis. Air kau bercampur semua tu.</p></div>\n      <div class=\"prob-card\"><div class=\"pc-icon\">&#129440;</div><h4>Bakteria & Kulat</h4><p>Air bertakung + haba = tempat pembiakan ideal. Gatal-gatal, cirit-birit — simptom biasa.</p></div>\n      <div class=\"prob-card\"><div class=\"pc-icon\">&#128066;</div><h4>Air Berbau & Berkarat</h4><p>Bau macam longkang? Warna kekuningan? Tangki kau dah lama menjerit minta tolong.</p></div>\n    </div>\n    <p style=\"text-align:center;margin-top:28px;color:#888;font-size:.85rem;font-style:italic\">Bukan nak seramkan. Tapi inilah hakikat yang ramai pemilik rumah tak ambil peduli.</p>\n  </div>\n</section>\n\n<!-- EDUKASI -->\n<section class=\"edu-section\" id=\"edukasi\">\n  <div class=\"container fade-up\">\n    <div class=\"edu-grid\">\n      <div>\n        <div class=\"img-ph no-img\" style=\"min-height:280px\">\n          <span class=\"ph-icon\">&#128218;</span>\n          <span class=\"ph-label\">[GAMBAR 3]<br>Infografik: kitaran penyelenggaraan tangki air setiap 6-12 bulan</span>\n        </div>\n      </div>\n      <div>\n        <div class=\"section-badge\">Jangan Tunggu Sampai Terlambat</div>\n        <h2 class=\"section-title\">Tangki kau dah berapa tahun tak cuci?</h2>\n        <p style=\"color:#555;font-size:.9rem;margin-bottom:12px\">Kementerian Kesihatan Malaysia (KKM) <strong>saran cuci setiap 6–12 bulan</strong>. Tapi realitinya? Ramai yang bertahun-tahun tak pernah cuci langsung.</p>\n        <p style=\"font-weight:700;font-size:.85rem;margin-bottom:10px\">Kalau kau tanda mana-mana ni, jangan tunggu lagi:</p>\n        <ul class=\"checklist\">\n          <li><span class=\"ck\">&#10003;</span> Air kekuningan atau berkarat</li>\n          <li><span class=\"ck\">&#10003;</span> Air berbau busuk / hapak</li>\n          <li><span class=\"ck\">&#10003;</span> Tekanan air makin lemah</li>\n          <li><span class=\"ck\">&#10003;</span> Kulit gatal-gatal tanpa sebab</li>\n          <li><span class=\"ck\">&#10003;</span> Dah lebih setahun tak cuci</li>\n          <li><span class=\"ck\">&#10003;</span> Nampak habuk/halusan dalam air</li>\n        </ul>\n        <p style=\"margin-top:16px;font-weight:700;color:#2E7D32\">&#10003; Mana-mana satu je kena — kau kena bertindak.</p>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- SOLUSI -->\n<section id=\"solusi\">\n  <div class=\"container fade-up\">\n    <div class=\"sol-grid\">\n      <div class=\"sol-text\">\n        <div class=\"section-badge\">Kami Boleh Bantu</div>\n        <h2 class=\"section-title\">Jaya Bina Services &mdash; kami buat satu je: cuci tangki air kau sampai bersih.</h2>\n        <p>Kami syarikat <strong>baru</strong>. Jujur. Tapi jangan salah faham — baru bukan bermaksud tak bagus. Baru bermaksud <strong>kami bekerja dua kali ganda keras</strong> untuk setiap servis. Sebab setiap rumah yang kami masuk adalah peluang untuk buktikan kualiti.</p>\n        <p>Kami tak perlu 10 tahun pengalaman nak buat kerja betul. Kami perlu <strong>sikap betul, alat betul, komitmen penuh.</strong> Itu yang kami bawa.</p>\n        <p style=\"font-weight:700;color:#2E7D32;font-size:1rem\">Servis telus. Harga telus. Hasil bersih. &mdash; Itu janji kami.</p>\n      </div>\n      <div>\n        <div class=\"img-ph no-img\" style=\"min-height:300px\">\n          <span class=\"ph-icon\">&#129489;&#8205;&#128295;</span>\n          <span class=\"ph-label\">[GAMBAR 4]<br>Team Jaya Bina Services — profesional, mesra, trusted</span>\n        </div>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- PROSES -->\n<section id=\"proses\">\n  <div class=\"container fade-up\">\n    <div style=\"text-align:center\"><div class=\"section-badge\">Cara Kami Bekerja</div></div>\n    <h2 class=\"section-title\" style=\"text-align:center\">4 langkah. Bersih. Telus. Tiada shortcut.</h2>\n    <p class=\"section-sub\" style=\"text-align:center\">Setiap langkah kami buat betul-betul. Sebab kau bayar untuk hasil, bukan alasan.</p>\n    <div class=\"grid4\">\n      <div class=\"step-card\">\n        <div class=\"step-img\"><div class=\"img-ph no-img\" style=\"min-height:140px;border-radius:12px\"><span class=\"ph-icon\" style=\"font-size:1.8rem\">&#128270;</span><span class=\"ph-label\">[GAMBAR 5]<br>Pemeriksaan tangki</span></div></div>\n        <div class=\"step-num\">01</div><h4>Periksa Dulu</h4><p>Kami tiba, check condition tangki — tahap kotor, jenis mendapan, akses. Bagi kau gambaran jelas sebelum kerja mula.</p>\n      </div>\n      <div class=\"step-card\">\n        <div class=\"step-img\"><div class=\"img-ph no-img\" style=\"min-height:140px;border-radius:12px\"><span class=\"ph-icon\" style=\"font-size:1.8rem\">&#128688;</span><span class=\"ph-label\">[GAMBAR 6]<br>Air kotor disedut keluar</span></div></div>\n        <div class=\"step-num\">02</div><h4>Sedut Air Kotor</h4><p>Air bercampur lumpur & kelodak disedut keluar guna pam khas. Habis. Tak tinggal.</p>\n      </div>\n      <div class=\"step-card\">\n        <div class=\"step-img\"><div class=\"img-ph no-img\" style=\"min-height:140px;border-radius:12px\"><span class=\"ph-icon\" style=\"font-size:1.8rem\">&#129529;</span><span class=\"ph-label\">[GAMBAR 7]<br>Cucian & disinfeksi tangki</span></div></div>\n        <div class=\"step-num\">03</div><h4>Gosok & Disinfeksi</h4><p>Dinding dan dasar digosok. Disinfektan selamat digunakan — bunuh bakteria, kulat, kuman.</p>\n      </div>\n      <div class=\"step-card\">\n        <div class=\"step-img\"><div class=\"img-ph no-img\" style=\"min-height:140px;border-radius:12px\"><span class=\"ph-icon\" style=\"font-size:1.8rem\">&#10004;&#65039;</span><span class=\"ph-label\">[GAMBAR 8]<br>Tangki bersih — selesai</span></div></div>\n        <div class=\"step-num\">04</div><h4>Bilas & Check Akhir</h4><p>Bilas bersih-bersih. Check kualiti air. Pastikan semuanya perfect sebelum kami balik.</p>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- KENAPA KAMI -->\n<section id=\"harga\" style=\"background:#fafafa\">\n  <div class=\"container fade-up\">\n    <div style=\"text-align:center\"><div class=\"section-badge\">Kenapa Pilih Kami</div></div>\n    <h2 class=\"section-title\" style=\"text-align:center\">Bukan sekadar cuci. Ini soal kepercayaan.</h2>\n    <p class=\"section-sub\" style=\"text-align:center\">Kami tak claim paling hebat. Tapi ni yang kami tawarkan — straight forward.</p>\n    <div class=\"grid4\">\n      <div class=\"usp-card\"><div class=\"usp-icon\">&#128176;</div><h4>RM300. Satu Harga.</h4><p>Tiada hidden cost. Tiada up-sell lepas datang. Kau tahu harga sebelum kami sampai.</p></div>\n      <div class=\"usp-card\"><div class=\"usp-icon\">&#128274;</div><h4>Deposit RM150 Je</h4><p>50% booking. Baki lepas servis selesai. Bayaran selamat melalui sistem pembayaran online.</p></div>\n      <div class=\"usp-card\"><div class=\"usp-icon\">&#128295;</div><h4>Peralatan Proper</h4><p>Kami guna pam sedutan khas, disinfektan proper. Bukan baldi & berus murah.</p></div>\n      <div class=\"usp-card\"><div class=\"usp-icon\">&#129309;</div><h4>Jujur, Tak Kaw-kaw</h4><p>Takde paksa up-sell. Takde pressure. Kami bagi servis, kau bagi kepercayaan. Simple.</p></div>\n    </div>\n  </div>\n</section>\n\n<!-- BOOKING -->\n<section class=\"book-section\" id=\"tempah\">\n  <div class=\"container fade-up\">\n    <div style=\"text-align:center\"><div class=\"section-badge\">Booking</div></div>\n    <h2 class=\"section-title\" style=\"text-align:center\">Pilih Tarikh. Bayar Deposit. Selesai.</h2>\n    <p class=\"section-sub\" style=\"text-align:center\">Booking dulu. Kami datang, cuci, kau bayar baki lepas puas hati.</p>\n    <div class=\"book-card\" id=\"bookCard\">\n      <h3>&#128197; Tempah Slot Servis</h3>\n\n      <div class=\"book-step\">1. Pilih Tarikh</div>\n      <div class=\"cal-nav\"><button id=\"prevM\">&larr; Sebelum</button><span class=\"cal-month\" id=\"calMth\"></span><button id=\"nextM\">Seterusnya &rarr;</button></div>\n      <div class=\"cal\" id=\"cal\"></div>\n      <div class=\"sel-date\" id=\"selDt\"></div>\n\n      <div class=\"book-step\">2. Pilih Masa</div>\n      <div class=\"slots\" id=\"slots\">\n        <div class=\"slot\" data-slot=\"9am\">&#9728;&#65039; 9:00 AM</div>\n        <div class=\"slot\" data-slot=\"11am\">&#128338; 11:00 AM</div>\n        <div class=\"slot\" data-slot=\"2pm\">&#128338; 2:00 PM</div>\n        <div class=\"slot\" data-slot=\"4pm\">&#127774; 4:00 PM</div>\n      </div>\n\n      <div class=\"book-step\">3. Isi Butiran</div>\n      <div class=\"fg\"><label for=\"cn\">Nama Penuh</label><input type=\"text\" id=\"cn\" placeholder=\"Nama penuh kau...\"><div class=\"ferr\" id=\"ecn\">Sila isi nama penuh.</div></div>\n      <div class=\"fg\"><label for=\"cp\">Nombor Telefon</label><input type=\"tel\" id=\"cp\" placeholder=\"012xxxxxxx\"><div class=\"ferr\" id=\"ecp\">Nombor telefon mesti 10-11 digit, mula dengan 01.</div></div>\n      <div class=\"fg\"><label for=\"ca\">Alamat Penuh</label><textarea id=\"ca\" placeholder=\"No rumah, jalan, taman, poskod. Biar kami boleh sampai tepat.\"></textarea><div class=\"ferr\" id=\"eca\">Alamat penuh diperlukan — termasuk poskod.</div></div>\n\n      <div class=\"price-box\">\n        <div class=\"pr\"><span>Servis Cuci Tangki Air</span><span>RM300</span></div>\n        <div class=\"pr\"><span>Deposit Sekarang (50%)</span><span>RM150</span></div>\n        <div class=\"pr tl\"><span>Baki Selepas Servis</span><span>RM150</span></div>\n      </div>\n\n      <button class=\"btn-book\" id=\"btnBook\">&#128179; Bayar Deposit RM150 &rarr;</button>\n\n      <div class=\"confirm-msg\" id=\"confirmMsg\">\n        <div class=\"ci\">&#9989;</div>\n        <h4>Booking Diterima!</h4>\n        <p id=\"cmText\"></p>\n        <p style=\"margin-top:12px;font-size:.78rem;color:#999\">Kami akan call / WhatsApp dalam masa <strong>24 jam</strong> untuk confirm. Ada soalan? Terus tekan button WhatsApp kat bawah tu.</p>\n      </div>\n    </div>\n  </div>\n</section>\n\n<!-- FAQ -->\n<section id=\"faq\">\n  <div class=\"container fade-up\">\n    <div style=\"text-align:center\"><div class=\"section-badge\">Soalan Lazim</div></div>\n    <h2 class=\"section-title\" style=\"text-align:center\">Ada soalan? Kami jawab jujur.</h2>\n    <div class=\"faq-list\">\n      <div class=\"faq-item\"><button class=\"faq-q\">Berapa lama proses cuci? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>1-2 jam untuk rumah biasa. Bergantung saiz tangki & tahap kotor. Lepas check awal, kami bagitahu anggaran tepat.</p></div></div>\n      <div class=\"faq-item\"><button class=\"faq-q\">Guna bahan kimia bahaya ke? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>Tidak. Kami guna disinfektan selamat & diluluskan. Lepas proses, kami bilas sampai betul-betul bersih. Air selamat guna semula.</p></div></div>\n      <div class=\"faq-item\"><button class=\"faq-q\">Kenapa tak cuci sendiri je? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>Boleh — tapi berisiko. Tangki sempit, licin, susah nak capai semua sudut. Kami ada peralatan sedutan khas yang kau takkan ada kat rumah.</p></div></div>\n      <div class=\"faq-item\"><button class=\"faq-q\">Hujan macam mana? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>Hujan renyai — still on. Hujan lebat tak selamat — kami reschedule percuma. Kami call dulu pagi tu.</p></div></div>\n      <div class=\"faq-item\"><button class=\"faq-q\">Cover kawasan mana? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>Lembah Klang — KL & Selangor. Luar kawasan? Whatsapp dulu, kami check. Kami cakap jujur kalau tak cover.</p></div></div>\n      <div class=\"faq-item\"><button class=\"faq-q\">Kenapa kena deposit? <span class=\"arr\">&#9660;</span></button><div class=\"faq-a\"><p>Deposit RM150 untuk sahkan booking dan lindungi masa kami. Baki RM150 bayar <strong>lepas</strong> servis selesai, bila kau dah puas hati.</p></div></div>\n    </div>\n  </div>\n</section>\n\n<!-- TENTANG KAMI -->\n<section style=\"background:#f9fafb\" id=\"tentang\">\n  <div class=\"container fade-up\">\n    <div class=\"about-content\">\n      <div class=\"about-img-wrap\"><div class=\"img-ph no-img\" style=\"min-height:240px\"><span class=\"ph-icon\" style=\"font-size:2rem\">&#128100;</span><span class=\"ph-label\">[GAMBAR 9]<br>Gambar owner/founder<br>Jaya Bina Services</span></div></div>\n      <div class=\"section-badge\">Cerita Kami</div>\n      <h2 class=\"section-title\">Kami baru. Dan itu kebanggaan kami.</h2>\n      <p>Jaya Bina Services bermula dengan satu keyakinan: <strong>setiap keluarga berhak dapat air bersih.</strong> Simple macam tu.</p>\n      <p>Kami tahu orang skeptical bila dengar \"baru\". Tapi bagi kami, baru itu <strong>kelebihan</strong>. Kami tak ada reputasi nak jaga — jadi kami kena buktikan setiap kali. Setiap servis adalah peluang.</p>\n      <div class=\"about-hl\">\"Kami tak janji bulan bintang. Kami janji: sampai on-time, buat kerja bersih, tinggal tangki lagi bersih daripada masa kami datang.\"</div>\n      <p>Setiap kali kau buka paip lepas servis kami, kau boleh tarik nafas lega. Air bersih. Amanah terjaga. <strong>Itu ukuran kejayaan kami.</strong></p>\n    </div>\n  </div>\n</section>\n\n<!-- FINAL CTA -->\n<section class=\"cta-sec\" id=\"cta\">\n  <div class=\"container fade-up\">\n    <div class=\"cta-img-wrap\"><div class=\"img-ph no-img\" style=\"min-height:200px\"><span class=\"ph-icon\" style=\"font-size:2rem\">&#127968;</span><span class=\"ph-label\" style=\"color:rgba(255,255,255,.7)\">[GAMBAR 10]<br>Keluarga selesa di rumah — air bersih,<br>hati tenang, tiada lagi risau tangki kotor</span></div></div>\n    <h2>4 Slot Sehari. Sebab Kami Tak Nak Gelojoh.</h2>\n    <p>Kami sengaja limitkan. Supaya setiap rumah dapat perhatian penuh, bukan servis cincai kejar target. Bila kau book, kami datang dengan fokus 100% untuk <strong>rumah kau je.</strong></p>\n    <button class=\"btn\" onclick=\"document.getElementById(\\'tempah\\').scrollIntoView({behavior:\\'smooth\\'})\">&#128197; Book Sekarang &mdash; Bayar Deposit RM150</button>\n  </div>\n</section>\n\n<!-- FOOTER -->\n<footer>\n  <div class=\"container\">\n    <div class=\"fb\">Jaya Bina Services</div>\n    <p>Servis Cuci Tangki Air Profesional &mdash; Lembah Klang</p>\n    <p style=\"margin-top:4px\">&copy; 2026 Jaya Bina Services</p>\n  </div>\n</footer>`;
+
+  function loadEditor(){
+    var editor = grapesjs.init({
+      container: '#gjs',
+      height: '100%',
+      width: 'auto',
+      storageManager: false,
+      plugins: ['gjs-preset-webpage'],
+      pluginsOpts: {
+        'gjs-preset-webpage': {
+          blocks: ['link-block','quote','text-basic'],
+          navbarOpts: false,
+          countdownOpts: false,
+          formsOpts: false
+        }
+      },
+      canvas: {
+        styles: [
+          'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap'
+        ],
+        scripts: []
+      },
+      panels: {
+        defaults: [
+          {
+            id: 'panel-switcher',
+            el: '.panel__switcher',
+            buttons: [
+              { id: 'show-blocks', active: true, label: 'Blocks', command: 'show-blocks' },
+              { id: 'show-styles', label: 'Style', command: 'show-styles' },
+              { id: 'show-layers', label: 'Layers', command: 'show-layers' }
+            ]
+          }
+        ]
+      },
+      blockManager: {
+        appendTo: '#gjs',
+        blocks: [
+          { id: 'section', label: 'Section', category: 'Basic', content: '<section style="padding:60px 0"><div class="container"><h2>New Section</h2></div></section>' },
+          { id: 'text', label: 'Text Block', category: 'Basic', content: { type: 'text', content: 'Insert your text here' } },
+          { id: 'image', label: 'Image', category: 'Basic', content: { type: 'image' } },
+          { id: 'button', label: 'Button', category: 'Basic', content: '<a class="btn btn-primary" style="display:inline-block;padding:14px 32px;border-radius:50px;background:#2E7D32;color:#fff;font-weight:700;text-decoration:none">Click Here</a>' },
+          { id: 'grid2', label: '2 Columns', category: 'Layout', content: '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div>Column 1</div><div>Column 2</div></div>' }
+        ]
+      },
+      styleManager: {
+        sectors: [{
+          name: 'General',
+          properties: [
+            { property: 'margin', name: 'Margin' },
+            { property: 'padding', name: 'Padding' },
+            { property: 'background-color', name: 'Background' },
+            { property: 'color', name: 'Text Color' },
+            { property: 'font-size', name: 'Font Size' },
+            { property: 'font-weight', name: 'Bold' },
+            { property: 'text-align', name: 'Text Align' },
+            { property: 'border-radius', name: 'Round Corners' }
+          ]
+        }]
+      },
+      deviceManager: {
+        devices: [
+          { name: 'Desktop', width: '' },
+          { name: 'Tablet', width: '768px', widthMedia: '768px' },
+          { name: 'Mobile', width: '375px', widthMedia: '375px' }
+        ]
+      }
+    });
+
+    editor.addComponents(SALES_PAGE_HTML);
+    editor.on('load', function(){ document.getElementById('status').textContent = 'Loaded'; document.getElementById('status').classList.add('saved'); });
+
+    window.editorInstance = editor;
+  }
+
+  function exportHTML(){
+    var ed = window.editorInstance;
+    if(!ed){alert('Editor not ready.');return}
+    var html = ed.getHtml();
+    var css = ed.getCss();
+
+    var fullHTML = '<!DOCTYPE html>\n<html lang="ms">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <meta name="description" content="Servis cuci tangki air profesional Lembah Klang. RM300 satu servis. Deposit RM150.">\n  <meta property="og:title" content="Servis Cuci Tangki Air Profesional Lembah Klang | Jaya Bina Services">\n  <meta property="og:description" content="Tengok dulu rupa tangki air kau. Air wudhu nampak bersih - tapi dalam tangki? Jangan terkejut.">\n  <meta property="og:type" content="website">\n  <title>Servis Cuci Tangki Air Profesional Lembah Klang | Jaya Bina Services</title>\n  <link rel="preconnect" href="https://fonts.googleapis.com">\n  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">\n  <style>\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}\nhtml{scroll-behavior:smooth;font-size:16px}\nbody{font-family:\'Poppins\',-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a1a;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}\nimg{max-width:100%;display:block}\na{text-decoration:none;color:inherit}\n.container{max-width:1080px;margin:0 auto;padding:0 20px}\n' + css + '\n  </style>\n</head>\n<body>\n' + html + '\n<script src="salespage.js"><\/script>\n</body>\n</html>';
+
+    var blob = new Blob([fullHTML], {type:'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index-edited.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    document.getElementById('status').textContent = 'Exported!';
+    document.getElementById('status').classList.add('saved');
+    setTimeout(function(){document.getElementById('status').textContent='Ready';document.getElementById('status').classList.remove('saved')}, 2000);
+  }
+
+  function reloadPage(){
+    if(confirm('Muat semula page asal? Semua edit yang belum di-export akan hilang.')){
+      location.reload();
+    }
+  }
+
+  function showHelp(){
+    document.getElementById('helpOverlay').style.display = 'flex';
+  }
+
+  document.addEventListener('DOMContentLoaded', loadEditor);
+  </script>
+</body>
+</html>
