@@ -238,6 +238,7 @@
     .fade-up{transform:translateY(28px);transition:opacity .55s ease,transform .55s ease}
     .js-ready .fade-up{opacity:0}
     .fade-up.on,.no-js .fade-up{opacity:1;transform:translateY(0)}
+    .book-section .fade-up{opacity:1!important;transform:translateY(0)!important}
 
     /* WA */
     .wa{position:fixed;bottom:22px;right:22px;z-index:100;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.35);cursor:pointer;transition:transform .2s}
@@ -547,12 +548,6 @@ async function fetchBookedSlots(date){
 // CALENDAR
 var td=new Date();
 var cm=td.getMonth(),cy=td.getFullYear(),sd=null,ss=null;
-var bookedCache={};
-
-// CALENDAR (real Supabase)
-var td=new Date();
-var cm=td.getMonth(),cy=td.getFullYear(),sd=null,ss=null;
-var bookedDates={};
 function rCal(){
   var c=document.getElementById('cal'),l=document.getElementById('calMth'),mn=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
   l.textContent=mn[cm]+' '+cy;
@@ -575,14 +570,6 @@ function rCal(){
     el.style.cursor='pointer';
     el.addEventListener('click',function(){selectDate(this.dataset.date)});
   });
-}
-  c.innerHTML=h;
-  c.querySelectorAll('.day:not(.nodate)').forEach(function(el){
-    el.addEventListener('click',function(){selectDate(this.dataset.date)});
-    el.style.cursor='pointer';
-  });
-  c.innerHTML=h;
-  document.getElementById('prevM').disabled=(cy===td.getFullYear()&&cm<=td.getMonth());
 }
 document.getElementById('prevM').addEventListener('click',function(){if(cm===0){cm=11;cy--}else cm--;rCal();uSlots()});
 document.getElementById('nextM').addEventListener('click',function(){if(cm===11){cm=0;cy++}else cm++;rCal();uSlots()});
