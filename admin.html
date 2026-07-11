@@ -250,6 +250,34 @@
     .st-av{width:52px;height:52px;border-radius:14px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--text3)}
     .st-av img{width:100%;height:100%;object-fit:cover}
     .st-av.sm{width:40px;height:40px;border-radius:11px}
+    /* ════════ MODERN BOOKING CARDS ════════ */
+    .bk-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:768px){.bk-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
+    @media(min-width:1500px){.bk-grid{grid-template-columns:repeat(3,1fr)}}
+    .bk-card{background:var(--elevated);border:1px solid var(--border);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:pointer}
+    .bk-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--border-strong)}
+    .bk-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--text3)}
+    .bk-card.s-pending_payment::before{background:var(--warning)}
+    .bk-card.s-confirmed::before{background:var(--accent)}
+    .bk-card.s-completed::before{background:var(--accent2)}
+    .bk-card.s-cancelled::before{background:var(--danger)}
+    .bk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:13px}
+    .bk-cust{display:flex;align-items:center;gap:11px;min-width:0}
+    .bk-ava{width:44px;height:44px;border-radius:13px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.92rem;flex-shrink:0;letter-spacing:-.5px}
+    .bk-name{font-weight:700;font-size:.95rem;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bk-sub{font-size:.64rem;color:var(--text3);font-weight:600;margin-top:1px}
+    .bk-meta{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
+    .bk-mrow{display:flex;align-items:center;gap:8px;font-size:.77rem;color:var(--text2);min-width:0}
+    .bk-mrow svg{color:var(--text3)}
+    .bk-mrow .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bk-mrow .pill{background:var(--bg);padding:4px 11px;border-radius:20px;font-weight:700;font-size:.72rem;color:var(--text2);white-space:nowrap}
+    .bk-foot{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:12px}
+    .bk-act{flex:1;min-width:64px;padding:8px 6px;border-radius:10px;border:1px solid var(--border-strong);background:transparent;color:var(--text2);font-family:var(--font);font-weight:700;font-size:.68rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:all .12s}
+    .bk-act:active{transform:scale(.96)}
+    .bk-act.acc{color:var(--accent);border-color:var(--accent)}.bk-act.acc:hover{background:var(--accent);color:#fff}
+    .bk-act.don{color:var(--accent2);border-color:var(--accent2)}.bk-act.don:hover{background:var(--accent2);color:#fff}
+    .bk-act.del{color:var(--danger);border-color:var(--danger)}.bk-act.del:hover{background:var(--danger);color:#fff}
+    .bk-act.wa{color:#1da851;border-color:#25D366}.bk-act.wa:hover{background:#25D366;color:#fff}
 
     /* ════════ LOGIN ════════ */
     .login{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;transition:background .4s;padding:20px}
@@ -409,41 +437,32 @@ async function load(filter){
     document.getElementById('drBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
     if(!f.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="inbox"></i></div><h2>No Bookings</h2><p>New bookings will appear here.</p></div>';return}
 
-    if(isDesktop){renderTable(f);}else{renderCards(f);}
+    renderBookings(f);
   }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+e.message+'</p></div>'}
 }
 
-function renderCards(f){
-  var h='';f.forEach(function(b){
-    h+='<div class="card" onclick="showModal(\''+b.id+'\')"><div class="card-body">';
-    h+='<div class="card-meta"><span class="card-date">'+fd(b.booking_date)+'</span><span class="card-date">'+ft(b.booking_time)+'</span></div>';
-    h+='<div class="card-name">'+b.customer_name.replace(/</g,'&lt;')+'</div>';
-    h+='<div class="card-addr"><i data-lucide="map-pin"></i> '+b.customer_address.replace(/</g,'&lt;')+'</div>';
-    h+='<div class="card-phone"><i data-lucide="phone"></i> '+b.customer_phone.replace(/</g,'&lt;')+'</div>';
-    h+='<div class="qact" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')"><i data-lucide="check"></i> Confirm</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="quickUpdate(\''+b.id+'\',\'completed\')"><i data-lucide="check-check"></i> Complete</button>';
-    h+='<button class="qact-btn decline" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')"><i data-lucide="x"></i> Cancel</button></div>';
-    h+='</div><div>'+badge(b.status)+'</div></div>';
-  });
-  document.getElementById('list').innerHTML=h;
-}
-
-function renderTable(f){
-  var h='<div class="d-card"><table><thead><tr><th>Date &amp; Time</th><th>Customer</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+function initials(n){var p=(n||'').trim().split(/\s+/);return ((((p[0]||'')[0]||'')+((p[1]||'')[0]||'')).toUpperCase())||'?';}
+function renderBookings(f){
+  var h='<div class="bk-grid">';
   f.forEach(function(b){
-    h+='<tr onclick="showModal(\''+b.id+'\')" style="cursor:pointer">';
-    h+='<td><span class="d-date">'+fd(b.booking_date)+'</span><span class="d-dot">·</span><span class="d-date">'+ft(b.booking_time)+'</span></td>';
-    h+='<td><div class="d-name"><strong>'+b.customer_name.replace(/</g,'&lt;')+'</strong></div><span class="d-phone">'+b.customer_phone.replace(/</g,'&lt;')+'</span></td>';
-    h+='<td><div class="d-addr" title="'+b.customer_address.replace(/</g,'&lt;')+'">'+b.customer_address.replace(/</g,'&lt;')+'</div></td>';
-    h+='<td>'+badge(b.status)+'</td>';
-    h+='<td><div class="d-acts" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="d-btn acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">Confirm</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="d-btn don" onclick="quickUpdate(\''+b.id+'\',\'completed\')">Complete</button>';
-    h+='<button class="d-btn del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">Cancel</button></div></td>';
-    h+='</tr>';
+    var pay=(b.payment_status==='paid'?'Paid':(b.payment_status||'pending'));
+    var waph=waNum(b.customer_phone);
+    h+='<div class="bk-card s-'+b.status+'" onclick="showModal(\''+b.id+'\')">';
+    h+='<div class="bk-top"><div class="bk-cust"><div class="bk-ava">'+initials(b.customer_name)+'</div><div style="min-width:0"><div class="bk-name">'+esc(b.customer_name)+'</div><div class="bk-sub">#'+String(b.id).substring(0,8)+'</div></div></div>'+badge(b.status)+'</div>';
+    h+='<div class="bk-meta">';
+    h+='<div class="bk-mrow"><i data-lucide="calendar"></i><span class="pill">'+fd(b.booking_date)+'</span><span class="pill">'+ft(b.booking_time)+'</span></div>';
+    h+='<div class="bk-mrow"><i data-lucide="map-pin"></i><span class="txt">'+esc(b.customer_address)+'</span></div>';
+    h+='<div class="bk-mrow"><i data-lucide="phone"></i><span class="txt">'+esc(b.customer_phone)+'</span></div>';
+    h+='<div class="bk-mrow"><i data-lucide="credit-card"></i><span class="txt">Deposit RM'+esc(b.deposit_amount)+' &middot; '+esc(pay)+'</span></div>';
+    h+='</div>';
+    h+='<div class="bk-foot" onclick="event.stopPropagation()">';
+    if(b.status==='pending_payment')h+='<button class="bk-act acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')"><i data-lucide="check"></i>Confirm</button>';
+    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="bk-act don" onclick="quickUpdate(\''+b.id+'\',\'completed\')"><i data-lucide="check-check"></i>Complete</button>';
+    h+='<button class="bk-act wa" onclick="window.open(\'https://wa.me/'+waph+'\',\'_blank\')"><i data-lucide="message-circle"></i>WA</button>';
+    if(b.status!=='cancelled'&&b.status!=='completed')h+='<button class="bk-act del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')"><i data-lucide="x"></i></button>';
+    h+='</div></div>';
   });
-  h+='</tbody></table></div>';
+  h+='</div>';
   document.getElementById('list').innerHTML=h;
 }
 
