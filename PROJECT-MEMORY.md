@@ -10,6 +10,7 @@ Sales page cuci tangki air. Brand: JAYACUCI (Jaya Bina Services). Single page + 
 | Editor | https://cuci.jayabina.com/editor |
 | Admin panel | https://cuci.jayabina.com/admin |
 | Test calendar | https://cuci.jayabina.com/test-cal.html |
+| Test payment (RM2) | https://cuci.jayabina.com/test-pay.html |
 | GitHub repo | https://github.com/banktif/jayaclean-salespage |
 
 ## Tech Stack (RM0)
