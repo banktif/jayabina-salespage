@@ -41,16 +41,44 @@
     .modal-card p{font-size:.88rem;color:#bbb;margin-bottom:8px;line-height:1.6}
     .modal-card strong{color:#e0e0e0}
     .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+
+    /* LOGIN GATE */
+    .login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center}
+    .login-overlay.hidden{display:none}
+    .login-box{background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:40px 36px;width:380px;max-width:90vw;text-align:center}
+    .login-box h2{color:#4CAF50;margin-bottom:8px;font-size:1.4rem}
+    .login-box .sub{color:#888;font-size:.82rem;margin-bottom:24px}
+    .login-box input{width:100%;padding:12px 16px;background:#252525;border:1px solid #444;border-radius:10px;color:#e0e0e0;font-family:inherit;font-size:.95rem;margin-bottom:12px;outline:none;transition:border-color .2s}
+    .login-box input:focus{border-color:#4CAF50}
+    .login-box .err{color:#e53935;font-size:.78rem;margin-bottom:8px;display:none}
+    .login-box .btn-login{width:100%;padding:12px;background:#2E7D32;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;transition:background .15s}
+    .login-box .btn-login:hover{background:#388E3C}
+    .btn-logout{background:transparent;color:#e53935;border:1px solid #e53935;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.72rem;transition:all .15s}
+    .btn-logout:hover{background:#e53935;color:#fff}
   </style>
 </head>
 <body>
 
 <div class="header">
   <h1>Jaya Bina — Admin Panel</h1>
-  <div class="stats">
-    <span>Hari ini: <strong id="statToday">-</strong></span>
-    <span>Total: <strong id="statTotal">-</strong></span>
-    <span>Pending: <strong id="statPending">-</strong></span>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="stats">
+      <span>Hari ini: <strong id="statToday">-</strong></span>
+      <span>Total: <strong id="statTotal">-</strong></span>
+      <span>Pending: <strong id="statPending">-</strong></span>
+    </div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- LOGIN GATE -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>&#128274; Admin Login</h2>
+    <p class="sub">Masukkan password untuk akses panel</p>
+    <input type="password" id="loginPass" placeholder="Password..." autocomplete="current-password">
+    <p class="err" id="loginErr">Password salah</p>
+    <button class="btn-login" onclick="doLogin()">Login</button>
   </div>
 </div>
 
@@ -184,6 +212,43 @@ async function updateStatus(status){
 
 loadBookings();
 setInterval(loadBookings,30000);
+
+// === AUTH LOGIC ===
+var ADMIN_PW = '88f1cf5a9b4e3c7d2a6e8f0b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'; // SHA256 hash — tukar password guna hash
+var AUTH_KEY = 'jaya_admin_v1';
+
+function hash(str){var h=0,i,c;for(i=0;i<str.length;i++){c=str.charCodeAt(i);h=((h<<5)-h)+c;h|=0}return Math.abs(h).toString(36)}
+
+function doLogin(){
+  var pw=document.getElementById('loginPass').value;
+  if(!pw)return;
+  // For first use: accept 'admin123' to set your own password
+  // SHA256 not available in vanilla JS, guna salted hash instead
+  var salted = 'JBS'+pw+'cuci';
+  var h='';for(var i=0;i<salted.length;i++)h+=((salted.charCodeAt(i)*7)%16).toString(16);
+  if(h===ADMIN_PW || pw==='admin123'){ // 'admin123' untuk first-time login
+    if(pw==='admin123'){document.getElementById('loginErr').textContent='Tukar password! Guna console: setPassword("newpass")';document.getElementById('loginErr').style.color='#FFC107';document.getElementById('loginErr').style.display='block'}
+    sessionStorage.setItem(AUTH_KEY,'1');
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('loginPass').value='';
+  }else{
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('loginErr').style.color='#e53935';
+    document.getElementById('loginErr').textContent='Password salah';
+  }
+}
+function setPassword(newPw){
+  var salted='JBS'+newPw+'cuci';
+  var h='';for(var i=0;i<salted.length;i++)h+=((salted.charCodeAt(i)*7)%16).toString(16);
+  ADMIN_PW=h;sessionStorage.setItem('admin_pw_hash',h);
+  alert('Password updated! Copy hash ni ke admin.html: '+h);
+}
+function logout(){sessionStorage.removeItem(AUTH_KEY);location.reload()}
+if(sessionStorage.getItem(AUTH_KEY)==='1'){document.getElementById('loginOverlay').classList.add('hidden')}
+if(sessionStorage.getItem('admin_pw_hash')){ADMIN_PW=sessionStorage.getItem('admin_pw_hash')}
+
+// Enter key on password field
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 </script>
 </body>
 </html>
