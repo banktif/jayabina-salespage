@@ -1,0 +1,39 @@
+name: Mirror to GitLab
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # hourly
+  workflow_dispatch: {}
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror all GitHub repos to GitLab (private)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GL_TOKEN: ${{ secrets.GL_TOKEN }}
+          GL_USER: ${{ secrets.GL_USER }}
+        run: |
+          set -e
+          repos=$(curl -s -H "Authorization: Bearer $GH_PAT" \
+            "https://api.github.com/user/repos?per_page=100&affiliation=owner" | jq -r '.[].name')
+          for name in $repos; do
+            echo "===== $name ====="
+            # ensure GitLab project exists (private)
+            curl -s -o /dev/null -X POST -H "PRIVATE-TOKEN: $GL_TOKEN" -H "Content-Type: application/json" \
+              -d "{\"name\":\"$name\",\"path\":\"$name\",\"visibility\":\"private\"}" \
+              "https://gitlab.com/api/v4/projects" || true
+            proj=$(curl -s -H "PRIVATE-TOKEN: $GL_TOKEN" "https://gitlab.com/api/v4/projects/$GL_USER%2F$name")
+            pid=$(echo "$proj" | jq -r '.id')
+            db=$(echo "$proj" | jq -r '.default_branch')
+            if [ "$db" != "null" ] && [ -n "$db" ]; then
+              curl -s -o /dev/null -X DELETE -H "PRIVATE-TOKEN: $GL_TOKEN" \
+                "https://gitlab.com/api/v4/projects/$pid/protected_branches/$db" || true
+            fi
+            rm -rf repo.git
+            git clone --quiet --mirror "https://$GH_PAT@github.com/$GL_USER/$name.git" repo.git
+            git -C repo.git push --mirror "https://oauth2:$GL_TOKEN@gitlab.com/$GL_USER/$name.git" || echo "push failed: $name"
+            rm -rf repo.git
+          done
+          echo "Mirror complete."
