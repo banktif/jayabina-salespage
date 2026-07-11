@@ -2,3 +2,6 @@ project_id = "thbscwlcyhcnqsppoyfn"
 
 [functions.bayarcash]
 verify_jwt = false
+
+[functions.staff-admin]
+verify_jwt = false

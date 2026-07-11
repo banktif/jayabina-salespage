@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>JAYACLEAN — Staff</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f2f4f8;--elevated:#fff;--border:rgba(0,0,0,.09);--text:#0d1116;--text3:#8f9bb3;--accent:#0ea364;--accent-glow:rgba(14,163,100,.15);--danger:#e54545;--font:'Plus Jakarta Sans',-apple-system,sans-serif}
+    @media(prefers-color-scheme:dark){:root{--bg:#0f1218;--elevated:#161b23;--border:rgba(255,255,255,.08);--text:#eef1f6;--text3:#5a697a;--accent:#1db974;--accent-glow:rgba(29,185,116,.2)}}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center}
+    .box{max-width:400px}
+    .avatar{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--accent),#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:1.4rem;font-weight:800;color:#fff;box-shadow:0 8px 24px var(--accent-glow)}
+    h2{font-size:1.2rem;font-weight:700;margin-bottom:6px}
+    p{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:20px}
+    button{padding:12px 28px;background:var(--elevated);border:1px solid var(--border);border-radius:12px;color:var(--danger);font-family:var(--font);font-weight:700;font-size:.85rem;cursor:pointer}
+    .name{font-weight:700;color:var(--text)}
+  </style>
+</head>
+<body>
+<div class="box" id="box">
+  <div class="avatar">JC</div>
+  <h2>Checking access...</h2>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+async function guard(){
+  var {data:{user}}=await SB.auth.getUser();
+  if(!user){location.href='login.html';return;}
+  var {data:profile}=await SB.from('profiles').select('role,is_active,full_name').eq('id',user.id).single();
+  if(!profile||!profile.is_active){await SB.auth.signOut();location.href='login.html';return;}
+  if(profile.role==='admin'){location.href='admin.html';return;}
+  document.getElementById('box').innerHTML=
+    '<div class="avatar">JC</div>'+
+    '<h2>Welcome, <span class="name">'+(profile.full_name||'Staff')+'</span></h2>'+
+    '<p>Your staff dashboard (My Jobs, schedule, before/after photos) is coming soon.</p>'+
+    '<button onclick="logout()">Logout</button>';
+}
+async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='login.html';}
+guard();
+</script>
+</body>
+</html>

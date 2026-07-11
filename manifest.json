@@ -1,6 +1,6 @@
 {
-  "name": "JAYACUCI Admin",
-  "short_name": "JAYACUCI",
+  "name": "JAYACLEAN Admin",
+  "short_name": "JAYACLEAN",
   "start_url": "/admin",
   "display": "standalone",
   "background_color": "#111111",

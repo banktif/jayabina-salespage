@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f2f4f8">
   <link rel="manifest" href="/manifest.json">
-  <title>JAYACUCI — Admin</title>
+  <title>JAYACLEAN — Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -218,15 +218,17 @@
 <aside class="d-sidebar" id="dSidebar">
   <div class="d-brand">
     <div class="hdr-logo">JC</div>
-    <div class="d-brand-text"><h1>JAYACUCI</h1><span>Admin Panel</span></div>
+    <div class="d-brand-text"><h1>JAYACLEAN</h1><span>Admin Panel</span></div>
   </div>
-  <button class="d-nav-item active" id="dsAll" onclick="load()"><span class="dni">&#9635;</span> Semua Tempahan</button>
-  <button class="d-nav-item" id="dsWait" onclick="load('pending_payment')"><span class="dni">&#9200;</span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
-  <button class="d-nav-item" id="dsOK" onclick="load('confirmed')"><span class="dni">&#10003;</span> Diterima</button>
-  <button class="d-nav-item" id="dsDone" onclick="load('completed')"><span class="dni">&#10004;</span> Selesai</button>
+  <button class="d-nav-item active" id="dsAll" onclick="showBookings()"><span class="dni">&#9635;</span> All Bookings</button>
+  <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni">&#9200;</span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
+  <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni">&#10003;</span> Confirmed</button>
+  <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni">&#10004;</span> Completed</button>
+  <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni">&#128101;</span> Staff</button>
+  <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni">&#9881;</span> Settings</button>
   <div class="d-sidebar-footer">
-    <button onclick="load(currentFilter)">&#8635; Refresh</button>
-    <button onclick="toggleTheme()">&#9788; Tema</button>
+    <button onclick="refreshView()">&#8635; Refresh</button>
+    <button onclick="toggleTheme()">&#9788; Theme</button>
     <button onclick="logout()" style="color:var(--danger)">&#10005; Logout</button>
   </div>
 </aside>
@@ -234,16 +236,16 @@
 <!-- ═══════════ MAIN CONTENT ═══════════ -->
 <div class="d-main" id="dMain">
   <div class="d-hdr">
-    <div><h1>Dashboard</h1><p>Overview semua tempahan servis cuci tangki</p></div>
+    <div><h1 id="dTitle">Dashboard</h1><p id="dSub">Overview of all tank-cleaning bookings</p></div>
   </div>
 
   <div class="stats-grid">
-    <div class="stat today"><div class="stat-icon">&#128197;</div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Hari Ini</div></div>
-    <div class="stat total"><div class="stat-icon">&#128202;</div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Jumlah</div></div>
+    <div class="stat today"><div class="stat-icon">&#128197;</div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Today</div></div>
+    <div class="stat total"><div class="stat-icon">&#128202;</div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Total</div></div>
     <div class="stat wait"><div class="stat-icon">&#9203;</div><div class="stat-val" id="sWait">0</div><div class="stat-lbl">Pending</div></div>
   </div>
 
-  <div class="sec"><span class="sec-title">Senarai Tempahan</span><span class="sec-count" id="secCount">0</span></div>
+  <div class="sec"><span class="sec-title" id="secTitle">Bookings</span><span class="sec-count" id="secCount">0</span></div>
   <div class="list" id="list"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div>
 </div>
 
@@ -252,7 +254,7 @@
   <div class="hdr-l">
     <button class="hdr-btn" id="burgerBtn" onclick="toggleDrawer()" style="font-size:1.3rem">&#9776;</button>
     <div class="hdr-logo">JC</div>
-    <div class="hdr-title"><h1>JAYACUCI</h1><span>Admin</span></div>
+    <div class="hdr-title"><h1>JAYACLEAN</h1><span>Admin</span></div>
   </div>
   <div class="hdr-r">
     <button class="hdr-btn" onclick="toggleTheme()">&#9788;</button>
@@ -264,46 +266,48 @@
 <div class="drawer" id="drawer">
   <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
     <div class="hdr-logo" style="width:36px;height:36px;font-size:.75rem">JC</div>
-    <div><div style="font-weight:700;font-size:.9rem">JAYACUCI</div><div style="font-size:.62rem;color:var(--text3)">Admin Panel</div></div>
+    <div><div style="font-weight:700;font-size:.9rem">JAYACLEAN</div><div style="font-size:.62rem;color:var(--text3)">Admin Panel</div></div>
   </div>
   <div class="drawer-menu">
-    <button class="drawer-item" onclick="load();toggleDrawer()"><span>&#9635;</span> Semua Tempahan</button>
-    <button class="drawer-item" onclick="load('pending_payment');toggleDrawer()"><span>&#9200;</span> Pending <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
-    <button class="drawer-item" onclick="load('confirmed');toggleDrawer()"><span>&#10003;</span> Diterima</button>
-    <button class="drawer-item" onclick="load('completed');toggleDrawer()"><span>&#10004;</span> Selesai</button>
+    <button class="drawer-item" onclick="showBookings();toggleDrawer()"><span>&#9635;</span> All Bookings</button>
+    <button class="drawer-item" onclick="showBookings('pending_payment');toggleDrawer()"><span>&#9200;</span> Pending <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
+    <button class="drawer-item" onclick="showBookings('confirmed');toggleDrawer()"><span>&#10003;</span> Confirmed</button>
+    <button class="drawer-item" onclick="showBookings('completed');toggleDrawer()"><span>&#10004;</span> Completed</button>
+    <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span>&#128101;</span> Staff</button>
+    <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span>&#9881;</span> Settings</button>
   </div>
   <div class="drawer-menu" style="border-top:1px solid var(--border);padding-top:8px">
-    <button class="drawer-item" onclick="load(currentFilter);toggleDrawer()"><span>&#8635;</span> Refresh</button>
-    <button class="drawer-item" onclick="toggleTheme();toggleDrawer()"><span>&#9788;</span> Tema</button>
+    <button class="drawer-item" onclick="refreshView();toggleDrawer()"><span>&#8635;</span> Refresh</button>
+    <button class="drawer-item" onclick="toggleTheme();toggleDrawer()"><span>&#9788;</span> Theme</button>
     <button class="drawer-item" onclick="logout()" style="color:var(--danger)"><span>&#10005;</span> Logout</button>
   </div>
 </div>
 
 <!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
 <nav class="bnav">
-  <button class="bnav-item active" id="navAll" onclick="load()"><span class="bni">&#9635;</span><span class="bnl">Semua</span></button>
-  <button class="bnav-item" id="navWait" onclick="load('pending_payment')"><span class="bni">&#9200;</span><span class="bnl">Pending</span></button>
-  <button class="bnav-item" id="navOK" onclick="load('confirmed')"><span class="bni">&#10003;</span><span class="bnl">Diterima</span></button>
-  <button class="bnav-item" id="navDone" onclick="load('completed')"><span class="bni">&#10004;</span><span class="bnl">Selesai</span></button>
+  <button class="bnav-item active" id="navAll" onclick="showBookings()"><span class="bni">&#9635;</span><span class="bnl">All</span></button>
+  <button class="bnav-item" id="navWait" onclick="showBookings('pending_payment')"><span class="bni">&#9200;</span><span class="bnl">Pending</span></button>
+  <button class="bnav-item" id="navOK" onclick="showBookings('confirmed')"><span class="bni">&#10003;</span><span class="bnl">Confirmed</span></button>
+  <button class="bnav-item" id="navDone" onclick="showBookings('completed')"><span class="bni">&#10004;</span><span class="bnl">Done</span></button>
+  <button class="bnav-item" id="navStaff" onclick="showStaff()"><span class="bni">&#128101;</span><span class="bnl">Staff</span></button>
 </nav>
 
 <!-- ═══════════ MODAL ═══════════ -->
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="m-sheet"><h3 id="mTitle"></h3><div id="mBody"></div><div class="m-acts" id="mActs"></div></div></div>
 
-<!-- ═══════════ LOGIN ═══════════ -->
+<!-- ═══════════ AUTH GATE (loading / redirect) ═══════════ -->
 <div class="login" id="loginOverlay"><div class="login-box">
   <div class="login-avatar">JC</div>
-  <h2>JAYACUCI</h2>
-  <p class="sub">Admin Dashboard</p>
-  <input type="password" id="loginPass" placeholder="Password" autocomplete="off">
-  <p class="err" id="loginErr">Invalid password</p>
-  <button onclick="doLogin()">Unlock</button>
+  <h2>JAYACLEAN</h2>
+  <p class="sub" id="authMsg">Checking access...</p>
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
-var ADMIN_PW='6e5574b72c57535f',AUTH_KEY='jax',cf=null,all=[],cid=null;
+var FN_STAFF_ADMIN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/staff-admin';
+var cf=null,all=[],cid=null,currentView='bookings';
+async function authToken(){var {data:{session}}=await SB.auth.getSession();return session?session.access_token:'';}
 
 // THEME
 var theme=localStorage.getItem('theme')||'system';applyTheme(theme);
@@ -323,7 +327,7 @@ function toggleTheme(){
 function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function ft(t){return{'9am':'9:00 AM','11am':'11:00 AM','2pm':'2:00 PM','4pm':'4:00 PM'}[t]||t}
 function badge(s){
-  var m={confirmed:['confirmed','&#10003; Diterima'],completed:['completed','&#10004; Selesai'],cancelled:['cancelled','&#10007; Batal']};
+  var m={confirmed:['confirmed','&#10003; Confirmed'],completed:['completed','&#10004; Completed'],cancelled:['cancelled','&#10007; Cancelled']};
   var x=m[s]||['pending','&#9200; Pending'];
   return'<span class="bc-badge '+x[0]+'"><span class="bdot"></span>'+x[1]+'</span>';
 }
@@ -350,7 +354,7 @@ async function load(filter){
     updateStats(all);document.getElementById('secCount').textContent=f.length;
     document.getElementById('dsBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
     document.getElementById('drBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
-    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon">&#128588;</div><h2>Tiada Tempahan</h2><p>Booking baru akan muncul di sini.</p></div>';return}
+    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon">&#128588;</div><h2>No Bookings</h2><p>New bookings will appear here.</p></div>';return}
 
     if(isDesktop){renderTable(f);}else{renderCards(f);}
   }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+e.message+'</p></div>'}
@@ -364,16 +368,16 @@ function renderCards(f){
     h+='<div class="card-addr">&#128205; '+b.customer_address.replace(/</g,'&lt;')+'</div>';
     h+='<div class="card-phone">&#128241; '+b.customer_phone.replace(/</g,'&lt;')+'</div>';
     h+='<div class="qact" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">&#10003; Terima</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="quickUpdate(\''+b.id+'\',\'completed\')">&#10004; Selesai</button>';
-    h+='<button class="qact-btn decline" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">&#10007; Batal</button></div>';
+    if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">&#10003; Confirm</button>';
+    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="quickUpdate(\''+b.id+'\',\'completed\')">&#10004; Complete</button>';
+    h+='<button class="qact-btn decline" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">&#10007; Cancel</button></div>';
     h+='</div><div>'+badge(b.status)+'</div></div>';
   });
   document.getElementById('list').innerHTML=h;
 }
 
 function renderTable(f){
-  var h='<div class="d-card"><table><thead><tr><th>Tarikh & Masa</th><th>Pelanggan</th><th>Alamat</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>';
+  var h='<div class="d-card"><table><thead><tr><th>Date &amp; Time</th><th>Customer</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
   f.forEach(function(b){
     h+='<tr onclick="showModal(\''+b.id+'\')" style="cursor:pointer">';
     h+='<td><span class="d-date">'+fd(b.booking_date)+'</span><span class="d-dot">·</span><span class="d-date">'+ft(b.booking_time)+'</span></td>';
@@ -381,9 +385,9 @@ function renderTable(f){
     h+='<td><div class="d-addr" title="'+b.customer_address.replace(/</g,'&lt;')+'">'+b.customer_address.replace(/</g,'&lt;')+'</div></td>';
     h+='<td>'+badge(b.status)+'</td>';
     h+='<td><div class="d-acts" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="d-btn acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">Terima</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="d-btn don" onclick="quickUpdate(\''+b.id+'\',\'completed\')">Selesai</button>';
-    h+='<button class="d-btn del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">Batal</button></div></td>';
+    if(b.status==='pending_payment')h+='<button class="d-btn acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">Confirm</button>';
+    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="d-btn don" onclick="quickUpdate(\''+b.id+'\',\'completed\')">Complete</button>';
+    h+='<button class="d-btn del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">Cancel</button></div></td>';
     h+='</tr>';
   });
   h+='</tbody></table></div>';
@@ -402,33 +406,142 @@ function showModal(id){
   document.getElementById('mTitle').innerHTML='<span class="m-dot"></span>'+b.customer_name;
   var ph=b.customer_phone.replace(/[^0-9]/g,'');if(ph.startsWith('0'))ph='6'+ph.substring(1);
   document.getElementById('mBody').innerHTML=
-    '<div class="m-row"><span class="mk">Tarikh & Masa</span><span class="mv">'+fd(b.booking_date)+' · '+ft(b.booking_time)+'</span></div>'+
-    '<div class="m-row"><span class="mk">Telefon</span><span class="mv"><a class="m-wa" href="https://wa.me/'+ph+'" target="_blank">&#128172; WhatsApp</a></span></div>'+
-    '<div class="m-row"><span class="mk">Alamat</span><span class="mv">'+b.customer_address.replace(/</g,'&lt;')+'</span></div>'+
-    '<div class="m-row"><span class="mk">Jumlah</span><span class="mv">RM'+b.amount+'</span></div>'+
+    '<div class="m-row"><span class="mk">Date & Time</span><span class="mv">'+fd(b.booking_date)+' · '+ft(b.booking_time)+'</span></div>'+
+    '<div class="m-row"><span class="mk">Phone</span><span class="mv"><a class="m-wa" href="https://wa.me/'+ph+'" target="_blank">&#128172; WhatsApp</a></span></div>'+
+    '<div class="m-row"><span class="mk">Address</span><span class="mv">'+b.customer_address.replace(/</g,'&lt;')+'</span></div>'+
+    '<div class="m-row"><span class="mk">Total</span><span class="mv">RM'+b.amount+'</span></div>'+
     '<div class="m-row"><span class="mk">Deposit</span><span class="mv">RM'+b.deposit_amount+'</span></div>'+
-    '<div class="m-row"><span class="mk">Bayaran</span><span class="mv">'+b.payment_status+'</span></div>'+
+    '<div class="m-row"><span class="mk">Payment</span><span class="mv">'+b.payment_status+'</span></div>'+
     '<div class="m-row"><span class="mk">Ref</span><span class="mv" style="font-size:.65rem;opacity:.6">'+b.id+'</span></div>';
   var a='';
-  if(b.status==='pending_payment')a+='<button class="m-btn accept" onclick="updateStatus(\''+id+'\',\'confirmed\')">&#10003; Terima</button>';
-  if(b.status==='confirmed'||b.status==='pending_payment')a+='<button class="m-btn done" onclick="updateStatus(\''+id+'\',\'completed\')">&#10004; Selesai</button>';
-  a+='<button class="m-btn decline" onclick="updateStatus(\''+id+'\',\'cancelled\')">&#10007; Batal</button>';
-  a+='<button class="m-btn close" onclick="closeModal()">Tutup</button>';
+  if(b.status==='pending_payment')a+='<button class="m-btn accept" onclick="updateStatus(\''+id+'\',\'confirmed\')">&#10003; Confirm</button>';
+  if(b.status==='confirmed'||b.status==='pending_payment')a+='<button class="m-btn done" onclick="updateStatus(\''+id+'\',\'completed\')">&#10004; Complete</button>';
+  a+='<button class="m-btn decline" onclick="updateStatus(\''+id+'\',\'cancelled\')">&#10007; Cancel</button>';
+  a+='<button class="m-btn close" onclick="closeModal()">Close</button>';
   document.getElementById('mActs').innerHTML=a;document.getElementById('modal').classList.add('show');
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');cid=null}
 async function updateStatus(id,s){try{await SB.from('bookings').update({status:s,updated_at:new Date().toISOString()}).eq('id',id);closeModal();load(cf)}catch(e){alert(e.message)}}
 async function quickUpdate(id,s){try{await SB.from('bookings').update({status:s,updated_at:new Date().toISOString()}).eq('id',id);load(cf)}catch(e){alert(e.message)}}
 
-// AUTH
-function doLogin(){
-  var pw=document.getElementById('loginPass').value;if(!pw)return;
-  var t='JBS'+pw+'cuci',h='';for(var i=0;i<t.length;i++)h+=((t.charCodeAt(i)*7)%16).toString(16);
-  if(h===ADMIN_PW){sessionStorage.setItem(AUTH_KEY,'1');document.getElementById('loginOverlay').classList.add('hidden');load()}else{document.getElementById('loginErr').style.display='block'}
+// ═══════════ VIEW SWITCHING ═══════════
+function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+function setChrome(show){var g=document.querySelector('.stats-grid'),s=document.querySelector('.sec');if(g)g.style.display=show?'':'none';if(s)s.style.display=show?'':'none';}
+function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(function(n){n.classList.remove('active')});}
+function setNav(id){var el=document.getElementById(id);if(el)el.classList.add('active');}
+function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub');if(t)t.textContent=title;if(s)s.textContent=sub;}
+function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Dashboard','Overview of all tank-cleaning bookings');document.getElementById('secTitle').textContent='Bookings';load(filter);}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else load(cf);}
+
+// ═══════════ STAFF MANAGEMENT ═══════════
+async function showStaff(){
+  currentView='staff';setChrome(false);clearNav();setNav('dsStaff');setNav('navStaff');
+  setHeader('Staff','Manage staff accounts');
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var {data,error}=await SB.from('profiles').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    var staff=(data||[]).filter(function(p){return p.role==='staff'});
+    var h='<div class="d-card" style="padding:20px;margin-bottom:16px">';
+    h+='<h3 style="font-size:.9rem;font-weight:700;margin-bottom:12px">Add Staff</h3>';
+    h+='<div style="display:grid;gap:8px;grid-template-columns:1fr;max-width:420px">';
+    h+='<input id="stName" placeholder="Full name" style="padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font)">';
+    h+='<input id="stPhone" placeholder="Phone (e.g. 0123456789)" style="padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font)">';
+    h+='<input id="stPass" placeholder="Password (min 6 chars)" style="padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font)">';
+    h+='<button class="d-btn acc" style="padding:12px" onclick="addStaff()">Add Staff</button>';
+    h+='<div id="stMsg" style="font-size:.75rem;color:var(--text3)"></div>';
+    h+='</div></div>';
+    h+='<div class="sec"><span class="sec-title">Staff List</span><span class="sec-count">'+staff.length+'</span></div>';
+    if(!staff.length){h+='<div class="empty"><div class="eicon">&#128101;</div><h2>No staff yet</h2><p>Add your first staff above.</p></div>';}
+    else{
+      h+='<div class="d-card"><table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      staff.forEach(function(p){
+        h+='<tr><td><strong>'+esc(p.full_name)+'</strong></td><td class="d-phone">'+esc(p.phone)+'</td>';
+        h+='<td>'+(p.is_active?'<span class="bc-badge confirmed"><span class="bdot"></span>Active</span>':'<span class="bc-badge cancelled"><span class="bdot"></span>Inactive</span>')+'</td>';
+        h+='<td><div class="d-acts">';
+        h+='<button class="d-btn" onclick="resetStaffPassword(\''+p.id+'\')">Reset PW</button>';
+        h+=p.is_active?'<button class="d-btn del" onclick="setStaffActive(\''+p.id+'\',false)">Deactivate</button>':'<button class="d-btn acc" onclick="setStaffActive(\''+p.id+'\',true)">Activate</button>';
+        h+='</div></td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
+    l.innerHTML=h;
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
-function logout(){sessionStorage.removeItem(AUTH_KEY);location.reload()}
-if(sessionStorage.getItem(AUTH_KEY)==='1'){document.getElementById('loginOverlay').classList.add('hidden');load()}
-document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+
+async function callStaffAdmin(payload){
+  var token=await authToken();
+  var res=await fetch(FN_STAFF_ADMIN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(payload)});
+  return {ok:res.ok,body:await res.json()};
+}
+async function addStaff(){
+  var msg=document.getElementById('stMsg');
+  var name=document.getElementById('stName').value.trim(),phone=document.getElementById('stPhone').value.trim(),pass=document.getElementById('stPass').value;
+  if(!name||!phone||pass.length<6){msg.style.color='var(--danger)';msg.textContent='Enter name, phone, and password (min 6).';return;}
+  msg.style.color='var(--text3)';msg.textContent='Creating...';
+  var r=await callStaffAdmin({action:'create',full_name:name,phone:phone,password:pass});
+  if(r.ok){msg.style.color='var(--accent)';msg.textContent='Staff added.';showStaff();}
+  else{msg.style.color='var(--danger)';msg.textContent='Error: '+(r.body.error||'failed');}
+}
+async function setStaffActive(id,active){
+  var r=await callStaffAdmin({action:'set_active',user_id:id,is_active:active});
+  if(r.ok)showStaff();else alert('Error: '+(r.body.error||'failed'));
+}
+async function resetStaffPassword(id){
+  var pw=prompt('New password (min 6 chars):');if(!pw)return;if(pw.length<6){alert('Min 6 chars');return;}
+  var r=await callStaffAdmin({action:'reset_password',user_id:id,password:pw});
+  if(r.ok)alert('Password updated.');else alert('Error: '+(r.body.error||'failed'));
+}
+
+// ═══════════ SETTINGS ═══════════
+var SETTING_LABELS={business_name:'Business Name',bank_name:'Bank Name',bank_account_no:'Bank Account No',bank_account_holder:'Account Holder',qr_image_url:'Bank QR Image URL',price_total:'Price Total (RM)',price_deposit:'Deposit (RM)',price_balance:'Balance (RM)',wa_business_number:'Business WhatsApp Number',wa_tmpl_baki:'WhatsApp Template - Balance (Malay)',wa_tmpl_staff:'WhatsApp Template - Staff (Malay)',coverage_area:'Coverage Area',max_slots_per_day:'Max Slots/Day',slots:'Time Slots',auto_assign_enabled:'Auto-assign Enabled',auto_assign_rule:'Auto-assign Rule',cloud_name:'Cloudinary Cloud Name',upload_preset:'Cloudinary Upload Preset',folder:'Cloudinary Folder'};
+async function showSettings(){
+  currentView='settings';setChrome(false);clearNav();setNav('dsSettings');
+  setHeader('Settings','Business configuration');
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var {data,error}=await SB.from('app_settings').select('*').order('key',{ascending:true});
+    if(error)throw error;
+    var h='<div class="d-card" style="padding:20px"><div style="display:grid;gap:14px;max-width:640px">';
+    (data||[]).forEach(function(s){
+      var lbl=SETTING_LABELS[s.key]||s.key;
+      var isLong=(s.key.indexOf('tmpl')>-1);
+      h+='<div><label style="display:block;font-size:.72rem;color:var(--text3);font-weight:600;margin-bottom:4px">'+esc(lbl)+' <span style="opacity:.5">('+esc(s.key)+')</span></label>';
+      if(isLong)h+='<textarea data-key="'+esc(s.key)+'" rows="3" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.8rem">'+esc(s.value)+'</textarea>';
+      else h+='<input data-key="'+esc(s.key)+'" value="'+esc(s.value)+'" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.85rem">';
+      h+='</div>';
+    });
+    h+='<button class="d-btn acc" style="padding:12px" onclick="saveSettings()">Save Settings</button>';
+    h+='<div id="setMsg" style="font-size:.75rem;color:var(--text3)"></div>';
+    h+='</div></div>';
+    l.innerHTML=h;
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+}
+async function saveSettings(){
+  var msg=document.getElementById('setMsg');msg.style.color='var(--text3)';msg.textContent='Saving...';
+  var rows=[];document.querySelectorAll('[data-key]').forEach(function(el){rows.push({key:el.getAttribute('data-key'),value:el.value,updated_at:new Date().toISOString()});});
+  try{
+    var {error}=await SB.from('app_settings').upsert(rows);
+    if(error)throw error;
+    msg.style.color='var(--accent)';msg.textContent='Saved.';
+  }catch(e){msg.style.color='var(--danger)';msg.textContent='Error: '+e.message;}
+}
+
+// AUTH (Supabase)
+async function guard(){
+  try{
+    var {data:{user}}=await SB.auth.getUser();
+    if(!user){location.href='login.html';return;}
+    var {data:profile}=await SB.from('profiles').select('role,is_active,full_name').eq('id',user.id).single();
+    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();location.href='login.html';return;}
+    document.getElementById('loginOverlay').classList.add('hidden');
+    load();
+  }catch(e){document.getElementById('authMsg').textContent='Error: '+e.message;}
+}
+async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='login.html';}
+guard();
 
 // PULL TO REFRESH (mobile)
 var ts=0;document.addEventListener('touchstart',function(e){ts=e.touches[0].clientY});document.addEventListener('touchend',function(e){if(window.scrollY===0&&e.changedTouches[0].clientY-ts>80)load(cf)});

@@ -1,7 +1,12 @@
-# JAYACUCI — Project Memory
+# JAYACLEAN — Project Memory
+
+> Full rules & schema: see `AGENTS.md`. Build progress: see `BUILD-PLAN.md`.
 
 ## TL;DR
-Sales page cuci tangki air. Brand: JAYACUCI (Jaya Bina Services). Single page + booking + admin panel. Free.
+Water-tank cleaning business. Brand: **JAYACLEAN** (company: Jaya Bina Services). Sales page + booking + Bayarcash payment + admin panel. Building: staff task manager (50 staff, assignment, before/after photos, schedule, WhatsApp). Free stack.
+
+## Language rule
+Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages (index/success/test-pay) = Malay.
 
 ## URLs
 | Page | URL |
@@ -29,13 +34,13 @@ All API keys, tokens, passwords are in the chat history. Ask user to re-provide 
 - GitHub: account banktif, repo jayaclean-salespage
 
 ## Database (Supabase)
-- Tables: bookings, slots
-- RPC Functions: get_available_slots, check_slot, create_booking, create_bayarcash_payment (may need reload)
+- Tables: bookings, slots (+ building: profiles, tasks, task_photos, app_settings)
+- RPC: get_available_slots, check_slot, create_booking
 - PostgREST schema cache needs `NOTIFY pgrst, 'reload schema'` after migrations
 
 ## Admin Panel
-- Password: Salman43! (hash: 6e5574b72c57535f)
-- Brand: JAYACUCI, logo: JC
+- Auth: migrating to Supabase Auth (admin `banktifweb1@gmail.com`, role=admin). Old client-side password (Salman43!, hash 6e5574b72c57535f) being replaced.
+- Brand: JAYACLEAN, logo: JC
 - Theme: light/dark/system, responsive (mobile <1024px, desktop >=1024px)
 - Mobile: hamburger drawer + bottom nav 4 tabs
 - Desktop: 260px sidebar + data table
@@ -53,10 +58,11 @@ Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa 
 - Admin BG: #f2f4f8 (light) / #0f1218 (dark)
 
 ## Pending Tasks
-1. ~~Bayarcash auto-payment~~ DONE — Edge Function `supabase/functions/bayarcash` (create-intent + callback). TODO to go live: `supabase functions deploy bayarcash --project-ref thbscwlcyhcnqsppoyfn` + set secrets (BAYARCASH_PAT, BAYARCASH_PORTAL_KEY, BAYARCASH_API_SECRET, BAYARCASH_PAYMENT_CHANNEL, SITE_URL). Then in Bayarcash console rotate the leaked PAT.
+1. ~~Bayarcash auto-payment~~ DONE — live, tested, PAT rotated, channel=DuitNow(5)
 2. Replace 10 image placeholders with real photos
-3. ~~Replace WhatsApp placeholder number~~ DONE — now 60139373275 (index.html + success.html)
+3. ~~Replace WhatsApp placeholder number~~ DONE — now 60139373275
 4. Enable HTTPS enforcement on GitHub Pages
+5. **Staff Task Manager** (in progress) — see BUILD-PLAN.md phases 1-5. Rename JAYACUCI→JAYACLEAN done in docs.
 
 ## Payment Flow (Bayarcash)
 - Browser: insert booking (pending) → POST {booking_id} to Edge Function `/create-intent`
@@ -66,5 +72,6 @@ Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa 
 - Channel 5 = DuitNow (env BAYARCASH_PAYMENT_CHANNEL, override to 1 for FPX). Amount format = Ringgit string "150.00"
 
 ## File Structure (cuci-tangki/)
-index.html, editor.html, admin.html, success.html, test-cal.html, CNAME, manifest.json, migration.sql
-supabase/config.toml, supabase/functions/bayarcash/index.ts, supabase/migrations/*.sql
+Docs: AGENTS.md, BUILD-PLAN.md, PROJECT-MEMORY.md
+Pages: index.html, editor.html, admin.html, staff.html (new), login.html (new), success.html, test-pay.html, test-cal.html, CNAME, manifest.json
+Supabase: config.toml, functions/bayarcash/, functions/staff-admin/ (new), migrations/*.sql
