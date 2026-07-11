@@ -54,7 +54,7 @@ Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa 
 ## Pending Tasks
 1. ~~Bayarcash auto-payment~~ DONE — Edge Function `supabase/functions/bayarcash` (create-intent + callback). TODO to go live: `supabase functions deploy bayarcash --project-ref thbscwlcyhcnqsppoyfn` + set secrets (BAYARCASH_PAT, BAYARCASH_PORTAL_KEY, BAYARCASH_API_SECRET, BAYARCASH_PAYMENT_CHANNEL, SITE_URL). Then in Bayarcash console rotate the leaked PAT.
 2. Replace 10 image placeholders with real photos
-3. Replace WhatsApp placeholder number (60000000000)
+3. ~~Replace WhatsApp placeholder number~~ DONE — now 60139373275 (index.html + success.html)
 4. Enable HTTPS enforcement on GitHub Pages
 
 ## Payment Flow (Bayarcash)
