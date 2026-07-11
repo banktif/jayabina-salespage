@@ -221,6 +221,32 @@
     .sGrpH{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
     .sLbl{display:block;font-size:.7rem;color:var(--text3);font-weight:600;margin-bottom:4px}
     .sInp{padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.83rem;width:100%;resize:vertical}
+    /* ════════ DASHBOARD ════════ */
+    .dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+    @media(min-width:1024px){.dash-grid{grid-template-columns:repeat(4,1fr);gap:16px}}
+    .kpi{background:var(--elevated);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+    .kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+    .kpi .kpi-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .kpi .kpi-v{font-size:1.7rem;font-weight:800;letter-spacing:-1px;line-height:1}
+    .kpi .kpi-l{font-size:.64rem;color:var(--text3);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .kpi.green .kpi-ic{background:var(--accent-light);color:var(--accent)}.kpi.green .kpi-v{color:var(--accent)}
+    .kpi.blue .kpi-ic{background:var(--accent2-light);color:var(--accent2)}.kpi.blue .kpi-v{color:var(--accent2)}
+    .kpi.amber .kpi-ic{background:var(--warning-light);color:var(--warning)}.kpi.amber .kpi-v{color:var(--warning)}
+    .kpi.red .kpi-ic{background:var(--danger-light);color:var(--danger)}.kpi.red .kpi-v{color:var(--danger)}
+    .kpi.plain .kpi-ic{background:var(--bg);color:var(--text2)}
+    .panels{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px}
+    @media(min-width:1024px){.panels{grid-template-columns:1fr 1fr}}
+    .panel{background:var(--elevated);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+    .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .panel-h h3{font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:8px}
+    .panel-h .lnk{font-size:.68rem;color:var(--accent);font-weight:700;cursor:pointer;background:none;border:none;font-family:var(--font)}
+    .mrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+    .mrow:last-child{border:none}
+    .mrow .mslot{font-size:.64rem;font-weight:700;color:var(--text2);background:var(--bg);padding:4px 8px;border-radius:8px;white-space:nowrap;min-width:58px;text-align:center}
+    .mrow .mb{flex:1;min-width:0}
+    .mrow .mn{font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mrow .ma{font-size:.66rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+    .panel-empty{text-align:center;padding:22px;color:var(--text3);font-size:.76rem;display:flex;flex-direction:column;align-items:center;gap:6px}
 
     /* ════════ LOGIN ════════ */
     .login{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;transition:background .4s;padding:20px}
@@ -244,7 +270,8 @@
     <div class="hdr-logo">JC</div>
     <div class="d-brand-text"><h1>JAYACLEAN</h1><span>Admin Panel</span></div>
   </div>
-  <button class="d-nav-item active" id="dsAll" onclick="showBookings()"><span class="dni"><i data-lucide="layout-grid"></i></span> All Bookings</button>
+  <button class="d-nav-item active" id="dsDash" onclick="showDashboard()"><span class="dni"><i data-lucide="layout-dashboard"></i></span> Dashboard</button>
+  <button class="d-nav-item" id="dsAll" onclick="showBookings()"><span class="dni"><i data-lucide="layout-grid"></i></span> All Bookings</button>
   <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni"><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
   <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni"><i data-lucide="check"></i></span> Confirmed</button>
   <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
@@ -294,6 +321,7 @@
     <div><div style="font-weight:700;font-size:.9rem">JAYACLEAN</div><div style="font-size:.62rem;color:var(--text3)">Admin Panel</div></div>
   </div>
   <div class="drawer-menu">
+    <button class="drawer-item" onclick="showDashboard();toggleDrawer()"><span><i data-lucide="layout-dashboard"></i></span> Dashboard</button>
     <button class="drawer-item" onclick="showBookings();toggleDrawer()"><span><i data-lucide="layout-grid"></i></span> All Bookings</button>
     <button class="drawer-item" onclick="showBookings('pending_payment');toggleDrawer()"><span><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
     <button class="drawer-item" onclick="showBookings('confirmed');toggleDrawer()"><span><i data-lucide="check"></i></span> Confirmed</button>
@@ -311,10 +339,9 @@
 
 <!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
 <nav class="bnav">
-  <button class="bnav-item active" id="navAll" onclick="showBookings()"><span class="bni"><i data-lucide="layout-grid"></i></span><span class="bnl">All</span></button>
+  <button class="bnav-item active" id="navDash" onclick="showDashboard()"><span class="bni"><i data-lucide="layout-dashboard"></i></span><span class="bnl">Home</span></button>
   <button class="bnav-item" id="navSchedule" onclick="showSchedule()"><span class="bni"><i data-lucide="calendar"></i></span><span class="bnl">Schedule</span></button>
-  <button class="bnav-item" id="navOK" onclick="showBookings('confirmed')"><span class="bni"><i data-lucide="check"></i></span><span class="bnl">Confirmed</span></button>
-  <button class="bnav-item" id="navDone" onclick="showBookings('completed')"><span class="bni"><i data-lucide="check-check"></i></span><span class="bnl">Done</span></button>
+  <button class="bnav-item" id="navAll" onclick="showBookings()"><span class="bni"><i data-lucide="layout-grid"></i></span><span class="bnl">Bookings</span></button>
   <button class="bnav-item" id="navStaff" onclick="showStaff()"><span class="bni"><i data-lucide="users"></i></span><span class="bnl">Staff</span></button>
 </nav>
 
@@ -452,8 +479,61 @@ function setChrome(show){var g=document.querySelector('.stats-grid'),s=document.
 function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(function(n){n.classList.remove('active')});}
 function setNav(id){var el=document.getElementById(id);if(el)el.classList.add('active');}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub');if(t)t.textContent=title;if(s)s.textContent=sub;}
-function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Dashboard','Overview of all tank-cleaning bookings');document.getElementById('secTitle').textContent='Bookings';load(filter);}
-function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else load(cf);}
+function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';load(filter);}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else load(cf);}
+
+// ═══════════ DASHBOARD ═══════════
+function mrow(x){var b=x.b,t=x.t;return '<div class="mrow" onclick="openTask(\''+t.id+'\')"><span class="mslot">'+ft(b.booking_time)+'</span><div class="mb"><div class="mn">'+esc(b.customer_name)+'</div><div class="ma"><i data-lucide="map-pin"></i>'+esc(b.customer_address)+'</div></div>'+taskBadge(t.status)+'</div>';}
+async function showDashboard(){
+  currentView='dashboard';setChrome(false);clearNav();setNav('dsDash');setNav('navDash');
+  setHeader('Dashboard','Overview of operations');
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    await loadTaskData();
+    var bq=await SB.from('bookings').select('*').order('created_at',{ascending:false});
+    var bookings=bq.data||[];all=bookings;
+    var t=today();
+    var cnt=function(f){return taskList.filter(f).length};
+    var kToday=taskList.filter(function(x){return x.b.booking_date===t}).length;
+    var kUn=cnt(function(x){return x.t.status==='unassigned'});
+    var kProg=cnt(function(x){return x.t.status==='in_progress'});
+    var kRev=cnt(function(x){return x.t.status==='awaiting_review'});
+    var kDone=cnt(function(x){return x.t.status==='completed'});
+    var kPay=bookings.filter(function(b){return b.status==='pending_payment'}).length;
+    var kStaff=staffList.length;
+    var dep=parseInt(settings.price_deposit||'150',10);
+    var kDeposit=bookings.filter(function(b){return b.payment_status==='paid'}).length*dep;
+    function kpi(cls,icon,val,label){return '<div class="kpi '+cls+'"><div class="kpi-ic"><i data-lucide="'+icon+'"></i></div><div class="kpi-v">'+val+'</div><div class="kpi-l">'+label+'</div></div>';}
+    var h='<div class="dash-grid">';
+    h+=kpi('blue','calendar-days',kToday,"Today's Jobs");
+    h+=kpi('red','alert-circle',kUn,'Unassigned');
+    h+=kpi('amber','loader',kProg,'In Progress');
+    h+=kpi('amber','eye',kRev,'Awaiting Review');
+    h+=kpi('green','check-check',kDone,'Completed');
+    h+=kpi('red','credit-card',kPay,'Pending Payment');
+    h+=kpi('blue','users',kStaff,'Active Staff');
+    h+=kpi('green','banknote','RM'+kDeposit,'Deposits Collected');
+    h+='</div>';
+    h+='<div class="panels">';
+    var attn=taskList.filter(function(x){return x.t.status==='unassigned'||x.t.status==='awaiting_review'}).sort(function(a,b){return (a.b.booking_date||'').localeCompare(b.b.booking_date||'')});
+    h+='<div class="panel"><div class="panel-h"><h3><i data-lucide="bell"></i> Needs Attention</h3><span class="sec-count">'+attn.length+'</span></div>';
+    if(!attn.length)h+='<div class="panel-empty"><i data-lucide="check-circle"></i>All clear!</div>';
+    else attn.slice(0,6).forEach(function(x){h+=mrow(x)});
+    h+='</div>';
+    var todays=taskList.filter(function(x){return x.b.booking_date===t}).sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
+    h+='<div class="panel"><div class="panel-h"><h3><i data-lucide="calendar-clock"></i> Today\'s Schedule</h3><button class="lnk" onclick="showSchedule()">Calendar</button></div>';
+    if(!todays.length)h+='<div class="panel-empty"><i data-lucide="coffee"></i>No jobs today.</div>';
+    else todays.forEach(function(x){h+=mrow(x)});
+    h+='</div>';
+    h+='</div>';
+    h+='<div class="panel"><div class="panel-h"><h3><i data-lucide="history"></i> Recent Bookings</h3><button class="lnk" onclick="showBookings()">View all</button></div>';
+    if(!bookings.length)h+='<div class="panel-empty"><i data-lucide="inbox"></i>No bookings yet.</div>';
+    else bookings.slice(0,5).forEach(function(b){h+='<div class="mrow" onclick="showModal(\''+b.id+'\')"><span class="mslot">'+ft(b.booking_time)+'</span><div class="mb"><div class="mn">'+esc(b.customer_name)+'</div><div class="ma">'+fd(b.booking_date)+'</div></div>'+badge(b.status)+'</div>';});
+    h+='</div>';
+    l.innerHTML=h;
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+}
 
 // ═══════════ STAFF MANAGEMENT ═══════════
 async function showStaff(){
@@ -729,7 +809,7 @@ async function guard(){
     if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();location.href='login.html';return;}
     document.getElementById('loginOverlay').classList.add('hidden');
     await loadSettings();
-    load();
+    showDashboard();
   }catch(e){document.getElementById('authMsg').textContent='Error: '+e.message;}
 }
 async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='login.html';}
