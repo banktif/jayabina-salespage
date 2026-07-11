@@ -214,7 +214,7 @@ loadBookings();
 setInterval(loadBookings,30000);
 
 // === AUTH LOGIC ===
-var ADMIN_PW = '88f1cf5a9b4e3c7d2a6e8f0b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c'; // SHA256 hash — tukar password guna hash
+var ADMIN_PW = '6e5574b72c57535f'; // SHA256 hash — tukar password guna hash
 var AUTH_KEY = 'jaya_admin_v1';
 
 function hash(str){var h=0,i,c;for(i=0;i<str.length;i++){c=str.charCodeAt(i);h=((h<<5)-h)+c;h|=0}return Math.abs(h).toString(36)}
@@ -226,8 +226,7 @@ function doLogin(){
   // SHA256 not available in vanilla JS, guna salted hash instead
   var salted = 'JBS'+pw+'cuci';
   var h='';for(var i=0;i<salted.length;i++)h+=((salted.charCodeAt(i)*7)%16).toString(16);
-  if(h===ADMIN_PW || pw==='admin123'){ // 'admin123' untuk first-time login
-    if(pw==='admin123'){document.getElementById('loginErr').textContent='Tukar password! Guna console: setPassword("newpass")';document.getElementById('loginErr').style.color='#FFC107';document.getElementById('loginErr').style.display='block'}
+  if(h===ADMIN_PW){
     sessionStorage.setItem(AUTH_KEY,'1');
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('loginPass').value='';
