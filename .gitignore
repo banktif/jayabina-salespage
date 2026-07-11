@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+connect_test.js
+cloudinary-onboard.js
+supabase_test.js
