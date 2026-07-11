@@ -556,22 +556,26 @@ var bookedDates={};
 function rCal(){
   var c=document.getElementById('cal'),l=document.getElementById('calMth'),mn=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
   l.textContent=mn[cm]+' '+cy;
-  var fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate(),days=['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'],h='';
-  days.forEach(function(d){h+='<div class="dh">'+d+'</div>'});
+  var fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate(),h='';
+  ['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'].forEach(function(d){h+='<div class="dh">'+d+'</div>'});
   for(var i=0;i<fd;i++)h+='<div class="day e"></div>';
   var ts=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
   var mn2=new Date(td);mn2.setDate(mn2.getDate()+1);var mins=mn2.getFullYear()+'-'+String(mn2.getMonth()+1).padStart(2,'0')+'-'+String(mn2.getDate()).padStart(2,'0');
   var mx=new Date(td);mx.setDate(mx.getDate()+30);var maxs=mx.getFullYear()+'-'+String(mx.getMonth()+1).padStart(2,'0')+'-'+String(mx.getDate()).padStart(2,'0');
   for(var d=1;d<=dim;d++){
-    var dobj=new Date(cy,cm,d),ds=dobj.getFullYear()+'-'+String(dobj.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),cls=['day'];
-    if(ds<mins||ds>maxs)cls.push('d');
-    else if(bookedDates[ds]&&bookedDates[ds].full)cls.push('d');
-    else if(bookedDates[ds]&&bookedDates[ds].partial)cls.push('part');
-    if(ds===ts)cls.push('today');
-    if(sd===ds)cls.push('sel');
-    if(cls.indexOf('d')!==-1)cls.push('nodate');
-    h+='<div class="'+cls.join(' ')+'" data-date="'+ds+'">'+d+'</div>';
+    var ds=new Date(cy,cm,d).toISOString().split('T')[0],cls='day';
+    if(ds<mins||ds>maxs)cls+=' d';
+    if(ds===ts)cls+=' today';
+    if(sd===ds)cls+=' sel';
+    h+='<div class="'+cls+'" data-date="'+ds+'">'+d+'</div>';
   }
+  c.innerHTML=h;
+  document.getElementById('prevM').disabled=(cy===td.getFullYear()&&cm<=td.getMonth());
+  c.querySelectorAll('.day:not(.d):not(.e)').forEach(function(el){
+    el.style.cursor='pointer';
+    el.addEventListener('click',function(){selectDate(this.dataset.date)});
+  });
+}
   c.innerHTML=h;
   c.querySelectorAll('.day:not(.nodate)').forEach(function(el){
     el.addEventListener('click',function(){selectDate(this.dataset.date)});
@@ -584,14 +588,16 @@ document.getElementById('prevM').addEventListener('click',function(){if(cm===0){
 document.getElementById('nextM').addEventListener('click',function(){if(cm===11){cm=0;cy++}else cm++;rCal();uSlots()});
 
 // REAL SLOT CHECK via Supabase
-async function uSlots(){
+function uSlots(){
   var sl=document.querySelectorAll('#slots .slot');sl.forEach(function(s){s.classList.add('off');s.classList.remove('on')});
   if(!sd)return;
   var ts2=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
   if(sd<=ts2)return;
-  try{var booked=await fetchBookedSlots(sd);
+  fetchBookedSlots(sd).then(function(booked){
     sl.forEach(function(s){if(booked.indexOf(s.dataset.slot)===-1){s.classList.remove('off')}});
-  }catch(e){console.warn('Slot fetch:',e);sl.forEach(function(s){s.classList.remove('off')})}
+  }).catch(function(e){
+    sl.forEach(function(s){s.classList.remove('off')});
+  });
 }
 async function selectDate(ds){
   sd=ds;
