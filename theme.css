@@ -100,23 +100,30 @@ button:active{ transform:scale(.97); }
 a,button,input,select,textarea{ outline:none; }
 :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
 
-/* Auto-hide scrollbars — sidebar/drawer show on hover, body always hidden */
-html,body{ scrollbar-width:none; overflow-y:auto; }
-html::-webkit-scrollbar,body::-webkit-scrollbar{ width:0 !important;height:0 !important;background:transparent; }
-.d-sidebar,.drawer,.m-sheet,.d-main{ scrollbar-width:none; }
-.d-sidebar::-webkit-scrollbar,.drawer::-webkit-scrollbar,.m-sheet::-webkit-scrollbar,.d-main::-webkit-scrollbar{ width:0;height:0;background:transparent; }
+/* Nuke ALL scrollbars */
+::-webkit-scrollbar{display:none !important}
+::-webkit-scrollbar-track{display:none !important}
+::-webkit-scrollbar-thumb{display:none !important}
+::-webkit-scrollbar-corner{display:none !important}
+*{scrollbar-width:none !important;-ms-overflow-style:none !important}
+html,body,.d-sidebar,.drawer,.m-sheet,.d-main,.list,.d-card{scrollbar-width:none !important}
+html::-webkit-scrollbar,body::-webkit-scrollbar,.d-sidebar::-webkit-scrollbar,.drawer::-webkit-scrollbar,.m-sheet::-webkit-scrollbar,.d-main::-webkit-scrollbar{display:none !important}
 
-.d-sidebar:hover,.drawer:hover,.m-sheet:hover,.d-main:hover{
-  scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;
+/* Sidebar/drawer/modal — show scrollbar on hover */
+.d-sidebar:hover,.drawer:hover,.m-sheet:hover{
+  scrollbar-width:thin !important;scrollbar-color:var(--border-strong) transparent !important
 }
-.d-sidebar:hover::-webkit-scrollbar,.drawer:hover::-webkit-scrollbar,.m-sheet:hover::-webkit-scrollbar,.d-main:hover::-webkit-scrollbar{
-  width:5px;height:5px;
+.d-sidebar:hover::-webkit-scrollbar,.drawer:hover::-webkit-scrollbar,.m-sheet:hover::-webkit-scrollbar{
+  display:block !important;width:5px;height:5px
 }
-.d-sidebar:hover::-webkit-scrollbar-thumb,.drawer:hover::-webkit-scrollbar-thumb,.m-sheet:hover::-webkit-scrollbar-thumb,.d-main:hover::-webkit-scrollbar-thumb{
-  background:var(--border-strong); border-radius:20px;
+.d-sidebar:hover::-webkit-scrollbar-track,.drawer:hover::-webkit-scrollbar-track,.m-sheet:hover::-webkit-scrollbar-track{
+  display:block !important;background:transparent
 }
-.d-sidebar:hover::-webkit-scrollbar-thumb:hover,.drawer:hover::-webkit-scrollbar-thumb:hover,.m-sheet:hover::-webkit-scrollbar-thumb:hover,.d-main:hover::-webkit-scrollbar-thumb:hover{
-  background:var(--text3);
+.d-sidebar:hover::-webkit-scrollbar-thumb,.drawer:hover::-webkit-scrollbar-thumb,.m-sheet:hover::-webkit-scrollbar-thumb{
+  display:block !important;background:var(--border-strong);border-radius:20px
+}
+.d-sidebar:hover::-webkit-scrollbar-thumb:hover,.drawer:hover::-webkit-scrollbar-thumb:hover,.m-sheet:hover::-webkit-scrollbar-thumb:hover{
+  background:var(--text3) !important
 }
 
 ::selection{ background:var(--accent); color:#fff; }
