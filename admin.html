@@ -236,6 +236,10 @@
     .adm-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
     .adm-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg);border:1px solid var(--border);display:block}
     .adm-thumb img{width:100%;height:100%;object-fit:cover}
+    .sGrp{background:var(--elevated);border:1px solid var(--border);border-radius:16px;padding:18px}
+    .sGrpH{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .sLbl{display:block;font-size:.7rem;color:var(--text3);font-weight:600;margin-bottom:4px}
+    .sInp{padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.83rem;width:100%;resize:vertical}
 
     /* ════════ LOGIN ════════ */
     .login{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;transition:background .4s;padding:20px}
@@ -538,24 +542,24 @@ async function showSettings(){
   try{
     var {data,error}=await SB.from('app_settings').select('*').order('key',{ascending:true});
     if(error)throw error;
-    var h='<div class="d-card" style="padding:20px"><div style="display:grid;gap:14px;max-width:640px">';
-    (data||[]).forEach(function(s){
-      var lbl=SETTING_LABELS[s.key]||s.key;
-      var isLong=(s.key.indexOf('tmpl')>-1);
-      h+='<div><label style="display:block;font-size:.72rem;color:var(--text3);font-weight:600;margin-bottom:4px">'+esc(lbl)+' <span style="opacity:.5">('+esc(s.key)+')</span></label>';
-      if(s.key==='auto_assign_enabled'){
-        h+='<select data-key="auto_assign_enabled" class="mv-sel"><option value="false"'+(s.value==='true'?'':' selected')+'>Off</option><option value="true"'+(s.value==='true'?' selected':'')+'>On</option></select>';
-      }else if(s.key==='auto_assign_rule'){
-        h+='<select data-key="auto_assign_rule" class="mv-sel"><option value="round_robin"'+(s.value==='least_loaded'?'':' selected')+'>Round-robin (rotate evenly)</option><option value="least_loaded"'+(s.value==='least_loaded'?' selected':'')+'>Least loaded (fewest active jobs)</option></select>';
-      }else if(isLong)h+='<textarea data-key="'+esc(s.key)+'" rows="3" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.8rem">'+esc(s.value)+'</textarea>';
-      else h+='<input data-key="'+esc(s.key)+'" value="'+esc(s.value)+'" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.85rem">';
-      h+='</div>';
-    });
-    h+='<button class="d-btn" style="padding:12px" onclick="uploadQR()">&#128247; Upload Bank QR Image (Cloudinary)</button>';
-    h+='<div id="qrMsg" style="font-size:.75rem;color:var(--text3)"></div>';
-    h+='<button class="d-btn acc" style="padding:12px" onclick="saveSettings()">Save Settings</button>';
+    var map={};(data||[]).forEach(function(s){map[s.key]=s.value});
+    function fld(key,label,type){if(!type)type='text';var v=map[key]||'',lbl=label||SETTING_LABELS[key]||key;
+      if(type==='select_onoff')return '<div><label class="sLbl">'+esc(lbl)+'</label><select data-key="'+key+'" class="mv-sel"><option value="false"'+(v==='true'?'':' selected')+'>Off</option><option value="true"'+(v==='true'?' selected':'')+'>On</option></select></div>';
+      if(type==='select_rule')return '<div><label class="sLbl">'+esc(lbl)+'</label><select data-key="'+key+'" class="mv-sel"><option value="round_robin"'+(v==='least_loaded'?'':' selected')+'>Round-robin</option><option value="least_loaded"'+(v==='least_loaded'?' selected':'')+'>Least loaded</option></select></div>';
+      if(type==='textarea')return '<div><label class="sLbl">'+esc(lbl)+'</label><textarea data-key="'+key+'" rows="3" class="sInp">'+esc(v)+'</textarea></div>';
+      return '<div><label class="sLbl">'+esc(lbl)+'</label><input data-key="'+key+'" value="'+esc(v)+'" class="sInp" style="height:auto"></div>';
+    }
+    function grp(title,items){var s='<div class="sGrp"><div class="sGrpH">'+title+'</div>';items.forEach(function(i){s+=i});return s+'</div>'}
+    var h='<div style="display:grid;gap:16px;max-width:700px">';
+    h+=grp('Business',[fld('business_name'),fld('wa_business_number')]);
+    h+=grp('Payment / Bank',[fld('bank_name'),fld('bank_account_no'),fld('bank_account_holder'),fld('qr_image_url'),fld('price_total','Price Total (RM)','text'),fld('price_deposit','Deposit (RM)','text'),fld('price_balance','Balance (RM)','text'),'<div><label class="sLbl">Bank QR Image</label><button class="d-btn" style="padding:10px 14px;font-size:.72rem" onclick="uploadQR()">Upload QR (Cloudinary)</button><div id="qrMsg" style="font-size:.72rem;color:var(--text3);margin-top:6px"></div></div>']);
+    h+=grp('WhatsApp Templates (Malay)',[fld('wa_tmpl_baki','Balance Payment','textarea'),fld('wa_tmpl_staff','Staff Assignment','textarea')]);
+    h+=grp('Scheduling',[fld('slots'),fld('max_slots_per_day'),fld('coverage_area')]);
+    h+=grp('Auto-assign',[fld('auto_assign_enabled','Enable','select_onoff'),fld('auto_assign_rule','Rule','select_rule')]);
+    h+=grp('Cloudinary',[fld('cloud_name'),fld('upload_preset'),fld('folder')]);
+    h+='<button class="d-btn acc" style="padding:12px" onclick="saveSettings()">Save All Settings</button>';
     h+='<div id="setMsg" style="font-size:.75rem;color:var(--text3)"></div>';
-    h+='</div></div>';
+    h+='</div>';
     l.innerHTML=h;
   }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
