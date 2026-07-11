@@ -594,10 +594,16 @@ async function uSlots(){
   }catch(e){console.warn('Slot fetch:',e);sl.forEach(function(s){s.classList.remove('off')})}
 }
 async function selectDate(ds){
-  sd=ds;document.getElementById('selDt').textContent='Tarikh dipilih';
-  document.getElementById('selDt').classList.add('show');
+  sd=ds;
+  var lbl=document.getElementById('selDt');lbl.textContent='Memuatkan...';lbl.classList.add('show');
   ss=null;document.querySelectorAll('#slots .slot').forEach(function(s){s.classList.remove('on')});
-  await uSlots();rCal();
+  rCal();
+  var booked=[];
+  try{booked=await fetchBookedSlots(sd)}catch(e){console.log('Slot fetch:',e)}
+  var sl=document.querySelectorAll('#slots .slot');
+  sl.forEach(function(s){s.classList.add('off')});
+  sl.forEach(function(s){if(booked.indexOf(s.dataset.slot)===-1){s.classList.remove('off')}});
+  lbl.textContent='Tarikh dipilih';
 }
 
 document.getElementById('slots').addEventListener('click',function(e){var s=e.target.closest('.slot');if(!s||s.classList.contains('off'))return;if(!sd){alert('Pilih tarikh dulu.');return}document.querySelectorAll('#slots .slot').forEach(function(x){x.classList.remove('on')});s.classList.add('on');ss=s.dataset.slot});
