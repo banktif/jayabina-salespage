@@ -1,0 +1,4 @@
+project_id = "thbscwlcyhcnqsppoyfn"
+
+[functions.bayarcash]
+verify_jwt = false

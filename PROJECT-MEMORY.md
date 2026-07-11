@@ -16,7 +16,7 @@ Sales page cuci tangki air. Brand: JAYACUCI (Jaya Bina Services). Single page + 
 - Hosting: GitHub Pages + Cloudflare CDN/DNS (proxy ON, orange cloud)
 - Backend: Supabase (PostgreSQL + REST API)
 - Images: Cloudinary (dkibczut)
-- Payment: Bayarcash (not integrated — CORS blocked, needs proxy)
+- Payment: Bayarcash v3 (integrated via Supabase Edge Function `bayarcash` — solves CORS; PAT stored as Supabase secret)
 - Editor: GrapesJS 0.21.13 + preset-webpage 1.0.3 (CDN)
 - Fonts: Plus Jakarta Sans (admin) / Poppins (sales page)
 
@@ -52,10 +52,18 @@ Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa 
 - Admin BG: #f2f4f8 (light) / #0f1218 (dark)
 
 ## Pending Tasks
-1. Bayarcash auto-payment (needs server-side proxy — Supabase Edge Function or Cloudflare Worker)
+1. ~~Bayarcash auto-payment~~ DONE — Edge Function `supabase/functions/bayarcash` (create-intent + callback). TODO to go live: `supabase functions deploy bayarcash --project-ref thbscwlcyhcnqsppoyfn` + set secrets (BAYARCASH_PAT, BAYARCASH_PORTAL_KEY, BAYARCASH_API_SECRET, BAYARCASH_PAYMENT_CHANNEL, SITE_URL). Then in Bayarcash console rotate the leaked PAT.
 2. Replace 10 image placeholders with real photos
 3. Replace WhatsApp placeholder number (60000000000)
 4. Enable HTTPS enforcement on GitHub Pages
 
+## Payment Flow (Bayarcash)
+- Browser: insert booking (pending) → POST {booking_id} to Edge Function `/create-intent`
+- Function: reads booking from DB (service role, amount server-side = deposit RM150), calls Bayarcash v3 payment-intents, returns `url` → browser redirects
+- Bayarcash → POST `/callback` (server-to-server): checksum HMAC-SHA256 verified → set payment_status=paid/failed, status=confirmed
+- return_url → `success.html?order=<id>` polls booking.payment_status for live status
+- Channel 5 = DuitNow (env BAYARCASH_PAYMENT_CHANNEL, override to 1 for FPX). Amount format = Ringgit string "150.00"
+
 ## File Structure (cuci-tangki/)
-index.html, editor.html, admin.html, success.html, test-cal.html, CNAME, manifest.json, migration.sql, supabase/migrations/*.sql
+index.html, editor.html, admin.html, success.html, test-cal.html, CNAME, manifest.json, migration.sql
+supabase/config.toml, supabase/functions/bayarcash/index.ts, supabase/migrations/*.sql
