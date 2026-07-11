@@ -144,6 +144,76 @@ async function handleCreateIntent(req: Request): Promise<Response> {
   return json({ url: data.url, id: data.id ?? null });
 }
 
+// ═══════════ BALANCE PAYMENT INTENT ═══════════
+async function handleCreateBalanceIntent(req: Request): Promise<Response> {
+  const PAT = Deno.env.get("BAYARCASH_PAT");
+  const PORTAL = Deno.env.get("BAYARCASH_PORTAL_KEY");
+  const SECRET = Deno.env.get("BAYARCASH_API_SECRET");
+  const CHANNEL = parseInt(Deno.env.get("BAYARCASH_PAYMENT_CHANNEL") ?? "5", 10);
+  if (!PAT || !PORTAL) return json({ error: "Payment gateway not configured" }, 500);
+
+  let payload: { booking_id?: string; origin?: string };
+  try { payload = await req.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
+  const bookingId = payload.booking_id;
+  if (!bookingId) return json({ error: "booking_id required" }, 400);
+
+  const sb = admin();
+  const { data: booking, error } = await sb
+    .from("bookings")
+    .select("id, customer_name, customer_phone")
+    .eq("id", bookingId)
+    .single();
+  if (error || !booking) return json({ error: "Booking not found" }, 404);
+
+  const { data: settings } = await sb
+    .from("app_settings")
+    .select("value")
+    .eq("key", "price_balance")
+    .single();
+  const amount = (settings?.value ? Number(settings.value) : 150).toFixed(2);
+
+  const payerName = String(booking.customer_name || "Pelanggan").slice(0, 100);
+  const payerEmail = `${String(booking.id).slice(0, 8)}@jayabina.local`;
+  const phone = normalizePhone(booking.customer_phone || "");
+
+  const orderNo = ("BB" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)).toUpperCase();
+
+  const siteOrigin = (payload.origin || Deno.env.get("SITE_URL") || "https://cuci.jayabina.com").replace(/\/$/, "");
+  const returnUrl = `${siteOrigin}/success.html?order=${booking.id}`;
+  const callbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/bayarcash/callback`;
+
+  const body: Record<string, unknown> = {
+    payment_channel: CHANNEL,
+    portal_key: PORTAL,
+    order_number: orderNo,
+    amount,
+    payer_name: payerName,
+    payer_email: payerEmail,
+    return_url: returnUrl,
+    callback_url: callbackUrl,
+  };
+  if (phone) body.payer_telephone_number = phone;
+
+  if (SECRET) {
+    body.checksum = await hmacSha256Hex(
+      ksortJoin({ amount, order_number: orderNo, payer_email: payerEmail, payer_name: payerName, payment_channel: CHANNEL }),
+      SECRET,
+    );
+  }
+
+  const res = await fetch(BAYARCASH_API, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${PAT}`, "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const text = await res.text();
+  let data: Record<string, unknown>;
+  try { data = JSON.parse(text); } catch { return json({ error: "Gateway error", detail: text.slice(0, 300) }, 502); }
+  if (!res.ok || !data.url) return json({ error: "Payment creation failed", detail: data }, 502);
+
+  return json({ url: data.url, id: data.id ?? null });
+}
 async function handleCallback(req: Request): Promise<Response> {
   const SECRET = Deno.env.get("BAYARCASH_API_SECRET");
 
@@ -223,6 +293,7 @@ Deno.serve(async (req: Request) => {
   try {
     if (path.endsWith("/callback")) return await handleCallback(req);
     if (path.endsWith("/create-intent")) return await handleCreateIntent(req);
+    if (path.endsWith("/create-balance-intent")) return await handleCreateBalanceIntent(req);
     return json({ error: "Not found" }, 404);
   } catch (_e) {
     return json({ error: "Internal error" }, 500);
