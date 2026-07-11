@@ -135,7 +135,110 @@
     /* Four color panel */
     .gjs-four-color-h:hover{color:#4CAF50!important}
 
-    /* Loading overlay tetap dark */
+    /* ===== PHASE 2: RTE Toolbar ===== */
+    .gjs-rte-toolbar{background:#2d2d2d!important;border:1px solid #3a3a3a!important;border-radius:6px!important;box-shadow:0 4px 16px rgba(0,0,0,.4)!important}
+    .gjs-rte-action{color:#c0c0c0!important;border-radius:3px!important}
+    .gjs-rte-action:hover{background:#3a3a3a!important;color:#e0e0e0!important}
+    .gjs-rte-action svg{fill:#c0c0c0!important}
+    .gjs-rte-action:hover svg{fill:#4CAF50!important}
+    .gjs-rte-action--active{background:#4CAF50!important;color:#fff!important}
+
+    /* ===== PHASE 2: Color Picker ===== */
+    .gjs-clm-header{background:#2d2d2d!important;color:#e0e0e0!important;border-bottom:1px solid #3a3a3a!important}
+    .gjs-clm-picker,.gjs-clm-stroke,.gjs-clm-picker-res{background:#1e1e1e!important}
+    .gjs-clm-hsl input{background:#252525!important;color:#e0e0e0!important;border:1px solid #3a3a3a!important;border-radius:3px!important}
+    .gjs-clm-preview{background:#252525!important;border:1px solid #3a3a3a!important}
+    .gjs-clm-color-var input{background:#252525!important;color:#e0e0e0!important;border:1px solid #3a3a3a!important}
+    .gjs-clm-color-var label{color:#c0c0c0!important}
+
+    /* ===== PHASE 2: Number input steppers ===== */
+    .gjs-field-arrow{background:#3a3a3a!important;border-color:#4a4a4a!important}
+    .gjs-field-arrow-u{border-bottom-color:#c0c0c0!important}
+    .gjs-field-arrow-d{border-top-color:#c0c0c0!important}
+    .gjs-field-arrow:hover{background:#4CAF50!important}
+    .gjs-field-arrow:hover .gjs-field-arrow-u{border-bottom-color:#fff!important}
+    .gjs-field-arrow:hover .gjs-field-arrow-d{border-top-color:#fff!important}
+
+    /* ===== PHASE 2: Unit select ===== */
+    .gjs-field-units{background:#252525!important;color:#e0e0e0!important;border:1px solid #3a3a3a!important;border-radius:4px!important;font-size:.82rem!important;padding:2px 6px!important}
+    .gjs-field-units:hover{border-color:#4CAF50!important}
+    .gjs-field-units option{background:#2d2d2d!important;color:#e0e0e0!important}
+
+    /* ===== PHASE 2: Clear/X button ===== */
+    .gjs-sm-clear{background:#3a3a3a!important;color:#e0e0e0!important;border-radius:50%!important;width:20px!important;height:20px!important;line-height:20px!important;text-align:center!important;font-size:.7rem!important;cursor:pointer!important}
+    .gjs-sm-clear:hover{background:#e53935!important;color:#fff!important}
+
+    /* ===== PHASE 2: Modal footer ===== */
+    .gjs-mdl-footer{background:#252525!important;border-top:1px solid #3a3a3a!important;padding:12px 16px!important}
+
+    /* ===== PHASE 2: Assets manager ===== */
+    .gjs-assets,.gjs-am-assets-cont{background:#1e1e1e!important;padding:8px!important}
+    .gjs-am-upload{background:#4CAF50!important;color:#fff!important;border:none!important;border-radius:4px!important;padding:6px 16px!important;font-size:.8rem!important;cursor:pointer!important}
+    .gjs-am-upload:hover{background:#388E3C!important}
+    .gjs-am-asset{background:#2d2d2d!important;border:1px solid #3a3a3a!important;border-radius:4px!important}
+    .gjs-am-asset:hover{border-color:#4CAF50!important}
+
+    /* ===== PHASE 2: Empty state ===== */
+    .gjs-no-app{color:#999!important;background:#1e1e1e!important}
+    .gjs-no-app h2{color:#ccc!important}
+
+    /* ===== PHASE 2: Checkbox & Radio ===== */
+    .gjs-field input[type=checkbox],.gjs-field input[type=radio]{accent-color:#4CAF50!important;width:16px!important;height:16px!important;cursor:pointer!important}
+    .gjs-radio-item{color:#c0c0c0!important;padding:3px 0!important;font-size:.82rem!important}
+    .gjs-radio-item input{accent-color:#4CAF50!important}
+
+    /* ===== PHASE 2: Composite/Stack fields ===== */
+    .gjs-sm-composite,.gjs-sm-stack,.gjs-sm-layer{background:transparent!important}
+    .gjs-sm-composite .gjs-sm-field input{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important}
+
+    /* ===== PHASE 2: Textarea in traits ===== */
+    .gjs-field-wrp--textarea textarea{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important;border-radius:4px!important;padding:6px 10px!important;resize:vertical!important}
+    .gjs-field-wrp--textarea textarea:focus{border-color:#4CAF50!important}
+
+    /* ===== PHASE 2: Trait selects ===== */
+    .gjs-trt-trait select{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important;border-radius:4px!important;padding:4px 8px!important;font-size:.82rem!important}
+
+    /* ===== PHASE 2: Canvas frames bg ===== */
+    .gjs-cv-canvas__frames{background:#1e1e1e!important;padding:20px!important}
+    .gjs-cv-canvas{background-color:#d5d5d5!important}
+
+    /* ===== PHASE 2: Contrast & Readability fixes ===== */
+    .gjs-block__label{color:#bbb!important;font-size:.8rem!important}
+    .gjs-pn-btn{color:#c0c0c0!important;font-size:.8rem!important}
+    .gjs-pn-switcher .gjs-pn-btn{font-size:.8rem!important}
+    .gjs-sm-property,.gjs-sm-property .gjs-sm-label{font-size:.84rem!important;color:#bbb!important}
+    .gjs-sm-field input,.gjs-sm-field select{font-size:.84rem!important}
+    .gjs-sm-sector .gjs-sm-title .gjs-sm-label{color:#bbb!important}
+    .gjs-layer-caret,.gjs-sm-sector .gjs-sm-title .fa-caret-down,.gjs-block-category .gjs-title .fa-caret-down{color:#aaa!important}
+    .gjs-layer-vis{color:#888!important}
+    .gjs-layer{padding:8px 12px!important}
+    .gjs-layer-name{font-size:.84rem!important}
+    .gjs-selector{font-size:.8rem!important}
+    .gjs-badge{font-size:.75rem!important}
+    .gjs-trt-trait .gjs-label{font-size:.8rem!important;color:#bbb!important}
+    .gjs-pn-device-label{font-size:.8rem!important}
+    .gjs-pn-devices-c .gjs-pn-btn{font-size:.8rem!important}
+    .gjs-clm-tag-status{color:#aaa!important}
+
+    /* ===== PHASE 2: Resizer handle ===== */
+    .gjs-resizer-c{width:6px!important;cursor:col-resize!important;border:none!important;transition:background .2s!important}
+    .gjs-resizer-c:hover{background:#4CAF50!important}
+
+    /* ===== PHASE 2: Focus-visible ring ===== */
+    .gjs-sm-field input:focus-visible,.gjs-sm-field select:focus-visible,.gjs-mdl-dialog input:focus-visible,.gjs-trt-trait input:focus-visible,.gjs-trt-trait select:focus-visible{outline:2px solid #4CAF50!important;outline-offset:1px!important;border-color:#4CAF50!important}
+
+    /* ===== PHASE 2: Panel divider ===== */
+    .gjs-pn-panels{border-right:2px solid #1e1e1e!important}
+
+    /* ===== PHASE 2: Block category SVG icons ===== */
+    .gjs-block-category .gjs-title svg{fill:#bbb!important}
+    .gjs-block-category.gjs-open .gjs-title svg{fill:#4CAF50!important}
+    .gjs-sm-sector .gjs-sm-title svg{fill:#bbb!important}
+
+    /* ===== PHASE 2: Right panel width ===== */
+    .gjs-pn-views-container{min-width:300px!important}
+
+    /* ===== PHASE 2: Loading overlay tetap dark ===== */
     .loading-overlay{position:fixed;inset:0;z-index:9999;background:#1e1e1e;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .4s}
     .loading-overlay.hidden{opacity:0;pointer-events:none}
     .loading-overlay h2{color:#4CAF50;font-size:1.5rem}
@@ -266,7 +369,7 @@
   // EXPORT BUTTON in panel
   editor.Panels.addButton('options', {
     id: 'export-html-btn',
-    className: 'fa fa-download',
+    label: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
     command: 'export-full-html',
     attributes: { title: 'Download Full HTML (Ctrl+S)' }
   });
