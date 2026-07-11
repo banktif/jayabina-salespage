@@ -100,11 +100,25 @@ button:active{ transform:scale(.97); }
 a,button,input,select,textarea{ outline:none; }
 :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
 
-/* Modern thin scrollbars */
-*{ scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent; }
-*::-webkit-scrollbar{ width:9px;height:9px; }
-*::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:20px; border:2px solid transparent; background-clip:content-box; }
-*::-webkit-scrollbar-thumb:hover{ background:var(--text3); background-clip:content-box; }
-*::-webkit-scrollbar-track{ background:transparent; }
+/* Auto-hide scrollbars — visible only on hover */
+*{ scrollbar-width:none; }
+html,body{ scrollbar-width:none; }
+::-webkit-scrollbar{ display:none; }
+
+.d-sidebar:hover,.drawer:hover,.m-sheet:hover,body:hover{
+  scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;
+}
+.d-sidebar:hover::-webkit-scrollbar,.drawer:hover::-webkit-scrollbar,.m-sheet:hover::-webkit-scrollbar,body:hover::-webkit-scrollbar{
+  display:block; width:5px;height:5px;
+}
+.d-sidebar:hover::-webkit-scrollbar-thumb,.drawer:hover::-webkit-scrollbar-thumb,.m-sheet:hover::-webkit-scrollbar-thumb,body:hover::-webkit-scrollbar-thumb{
+  background:var(--border-strong); border-radius:20px;
+}
+.d-sidebar:hover::-webkit-scrollbar-thumb:hover,.drawer:hover::-webkit-scrollbar-thumb:hover,.m-sheet:hover::-webkit-scrollbar-thumb:hover,body:hover::-webkit-scrollbar-thumb:hover{
+  background:var(--text3);
+}
+.d-sidebar:hover::-webkit-scrollbar-track,.drawer:hover::-webkit-scrollbar-track,.m-sheet:hover::-webkit-scrollbar-track,body:hover::-webkit-scrollbar-track{
+  background:transparent;
+}
 
 ::selection{ background:var(--accent); color:#fff; }
