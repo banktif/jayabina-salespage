@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calendar Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Poppins',sans-serif;padding:20px;max-width:400px;margin:0 auto}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin:12px 0}
+.day{padding:10px;border-radius:8px;cursor:pointer;border:1px solid #ddd;transition:all .15s}
+.day:hover{background:#E8F5E9;border-color:#4CAF50}
+.day.sel{background:#2E7D32;color:#fff}
+.day.dis{color:#ccc;cursor:not-allowed;background:#f5f5f5}
+.day.empty{cursor:default}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.slot{padding:10px;border:2px solid #ddd;border-radius:8px;text-align:center;cursor:pointer;font-weight:600;font-size:.85rem}
+.slot.on{border-color:#2E7D32;background:#E8F5E9;color:#2E7D32}
+.slot.off{border-color:#f0f0f0;color:#ccc;cursor:not-allowed;background:#fafafa}
+.btn{width:100%;padding:14px;background:#2E7D32;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;margin-top:12px}
+input,textarea{width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:.9rem;margin:6px 0}
+.log{background:#111;color:#0f0;font-family:monospace;padding:10px;border-radius:8px;font-size:.75rem;max-height:150px;overflow-y:auto;margin:12px 0;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h2>Calendar Test</h2>
+<p id="dateLabel"><em>Pilih tarikh</em></p>
+<div id="cal" class="cal"></div>
+<div id="slots" class="slots">
+  <div class="slot off" data-slot="9am">9:00 AM</div>
+  <div class="slot off" data-slot="11am">11:00 AM</div>
+  <div class="slot off" data-slot="2pm">2:00 PM</div>
+  <div class="slot off" data-slot="4pm">4:00 PM</div>
+</div>
+<input placeholder="Nama" id="name">
+<input placeholder="Telefon (01xxxxxxxx)" id="phone">
+<textarea placeholder="Alamat" id="addr"></textarea>
+<button class="btn" id="submit">Bayar Deposit RM150</button>
+<div class="log" id="log">Waiting...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+function log(msg){var l=document.getElementById('log');l.textContent+=msg+'\n';l.scrollTop=l.scrollHeight}
+
+log('1. Page loaded');
+log('2. Supabase CDN: '+(typeof supabase!=='undefined'?'OK':'FAIL'));
+
+try{
+  var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+  log('3. SB client created: OK');
+}catch(e){log('3. SB client: FAIL - '+e.message)}
+
+var td=new Date(),cm=td.getMonth(),cy=td.getFullYear(),sd=null,ss=null;
+
+async function fetchBooked(date){
+  try{
+    var {data,error}=await SB.from('slots').select('time_slot').eq('date',date).eq('is_booked',true);
+    if(error){log('fetchBooked error: '+error.message);return[]}
+    log('Slots query OK for '+date+': '+(data?data.length:0)+' booked');
+    return data?data.map(function(s){return s.time_slot}):[];
+  }catch(e){log('fetchBooked exception: '+e.message);return[]}
+}
+
+function rCal(){
+  var c=document.getElementById('cal'),mn=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'];
+  var fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate(),h='';
+  for(var i=0;i<fd;i++)h+='<div class="day empty"></div>';
+  var ts=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+  var mn2=new Date(td);mn2.setDate(mn2.getDate()+1);
+  var mins=mn2.getFullYear()+'-'+String(mn2.getMonth()+1).padStart(2,'0')+'-'+String(mn2.getDate()).padStart(2,'0');
+  var mx=new Date(td);mx.setDate(mx.getDate()+30);
+  var maxs=mx.getFullYear()+'-'+String(mx.getMonth()+1).padStart(2,'0')+'-'+String(mx.getDate()).padStart(2,'0');
+  for(var d=1;d<=dim;d++){
+    var ds=new Date(cy,cm,d).toISOString().split('T')[0],cls='day';
+    if(ds<mins||ds>maxs)cls+=' dis';
+    if(ds===ts)cls+=' today';
+    if(ds===sd)cls+=' sel';
+    h+='<div class="'+cls+'" data-date="'+ds+'">'+d+'</div>';
+  }
+  c.innerHTML=h;
+  c.querySelectorAll('.day:not(.dis):not(.empty)').forEach(function(el){
+    el.addEventListener('click',function(){selectDate(this.dataset.date)});
+  });
+}
+
+async function selectDate(ds){
+  log('selectDate called: '+ds);
+  sd=ds;document.getElementById('dateLabel').textContent='Loading slots...';
+  ss=null;document.querySelectorAll('#slots .slot').forEach(function(s){s.classList.remove('on')});
+  rCal();
+  try{
+    var booked=await fetchBooked(ds);
+    var sl=document.querySelectorAll('#slots .slot');
+    sl.forEach(function(s){s.classList.add('off')});
+    log('Booked slots: ['+booked.join(',')+']');
+    sl.forEach(function(s){
+      if(booked.indexOf(s.dataset.slot)===-1){s.classList.remove('off');log('Available: '+s.dataset.slot)}
+    });
+    document.getElementById('dateLabel').textContent='Tarikh: '+ds;
+  }catch(e){
+    document.getElementById('dateLabel').textContent='Error: '+e.message;
+    log('selectDate error: '+e.message);
+  }
+}
+
+document.getElementById('slots').addEventListener('click',function(e){
+  var s=e.target.closest('.slot');if(!s||s.classList.contains('off'))return;
+  if(!sd){log('No date selected');return}
+  document.querySelectorAll('#slots .slot').forEach(function(x){x.classList.remove('on')});
+  s.classList.add('on');ss=s.dataset.slot;
+  log('Slot selected: '+ss);
+});
+
+document.getElementById('submit').addEventListener('click',async function(){
+  var n=document.getElementById('name').value.trim(),p=document.getElementById('phone').value.trim(),a=document.getElementById('addr').value.trim();
+  if(!n||!p||!a||!sd||!ss){log('Form incomplete');return}
+  log('Submitting booking: '+n+' '+sd+' '+ss);
+  try{
+    var {data,error}=await SB.from('bookings').insert({
+      customer_name:n,customer_phone:p,customer_address:a,
+      booking_date:sd,booking_time:ss,amount:300,deposit_amount:150,
+      status:'pending_payment',payment_status:'pending'
+    }).select();
+    if(error){log('Insert error: '+error.message);return}
+    var id=data[0].id;log('Booking created: '+id);
+    await SB.from('slots').insert({date:sd,time_slot:ss,is_booked:true,booking_id:id});
+    log('Slot reserved');
+  }catch(e){log('Submit error: '+e.message)}
+});
+
+rCal();
+log('Ready. Click a date.');
+</script>
+</body>
+</html>
