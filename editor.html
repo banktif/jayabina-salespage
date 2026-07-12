@@ -264,8 +264,7 @@ function buildEditor(html){
     pluginsOpts:{'gjs-preset-webpage':{}},
     canvas:{styles:[
       'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap',
-      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-      'body::-webkit-scrollbar{width:10px;height:10px}body::-webkit-scrollbar-thumb{background:#4a4a4a;border-radius:6px}body::-webkit-scrollbar-track{background:transparent}body{scrollbar-width:thin;scrollbar-color:#4a4a4a transparent}'
+      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
     ]},
     deviceManager:{devices:[
       {name:'Desktop',width:''},
@@ -281,12 +280,13 @@ function buildEditor(html){
   editor.on('load',function(){
     if(styleCSS)editor.setStyle(styleCSS);
     editor.addComponents(bodyHTML);
-    // Force scrollbars on canvas
-    setTimeout(function(){
-      document.querySelectorAll('.gjs-cv-canvas,.gjs-cv-canvas__frames,.gjs-frame-wrapper').forEach(function(el){
-        el.style.overflow='auto';el.style.overflowX='auto';el.style.overflowY='auto'
-      });
-    },300);
+    // Inject scrollbar CSS into iframe
+    try{
+      var doc=editor.Canvas.getDocument();
+      var s=doc.createElement('style');
+      s.textContent='::-webkit-scrollbar{width:10px!important;height:10px!important}::-webkit-scrollbar-thumb{background:#4a4a4a!important;border-radius:6px}::-webkit-scrollbar-track{background:#1e1e1e!important}*{scrollbar-width:thin!important;scrollbar-color:#4a4a4a #1e1e1e!important}';
+      doc.head.appendChild(s);
+    }catch(e){}
 
     var bm=editor.Blocks;
     bm.add('Layout',{id:'hero',label:'★ Hero',category:'Extra',content:'<section style="padding:100px 0;text-align:center;background:#f5f5f5"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'});
