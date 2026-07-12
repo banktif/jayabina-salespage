@@ -356,6 +356,8 @@
     .crm-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
     .crm-search{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--border-strong);border-radius:12px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.85rem}
     .crm-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+    .crm-sel{padding:12px 12px;border:1px solid var(--border-strong);border-radius:12px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:.8rem;cursor:pointer}
+    .cust-cb{width:17px;height:17px;flex-shrink:0;accent-color:var(--accent);cursor:pointer}
     .cust-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--elevated);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:border-color .12s}
     .cust-row:hover{border-color:var(--accent)}
     .cust-main{flex:1;min-width:0}
@@ -628,16 +630,20 @@ function showBookings(filter){currentView='bookings';setChrome(true);setHeader('
 function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else load(cf);}
 
 // ═══════════ CUSTOMER CRM ═══════════
-var custState={q:'',page:0,per:25,total:0,timer:null};
+var custState={q:'',status:'',sort:'last',page:0,per:25,total:0,timer:null,sel:{}};
 function custBadge(s){var m={active:'Active',vip:'VIP',inactive:'Inactive',blacklist:'Blacklist'};return '<span class="cbadge '+s+'">'+(m[s]||s)+'</span>';}
 async function showCustomers(){
   currentView='customers';setChrome(false);clearNav();setNav('dsCustomers');
-  setHeader('Customers','CRM - manage your customers');location.hash='#customers';
+  setHeader('Customers','CRM - manage your customers');location.hash='#customers';custState.sel={};
   var l=document.getElementById('list');
-  l.innerHTML='<div class="crm-bar"><input id="custSearch" class="crm-search" placeholder="Search name or phone..." value="'+esc(custState.q)+'"><span id="custCount" style="font-size:.75rem;color:var(--text3);font-weight:600"></span></div><div id="custList"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div><div class="pager" id="custPager"></div>';
+  l.innerHTML='<div class="crm-bar"><input id="custSearch" class="crm-search" placeholder="Search name or phone..." value="'+esc(custState.q)+'"><select id="custStatusF" class="crm-sel"><option value="">All status</option><option value="active">Active</option><option value="vip">VIP</option><option value="inactive">Inactive</option><option value="blacklist">Blacklist</option></select><select id="custSortF" class="crm-sel"><option value="last">Last booking</option><option value="bookings">Most bookings</option><option value="spent">Most spent</option><option value="name">Name A-Z</option><option value="newest">Newest</option></select></div>'+
+    '<div id="custSelBar" style="display:none;align-items:center;gap:10px;margin-bottom:12px;background:var(--danger-light);border:1px solid var(--danger);border-radius:10px;padding:8px 12px"><span id="custSelN" style="font-size:.78rem;font-weight:700;color:var(--danger)"></span><button class="d-btn del" onclick="bulkDeleteCustomers()">Delete selected</button><button class="d-btn" onclick="clearCustSel()">Clear</button></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><label style="font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="custSelAll" onclick="toggleSelAll(this.checked)"> Select page</label><span id="custCount" style="font-size:.75rem;color:var(--text3);font-weight:600"></span></div>'+
+    '<div id="custList"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div><div class="pager" id="custPager"></div>';
   var si=document.getElementById('custSearch');
   si.oninput=function(){clearTimeout(custState.timer);custState.timer=setTimeout(function(){custState.q=si.value.trim();custState.page=0;loadCustomers();},350);};
-  si.focus();
+  var sf=document.getElementById('custStatusF');sf.value=custState.status;sf.onchange=function(){custState.status=this.value;custState.page=0;loadCustomers();};
+  var so=document.getElementById('custSortF');so.value=custState.sort;so.onchange=function(){custState.sort=this.value;custState.page=0;loadCustomers();};
   loadCustomers();
 }
 async function loadCustomers(){
@@ -647,24 +653,38 @@ async function loadCustomers(){
     var from=custState.page*custState.per,to=from+custState.per-1;
     var qy=SB.from('customers').select('*',{count:'exact'});
     if(custState.q){var q=custState.q.replace(/[%,()]/g,'');qy=qy.or('name.ilike.%'+q+'%,phone.ilike.%'+q+'%');}
-    qy=qy.order('last_booking_date',{ascending:false,nullsFirst:false}).range(from,to);
+    if(custState.status)qy=qy.eq('status',custState.status);
+    var sm={last:['last_booking_date',false],bookings:['total_bookings',false],spent:['total_spent',false],name:['name',true],newest:['created_at',false]}[custState.sort]||['last_booking_date',false];
+    qy=qy.order(sm[0],{ascending:sm[1],nullsFirst:false}).range(from,to);
     var res=await qy;if(res.error)throw res.error;
-    custState.total=res.count||0;
-    var data=res.data||[];
+    custState.total=res.count||0;var data=res.data||[];
     var cc=document.getElementById('custCount');if(cc)cc.textContent=custState.total.toLocaleString()+' customers';
-    if(!data.length){el.innerHTML='<div class="empty" style="padding:40px"><div class="eicon"><i data-lucide="contact"></i></div><h2>No customers</h2><p>'+(custState.q?'No match for "'+esc(custState.q)+'".':'Customers appear here after bookings.')+'</p></div>';document.getElementById('custPager').innerHTML='';return;}
+    if(!data.length){el.innerHTML='<div class="empty" style="padding:40px"><div class="eicon"><i data-lucide="contact"></i></div><h2>No customers</h2><p>'+(custState.q||custState.status?'No match for current filter.':'Customers appear here after bookings.')+'</p></div>';document.getElementById('custPager').innerHTML='';updateSelBar();return;}
     var h='';
     data.forEach(function(c){
-      h+='<div class="cust-row" onclick="openCustomer(\''+c.id+'\')"><div class="cust-main"><div class="cust-name">'+esc(c.name||'(no name)')+'</div><div class="cust-sub"><i data-lucide="phone"></i> '+esc(c.phone)+(c.last_booking_date?' &middot; last '+fd(c.last_booking_date):'')+'</div></div><div class="cust-stat"><b>'+c.total_bookings+'</b> job'+(c.total_bookings===1?'':'s')+'<br>RM'+esc(c.total_spent)+'</div>'+custBadge(c.status)+'</div>';
+      h+='<div class="cust-row"><input type="checkbox" class="cust-cb" data-id="'+c.id+'"'+(custState.sel[c.id]?' checked':'')+' onclick="event.stopPropagation();toggleCust(\''+c.id+'\',this.checked)"><div class="cust-main" onclick="openCustomer(\''+c.id+'\')"><div class="cust-name">'+esc(c.name||'(no name)')+'</div><div class="cust-sub"><i data-lucide="phone"></i> '+esc(c.phone)+(c.last_booking_date?' &middot; last '+fd(c.last_booking_date):'')+'</div></div><div class="cust-stat" onclick="openCustomer(\''+c.id+'\')"><b>'+c.total_bookings+'</b> job'+(c.total_bookings===1?'':'s')+'<br>RM'+esc(c.total_spent)+'</div>'+custBadge(c.status)+'</div>';
     });
     el.innerHTML=h;
-    // pager
     var pages=Math.ceil(custState.total/custState.per),cur=custState.page+1;
-    var p='<button onclick="custGo(-1)"'+(custState.page<=0?' disabled':'')+'>&#8249; Prev</button><span style="font-size:.78rem;color:var(--text2);font-weight:600">Page '+cur+' / '+pages+'</span><button onclick="custGo(1)"'+(cur>=pages?' disabled':'')+'>Next &#8250;</button>';
-    document.getElementById('custPager').innerHTML=p;
+    document.getElementById('custPager').innerHTML='<button onclick="custGo(-1)"'+(custState.page<=0?' disabled':'')+'>&#8249; Prev</button><span style="font-size:.78rem;color:var(--text2);font-weight:600">Page '+cur+' / '+pages+'</span><button onclick="custGo(1)"'+(cur>=pages?' disabled':'')+'>Next &#8250;</button>';
+    var sa=document.getElementById('custSelAll');if(sa)sa.checked=data.every(function(c){return custState.sel[c.id]});
+    updateSelBar();
   }catch(e){el.innerHTML='<div class="empty" style="padding:30px"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
 function custGo(d){var pages=Math.ceil(custState.total/custState.per);var n=custState.page+d;if(n<0||n>=pages)return;custState.page=n;loadCustomers();window.scrollTo(0,0);}
+function toggleCust(id,ch){if(ch)custState.sel[id]=true;else delete custState.sel[id];updateSelBar();}
+function toggleSelAll(ch){document.querySelectorAll('.cust-cb').forEach(function(cb){cb.checked=ch;toggleCust(cb.getAttribute('data-id'),ch);});}
+function clearCustSel(){custState.sel={};document.querySelectorAll('.cust-cb').forEach(function(cb){cb.checked=false});var sa=document.getElementById('custSelAll');if(sa)sa.checked=false;updateSelBar();}
+function updateSelBar(){var n=Object.keys(custState.sel).length;var bar=document.getElementById('custSelBar');if(!bar)return;bar.style.display=n>0?'flex':'none';var t=document.getElementById('custSelN');if(t)t.textContent=n+' selected';}
+async function bulkDeleteCustomers(){
+  var ids=Object.keys(custState.sel);if(!ids.length)return;
+  if(!confirm('Delete '+ids.length+' customer(s)? Their bookings stay but get unlinked. This cannot be undone.'))return;
+  try{var {error}=await SB.from('customers').delete().in('id',ids);if(error)throw error;custState.sel={};loadCustomers();}catch(e){alert('Error: '+e.message);}
+}
+async function deleteCustomer(id){
+  if(!confirm('Delete this customer? Their bookings stay but get unlinked. This cannot be undone.'))return;
+  try{var {error}=await SB.from('customers').delete().eq('id',id);if(error)throw error;closeModal();loadCustomers();}catch(e){alert('Error: '+e.message);}
+}
 async function openCustomer(id){
   document.getElementById('mTitle').innerHTML='<span class="m-dot"></span>Customer';
   document.getElementById('mBody').innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
@@ -694,7 +714,7 @@ async function openCustomer(id){
       '<div style="margin:10px 0 4px;font-size:.72rem;color:var(--text3);font-weight:600">Notes</div><textarea id="custNotes" class="mv-sel" rows="3">'+esc(c.notes)+'</textarea>'+
       '<div style="margin:14px 0 6px;font-size:.72rem;color:var(--text3);font-weight:700">Booking History ('+bk.length+')</div>'+(hist||'<div style="font-size:.75rem;color:var(--text3)">No bookings.</div>');
     document.getElementById('mBody').innerHTML=body;
-    document.getElementById('mActs').innerHTML='<button class="m-btn accept" onclick="saveCustomer(\''+id+'\')">Save</button><button class="m-btn" style="background:#25D366;color:#fff" onclick="window.open(\'https://wa.me/'+ph+'\',\'_blank\')"><i data-lucide="message-circle"></i> WhatsApp</button><button class="m-btn close" onclick="closeModal()">Close</button>';
+    document.getElementById('mActs').innerHTML='<button class="m-btn accept" onclick="saveCustomer(\''+id+'\')">Save</button><button class="m-btn" style="background:#25D366;color:#fff" onclick="window.open(\'https://wa.me/'+ph+'\',\'_blank\')"><i data-lucide="message-circle"></i> WhatsApp</button><button class="m-btn decline" onclick="deleteCustomer(\''+id+'\')"><i data-lucide="trash-2"></i> Delete</button><button class="m-btn close" onclick="closeModal()">Close</button>';
   }catch(e){document.getElementById('mBody').innerHTML='<div style="padding:20px;color:var(--danger)">'+esc(e.message)+'</div>';}
 }
 async function saveCustomer(id){
