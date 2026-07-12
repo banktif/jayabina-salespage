@@ -152,6 +152,7 @@ function loadSites(){
 function saveSites(){localStorage.setItem('editor_sites',JSON.stringify(sites));refreshSiteSelect()}
 function refreshSiteSelect(){
   var sel=document.getElementById('siteSelect');
+  if(sites.length===0){sel.innerHTML='<option value="">-- No sites. Click ⚙ Sites → Fetch Repos --</option>';document.getElementById('saveBtn').disabled=true;return}
   sel.innerHTML='<option value="">-- Select Site --</option>';
   sites.forEach(function(s,i){sel.innerHTML+='<option value="'+i+'">'+s.name+' ('+s.repo+')</option>'});
 }
@@ -160,6 +161,7 @@ function onSiteChange(){document.getElementById('saveBtn').disabled=true;documen
 function openSiteModal(){
   document.getElementById('siteModal').classList.add('show');
   renderSiteList();
+  fillPAT();
 }
 function closeSiteModal(){document.getElementById('siteModal').classList.remove('show')}
 function renderSiteList(){
@@ -215,9 +217,8 @@ function initEditor(){
   pat=localStorage.getItem('gh_pat')||'';
   loadSites();
   if(!PASSWORD_HASH){document.getElementById('pwSub').textContent='Set a password to protect this editor'}
-  // Fill PAT input when modal opens
-  var orig=openSiteModal;openSiteModal=function(){orig();document.getElementById('patInput').value=pat}
 }
+function fillPAT(){document.getElementById('patInput').value=pat}
 
 // ═══════════ LOAD & EDIT ═══════════
 async function loadSite(){
