@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23166434'/><text x='50' y='68' font-family='system-ui,sans-serif' font-size='50' font-weight='800' fill='white' text-anchor='middle'>G</text></svg>">
+  <title>GrapesJS — Cloud Editor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#1e1e1e}
+    #loginGate{position:fixed;inset:0;z-index:99999;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+    #loginGate h2{color:#fff;font-size:1.3rem}#loginGate .sub{color:#888;font-size:.75rem}
+    #loginGate input{padding:12px 16px;border:2px solid #3a3a3a;border-radius:10px;background:#252525;color:#fff;font-size:.9rem;width:260px;text-align:center;font-family:inherit;outline:none}
+    #loginGate input:focus{border-color:#4CAF50}
+    #loginGate button{padding:12px 36px;background:#4CAF50;color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit}
+    #loginGate button:hover{background:#43a047}#loginGate .err{color:#e5484d;font-size:.75rem;text-align:center;display:none}#loginGate.hidden{display:none}
+    #topbar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#2d2d2d;border-bottom:1px solid #3a3a3a;z-index:10;position:relative}
+    #topbar select,#topbar button{font-family:inherit;padding:6px 10px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.72rem;cursor:pointer}
+    #topbar button.prim{background:#4CAF50;color:#fff;border:none;font-weight:600}#topbar .sep{width:1px;height:20px;background:#3a3a3a}#topbar .info{font-size:.68rem;color:#888;margin-left:auto}
+    .modal-bg{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+    .modal-bg.show{display:flex}
+    .modal-box{background:#2d2d2d;border-radius:14px;padding:20px;width:560px;max-width:90vw;max-height:80vh;overflow-y:auto;scrollbar-width:none}
+    .modal-box::-webkit-scrollbar{display:none}
+    .modal-box h3{color:#fff;font-size:1rem;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+    .sm-inp{padding:7px 10px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.73rem;font-family:inherit;width:100%}
+    .sm-inp:focus{border-color:#4CAF50;outline:none}
+    .sm-row{display:grid;grid-template-columns:1fr 1fr 1fr 40px;gap:6px;margin-bottom:6px;align-items:center}
+    .sm-btn{padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.7rem;font-weight:600;font-family:inherit}
+    .sm-btn.green{background:#4CAF50;color:#fff}.sm-btn.gray{background:#555;color:#fff}.sm-btn.red{background:#c62828;color:#fff}
+    #gjs{height:calc(100% - 37px);width:100%}
+    #gjs ::-webkit-scrollbar{width:10px;height:10px}#gjs ::-webkit-scrollbar-thumb{background:#4a4a4a;border-radius:6px}#gjs ::-webkit-scrollbar-track{background:#1e1e1e}#gjs *{scrollbar-width:thin;scrollbar-color:#4a4a4a #1e1e1e}
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;z-index:9999;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.ok{background:#2E7D32;color:#fff}.toast.err{background:#c62828;color:#fff}.toast.show{opacity:1}
+    .gjs-one-bg{background:#1e1e1e!important}.gjs-two-color{color:#4CAF50!important}.gjs-three-bg{background:#2d2d2d!important;color:#e0e0e0!important}.gjs-four-color,.gjs-four-color-h:hover{color:#4CAF50!important}
+    .gjs-cv-canvas{background-color:#f0f0f0!important}.gjs-pn-panels,.gjs-pn-commands,.gjs-pn-options{background:#2d2d2d!important;border-bottom:1px solid #3a3a3a!important}
+    .gjs-pn-panel,.gjs-pn-buttons{background:#1e1e1e!important}.gjs-pn-btn{border:none!important;color:#b0b0b0!important;background:transparent!important;border-radius:4px!important}
+    .gjs-pn-btn:hover{background:#3a3a3a!important;color:#e0e0e0!important}.gjs-pn-btn.gjs-pn-active{background:#4CAF50!important;color:#fff!important}
+    .gjs-blocks-c{background:#1e1e1e!important;padding:10px!important}.gjs-block{background:#2d2d2d!important;border:1px solid #3a3a3a!important;color:#ccc!important;border-radius:6px!important}
+    .gjs-block:hover{background:#3a3a3a!important;border-color:#4CAF50!important}.gjs-sm-header,.gjs-sm-sector .gjs-sm-title{background:#2d2d2d!important;color:#ccc!important;font-weight:600!important}
+    .gjs-sm-sector{background:#1e1e1e!important}.gjs-sm-field input,.gjs-sm-field select{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important}
+    .gjs-layer{background:transparent!important;color:#ccc!important;border-bottom:1px solid #2d2d2d!important}.gjs-layer:hover{background:#2d2d2d!important}.gjs-layer.gjs-selected{background:#3a3a3a!important}
+    .gjs-trt-traits{background:#1e1e1e!important}
+  </style>
+</head>
+<body>
+
+<div id="loginGate">
+  <h2>GrapesJS Editor</h2>
+  <p class="sub" id="loginSub">Enter password</p>
+  <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')verifyPassword()">
+  <button onclick="verifyPassword()">Unlock</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="topbar" style="display:none">
+  <select id="siteSelect" onchange="onSiteChange()"><option value="">-- Select Site --</option></select>
+  <span class="sep"></span>
+  <button onclick="loadSite()" class="prim">Load</button>
+  <button onclick="saveToGitHub()" id="saveBtn" class="prim" disabled>Save</button>
+  <span class="sep"></span>
+  <button onclick="openSettings()">⚙ Settings</button>
+  <button onclick="doLogout()">Logout</button>
+  <span class="info" id="siteInfo"></span>
+</div>
+
+<div id="gjs"></div>
+
+<!-- PAT MODAL -->
+<div class="modal-bg" id="patModal" onclick="if(event.target===this)closePatModal()">
+  <div class="modal-box">
+    <h3>GitHub Token Needed <button class="sm-btn gray" onclick="closePatModal()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
+    <p style="color:#888;font-size:.75rem;margin-bottom:10px">To save/fetch repos, enter your GitHub Personal Access Token.</p>
+    <div style="display:flex;gap:6px"><input type="password" id="patInput2" class="sm-inp" placeholder="ghp_..." style="flex:1"><button class="sm-btn green" onclick="savePAT()">Save</button></div>
+    <div style="color:#666;font-size:.65rem;margin-top:4px">Needs <b>repo</b> scope. <a href="https://github.com/settings/tokens" target="_blank" style="color:#4CAF50">Create token</a></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-box">
+    <h3>Settings <button class="sm-btn gray" onclick="closeSettings()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
+    <h4 style="color:#aaa;font-size:.75rem;margin-bottom:6px">Change Password</h4>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><input type="password" id="newPw" class="sm-inp" placeholder="New password" style="flex:1"><button class="sm-btn green" onclick="changePassword()">Save</button></div>
+    <h4 style="color:#aaa;font-size:.75rem;margin-bottom:6px">Sites</h4>
+    <div style="margin-bottom:8px;display:flex;gap:6px"><button class="sm-btn green" onclick="fetchRepos()">📂 Fetch My GitHub Repos</button><select id="repoSelect" style="display:none;flex:1;font-size:.73rem;font-family:inherit;padding:6px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0" onchange="onRepoSelect()"><option value="">Select repo...</option></select></div>
+    <div id="settingsSiteList"></div>
+    <button class="sm-btn gray" onclick="addSiteRow()" style="width:100%;margin-top:4px;padding:8px">+ Add Site Manually</button>
+    <div style="margin-top:10px"><button class="sm-btn green" style="width:100%;padding:10px" onclick="saveConfig()">Save All Settings</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/grapes.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grapesjs-preset-webpage@1.0.3/dist/index.min.js"></script>
+<script>
+var CONFIG_URL='config.json';
+var pat='',passwordHash='',configSha=null,sites=[],currentSite=null,editor=null,currentHTML='';
+
+function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+function toast(m,ok){var t=document.getElementById('toast');if(!t){alert(m);return}t.textContent=m;t.className='toast '+(ok?'ok':'err')+' show';setTimeout(function(){if(t)t.className='toast'},3000)}
+async function sha256(m){var buf=new TextEncoder().encode(m);var hash=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0')}).join('')}
+
+async function loadConfig(){
+  var r=await fetch(CONFIG_URL);if(!r.ok)return{password_hash:'',sites:[]};
+  return await r.json();
+}
+async function saveConfigToGitHub(json){
+  if(!pat){openPatModal();toast('Enter GitHub PAT to save',false);return false}
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(json,null,2))));
+  var api='https://api.github.com/repos/banktif/grapejs/contents/config.json';
+  var getR=await fetch(api,{headers:{Authorization:'Bearer '+pat}});
+  var getD=await getR.json();
+  var putR=await fetch(api,{method:'PUT',headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},body:JSON.stringify({message:'Update config',content:content,sha:getD.sha})});
+  if(!putR.ok){var err=await putR.json();throw new Error(err.message)}
+  return true;
+}
+
+// ═══════ AUTH ═══════
+async function verifyPassword(){
+  var pw=document.getElementById('pwInput').value,err=document.getElementById('loginErr');
+  if(!pw)return;
+  var hash=await sha256(pw);
+  try{var cfg=await loadConfig();passwordHash=cfg.password_hash||'';sites=cfg.sites||[]}catch(e){showErr('Cannot load config')}
+  if(!passwordHash){passwordHash=hash;await saveConfigToGitHub({password_hash:hash,sites:sites});unlockEditor();return}
+  if(hash===passwordHash){unlockEditor();return}
+  showErr('Wrong password');
+}
+function showErr(m){var e=document.getElementById('loginErr');e.textContent=m;e.style.display='block'}
+function unlockEditor(){
+  document.getElementById('loginGate').classList.add('hidden');
+  document.getElementById('topbar').style.display='flex';
+  refreshSiteSelect();
+  localStorage.setItem('editor_unlock_time',Date.now());
+}
+function doLogout(){
+  if(editor){editor.destroy();editor=null}document.getElementById('gjs').innerHTML='';
+  document.getElementById('loginGate').classList.remove('hidden');
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('pwInput').value='';document.getElementById('loginErr').style.display='none';
+  localStorage.removeItem('editor_unlock_time');
+}
+
+// ═══════ PAT ═══════
+function openPatModal(){document.getElementById('patModal').classList.add('show');if(pat)document.getElementById('patInput2').value=pat}
+function closePatModal(){document.getElementById('patModal').classList.remove('show')}
+function savePAT(){pat=document.getElementById('patInput2').value;localStorage.setItem('editor_pat',pat);closePatModal();toast('Token saved',true)}
+function needPAT(){if(!pat){openPatModal();return false}return true}
+
+// ═══════ SITES ═══════
+function refreshSiteSelect(){
+  var sel=document.getElementById('siteSelect');
+  if(!sites.length){sel.innerHTML='<option value="">No sites. Click ⚙ Settings</option>';return}
+  sel.innerHTML='<option value="">-- Select Site --</option>';
+  sites.forEach(function(s,i){sel.innerHTML+='<option value="'+i+'">'+s.name+' ('+s.repo+')</option>'});
+}
+function onSiteChange(){document.getElementById('saveBtn').disabled=true;document.getElementById('siteInfo').textContent=''}
+
+// ═══════ SETTINGS ═══════
+function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('patInput2').value=pat;renderSettingsSites()}
+function closeSettings(){document.getElementById('settingsModal').classList.remove('show')}
+function renderSettingsSites(){
+  var el=document.getElementById('settingsSiteList'),h='';
+  sites.forEach(function(s,i){h+='<div class="sm-row"><input value="'+esc(s.name)+'" placeholder="Name" class="sm-inp" onchange="sites['+i+'].name=this.value"><input value="'+esc(s.repo)+'" placeholder="user/repo" class="sm-inp" onchange="sites['+i+'].repo=this.value"><input value="'+(s.file||'index.html')+'" placeholder="file" class="sm-inp" onchange="sites['+i+'].file=this.value"><button class="sm-btn red" onclick="sites.splice('+i+',1);renderSettingsSites()">×</button></div>'});
+  el.innerHTML=h||'<p style="color:#888;font-size:.75rem;text-align:center">No sites. Add below.</p>';
+}
+function addSiteRow(){sites.push({name:'New Site',repo:'user/repo',file:'index.html',branch:'master'});renderSettingsSites()}
+async function changePassword(){var pw=document.getElementById('newPw').value;if(!pw){toast('Enter a password',false);return}passwordHash=await sha256(pw);try{await saveConfigToGitHub({password_hash:passwordHash,sites:sites});toast('Password updated',true)}catch(e){toast('Save failed: '+e.message,false)}}
+async function saveConfig(){try{await saveConfigToGitHub({password_hash:passwordHash,sites:sites});closeSettings();toast('Settings saved',true);refreshSiteSelect()}catch(e){toast('Save failed: '+e.message,false)}}
+
+async function fetchRepos(){
+  if(!pat){openPatModal();return}
+  var el=document.querySelector('#settingsModal .sm-btn.green');el.disabled=true;el.textContent='Loading...';
+  try{
+    var repos=[],page=1;
+    while(page<=5){var data=await(await fetch('https://api.github.com/user/repos?per_page=100&sort=updated&page='+page,{headers:{Authorization:'Bearer '+pat}})).json();if(!data.length)break;repos=repos.concat(data);page++}
+    var sel=document.getElementById('repoSelect');sel.innerHTML='<option value="">Select repo to add...</option>';
+    repos.forEach(function(r){sel.innerHTML+='<option value="'+r.full_name+'">'+r.full_name+'</option>'});
+    sel.style.display='block';toast('Found '+repos.length+' repos',true);
+  }catch(e){toast('Failed: '+e.message+' — check PAT',false)}
+  el.disabled=false;el.textContent='📂 Fetch My GitHub Repos';
+}
+function onRepoSelect(){
+  var name=document.getElementById('repoSelect').value;if(!name)return;
+  sites.push({name:name.split('/')[1].replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()}),repo:name,file:'index.html',branch:'master'});
+  renderSettingsSites();document.getElementById('repoSelect').value='';document.getElementById('repoSelect').style.display='none';
+}
+
+// ═══════ EDITOR ═══════
+async function loadSite(){
+  var idx=document.getElementById('siteSelect').value;if(idx==='')return;
+  currentSite=sites[parseInt(idx)];document.getElementById('siteInfo').textContent='Loading...';
+  try{
+    var r=await fetch('https://raw.githubusercontent.com/'+currentSite.repo+'/'+(currentSite.branch||'master')+'/'+(currentSite.file||'index.html'));
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    currentHTML=await r.text();document.getElementById('siteInfo').textContent=currentSite.name;
+    document.getElementById('saveBtn').disabled=false;buildEditor(currentHTML);
+  }catch(e){toast('Load failed: '+e.message,false);document.getElementById('siteInfo').textContent='Error'}
+}
+
+function buildEditor(html){
+  if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
+  var bodyM=html.match(/<body[^>]*>([\s\S]*?)<\/body>/i),bodyHTML=bodyM?bodyM[1]:html;
+  var styleM=html.match(/<style[^>]*>([\s\S]*?)<\/style>/i),styleCSS=styleM?styleM[1]:'';
+  editor=grapesjs.init({container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:{type:'local',autosave:false},plugins:['gjs-preset-webpage'],pluginsOpts:{'gjs-preset-webpage':{}},canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap']},deviceManager:{devices:[{name:'Desktop',width:''},{name:'Tablet',width:'768px',widthMedia:'768px'},{name:'Mobile',width:'375px',widthMedia:'375px'}]}});
+  editor.on('load',function(){
+    if(styleCSS)editor.setStyle(styleCSS);editor.addComponents(bodyHTML);
+    try{var doc=editor.Canvas.getDocument(),s=doc.createElement('style');s.textContent='::-webkit-scrollbar{width:10px!important;height:10px!important}::-webkit-scrollbar-thumb{background:#4a4a4a!important;border-radius:6px}::-webkit-scrollbar-track{background:#1e1e1e!important}*{scrollbar-width:thin!important;scrollbar-color:#4a4a4a #1e1e1e!important}';doc.head.appendChild(s)}catch(e){}
+    var bm=editor.Blocks;
+    bm.add('Extra',{id:'hero',label:'★ Hero',content:'<section style="padding:100px 0;text-align:center;background:#f5f5f5"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'});
+    bm.add('Extra',{id:'card',label:'▨ Card',content:'<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);max-width:360px"><img src="https://placehold.co/360x200/2E7D32/fff?text=Image" style="width:100%;display:block"><div style="padding:20px"><h3>Card Title</h3><p style="color:#666">Description</p><a href="#" style="color:#2E7D32;font-weight:700">Learn More →</a></div></div>'});
+    bm.add('Extra',{id:'navbar',label:'☰ Navbar',content:'<nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08)"><div style="font-weight:800;font-size:1.2rem">LOGO</div><div style="display:flex;gap:24px"><a href="#" style="color:#333;text-decoration:none;font-weight:600">Home</a><a href="#" style="color:#333;font-weight:600">About</a></div></nav>'});
+    bm.add('Extra',{id:'pricing',label:'💳 Pricing',content:'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center"><div style="padding:30px;border:1px solid #ddd;border-radius:16px"><h3>Basic</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM99</div><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div><div style="padding:30px;border:1px solid #ddd;border-radius:16px"><h3>Pro</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM199</div><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div><div style="padding:30px;border:1px solid #ddd;border-radius:16px"><h3>Premium</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM299</div><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div></div>'});
+    bm.add('Extra',{id:'cta',label:'📢 CTA',content:'<section style="background:#2E7D32;color:#fff;text-align:center;padding:60px;border-radius:16px"><h2>Ready?</h2><p style="margin-bottom:20px">Join now.</p><a href="#" style="display:inline-block;padding:16px 36px;background:#fff;color:#2E7D32;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></section>'});
+  });
+  window.editor=editor;
+  document.onkeydown=function(e){if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveToGitHub()}}
+}
+
+async function saveToGitHub(){
+  if(!currentSite||!editor)return;
+  if(!pat){toast('No GitHub token. Add sites via ⚙ Settings first.',false);return}
+  var html=editor.getHtml(),css=editor.getCss();
+  var headM=currentHTML.match(/<head[^>]*>([\s\S]*?)<\/head>/i),headContent=headM?headM[1]:'';
+  headContent=headContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'');
+  var htmlAM=currentHTML.match(/<html([^>]*)>/i),htmlAttrs=htmlAM?htmlAM[1]:' lang="ms"';
+  var fullHTML='<!DOCTYPE html>\n<html'+htmlAttrs+'>\n<head>\n'+headContent.trim()+'\n  <style>\n'+css+'\n  </style>\n</head>\n<body>\n'+html+'\n</body>\n</html>';
+  var api='https://api.github.com/repos/'+currentSite.repo+'/contents/'+(currentSite.file||'index.html');
+  try{
+    var getD=await(await fetch(api,{headers:{Authorization:'Bearer '+pat}})).json();
+    var content=btoa(unescape(encodeURIComponent(fullHTML)));
+    await fetch(api,{method:'PUT',headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},body:JSON.stringify({message:'Update via GrapesJS',content:content,sha:getD.sha,branch:currentSite.branch||'master'})});
+    currentHTML=fullHTML;toast('Saved! '+currentSite.repo+' deploying...',true);
+  }catch(e){toast('Save failed: '+e.message,false)}
+}
+
+// Auto-login
+(function(){
+  var last=parseInt(localStorage.getItem('editor_unlock_time')||'0');
+  var savedPat=localStorage.getItem('editor_pat');if(savedPat)pat=savedPat;
+  if(Date.now()-last<43200000){loadConfig().then(function(cfg){sites=cfg.sites||[];passwordHash=cfg.password_hash||''}).catch(function(){});unlockEditor()}
+})();
+</script>
+</body>
+</html>

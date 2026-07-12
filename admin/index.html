@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ms" class="light">
 <head>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -387,6 +388,7 @@
   <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
   <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Reports</button>
   <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Settings</button>
+  <button class="d-nav-item" id="dsBackup" onclick="showBackup()"><span class="dni"><i data-lucide="database-backup"></i></span> Backup</button>
   <div class="d-sidebar-footer">
     <button onclick="refreshView()"><i data-lucide="refresh-cw"></i> Refresh</button>
     <button onclick="toggleTheme()"><i data-lucide="sun-moon"></i> Theme</button>
@@ -439,6 +441,7 @@
     <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staff</button>
     <button class="drawer-item" onclick="showReports();toggleDrawer()"><span><i data-lucide="bar-chart-3"></i></span> Reports</button>
     <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span><i data-lucide="settings"></i></span> Settings</button>
+    <button class="drawer-item" onclick="showBackup();toggleDrawer()"><span><i data-lucide="database-backup"></i></span> Backup</button>
   </div>
   <div class="drawer-menu" style="border-top:1px solid var(--border);padding-top:8px">
     <button class="drawer-item" onclick="refreshView();toggleDrawer()"><span><i data-lucide="refresh-cw"></i></span> Refresh</button>
@@ -600,7 +603,96 @@ function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(
 function setNav(id){var el=document.getElementById(id);if(el)el.classList.add('active');}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub');if(t)t.textContent=title;if(s)s.textContent=sub;}
 function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';location.hash='#bookings';if(filter)location.hash='#pending';load(filter);}
-function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else load(cf);}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else load(cf);}
+
+// ═══════════ BACKUP ═══════════
+async function callBackup(action){
+  var token=await authToken();
+  var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:action})});
+  return {ok:res.ok,body:await res.json()};
+}
+function bkPanel(label,icon,at,status){
+  var when=at?new Date(at).toLocaleString():'Never';
+  var ok=(status||'').indexOf('ok')===0||(status||'').indexOf('triggered')===0;
+  var col=at?(ok?'var(--accent)':'var(--danger)'):'var(--text3)';
+  return '<div class="panel"><div class="panel-h"><h3><i data-lucide="'+icon+'"></i> '+label+'</h3></div><div style="font-size:.8rem;color:var(--text2)">Last: <strong>'+when+'</strong></div><div style="font-size:.72rem;color:'+col+';margin-top:6px;word-break:break-word">'+esc(status||'No backup yet')+'</div></div>';
+}
+async function showBackup(){
+  currentView='backup';setChrome(false);clearNav();setNav('dsBackup');
+  setHeader('Backup','Code + database backups (auto)');location.hash='#backup';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var st=((await callBackup('status')).body.data)||{};
+    var priv={};try{var pv=await SB.from('private_settings').select('key,value');(pv.data||[]).forEach(function(r){priv[r.key]=r.value});}catch(e){}
+    var driveOn=st.drive_configured==='true';var r2On=st.r2_configured==='true';
+    function freqSel(id,val){var o=['hourly','daily','weekly','monthly'];var s='<select id="'+id+'" class="mv-sel">';o.forEach(function(f){s+='<option value="'+f+'"'+((val||'daily')===f?' selected':'')+'>'+f.charAt(0).toUpperCase()+f.slice(1)+'</option>'});return s+'</select>';}
+    var h='<div class="panels">'+bkPanel('Google Drive','hard-drive',st.backup_last_drive_at,driveOn?(st.backup_last_drive_status||'Waiting'):'Not configured')+bkPanel('Cloudflare R2','cloud',st.backup_last_r2_at,r2On?(st.backup_last_r2_status||'Waiting'):'Not configured')+bkPanel('Code Backup (GitLab)','git-branch',st.backup_last_code_at,st.backup_last_code_status)+'</div>';
+    h+='<div class="sGrp"><div class="sGrpH">Run Backup Now</div><div style="display:flex;gap:10px;flex-wrap:wrap">';
+    h+='<button class="btn-primary" style="width:auto" onclick="backupNow(\'db\')"><i data-lucide="database"></i> Backup Database</button>';
+    h+='<button class="btn-primary" style="width:auto;background:var(--accent2)" onclick="backupNow(\'code\')"><i data-lucide="git-branch"></i> Backup Code to GitLab</button>';
+    h+='</div><div id="bkMsg" style="font-size:.78rem;color:var(--text3);margin-top:10px"></div></div>';
+    h+='<div class="sGrp"><div class="sGrpH">Backup Frequency</div><div class="sFields">';
+    h+='<div><label class="sLbl">Google Drive</label>'+freqSel('freqDrive',st.backup_freq_drive)+'</div>';
+    h+='<div><label class="sLbl">Cloudflare R2</label>'+freqSel('freqR2',st.backup_freq_r2)+'</div>';
+    h+='<button class="btn-primary" style="width:auto" onclick="saveFreq()"><i data-lucide="save"></i> Save Frequency</button><div id="bkFreqMsg" style="font-size:.75rem;color:var(--text3)"></div>';
+    h+='<div style="font-size:.72rem;color:var(--text3)">Auto-backup runs on this schedule. Keep last 48 (auto-delete) on Drive &amp; R2. Code &rarr; GitLab daily. Supabase Storage NOT used.</div></div></div>';
+    h+='<div class="sGrp"><div class="sGrpH">Google Drive '+(driveOn?'&#9989; Connected':'&#9888; Not configured')+'</div><div class="sFields">';
+    h+='<div><label class="sLbl">Service Account Email</label><input id="gdEmail" class="sInp" value="'+esc(priv.gdrive_client_email||'')+'" placeholder="name@project.iam.gserviceaccount.com"></div>';
+    h+='<div><label class="sLbl">Private Key</label><textarea id="gdKey" class="sInp" rows="4" placeholder="-----BEGIN PRIVATE KEY-----">'+esc(priv.gdrive_private_key||'')+'</textarea></div>';
+    h+='<div><label class="sLbl">Drive Folder ID</label><input id="gdFolder" class="sInp" value="'+esc(priv.gdrive_folder_id||'')+'" placeholder="folder id from the Drive folder URL"></div>';
+    h+='<button class="btn-primary" style="width:auto" onclick="saveBackupCfg()"><i data-lucide="save"></i> Save Google Drive</button><div id="bkCfgMsg" style="font-size:.75rem;color:var(--text3)"></div>';
+    h+='<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Setup: Google Cloud &rarr; create Service Account + JSON key &rarr; enable Drive API. Copy <code>client_email</code> + <code>private_key</code> here. Share your Drive folder with that email (Editor), paste folder ID.</div></div></div>';
+    h+='<div class="sGrp"><div class="sGrpH">Cloudflare R2 '+(r2On?'&#9989; Connected':'&#9888; Not configured')+'</div><div class="sFields">';
+    h+='<div><label class="sLbl">Account ID</label><input id="r2Account" class="sInp" value="'+esc(priv.r2_account_id||'')+'" placeholder="Cloudflare account ID"></div>';
+    h+='<div><label class="sLbl">Access Key ID</label><input id="r2Key" class="sInp" value="'+esc(priv.r2_access_key||'')+'" placeholder="R2 access key id"></div>';
+    h+='<div><label class="sLbl">Secret Access Key</label><input id="r2Secret" type="password" class="sInp" value="'+esc(priv.r2_secret_key||'')+'" placeholder="R2 secret access key"></div>';
+    h+='<div><label class="sLbl">Bucket Name</label><input id="r2Bucket" class="sInp" value="'+esc(priv.r2_bucket||'')+'" placeholder="e.g. jayaclean-backup"></div>';
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" style="width:auto" onclick="saveR2()"><i data-lucide="save"></i> Save R2</button><button class="d-btn" onclick="testR2()">Test Connection</button></div><div id="bkR2Msg" style="font-size:.75rem;color:var(--text3)"></div>';
+    h+='<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Setup: Cloudflare &rarr; R2 &rarr; create bucket. R2 &rarr; Manage API Tokens &rarr; create token (Object Read &amp; Write) &rarr; copy Access Key ID + Secret. Account ID from the R2 S3 endpoint. 10 GB free, no egress fees.</div></div></div>';
+    h+='<div class="sGrp"><div class="sGrpH">Recent Database Backups</div><div id="bkList"><div style="font-size:.78rem;color:var(--text3)">Loading...</div></div></div>';
+    l.innerHTML=h;
+    loadBackupList();
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+}
+async function backupNow(kind){
+  var msg=document.getElementById('bkMsg');msg.style.color='var(--text3)';msg.textContent=(kind==='db'?'Backing up database...':'Triggering code backup...');
+  var token=await authToken();
+  var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(kind==='db'?{action:'db',force:true}:{action:'code'})});
+  var r={ok:res.ok,body:await res.json()};
+  if(r.ok){msg.style.color='var(--accent)';msg.textContent=(kind==='db'?'Database backup done.':'Code backup triggered (GitHub Actions running).');setTimeout(showBackup,1400);}
+  else{msg.style.color='var(--danger)';msg.textContent='Error: '+(r.body.error||'failed');}
+}
+async function saveFreq(){
+  var m=document.getElementById('bkFreqMsg');m.style.color='var(--text3)';m.textContent='Saving...';
+  var now=new Date().toISOString();
+  var rows=[{key:'backup_freq_drive',value:document.getElementById('freqDrive').value,updated_at:now},{key:'backup_freq_r2',value:document.getElementById('freqR2').value,updated_at:now}];
+  try{var {error}=await SB.from('app_settings').upsert(rows);if(error)throw error;m.style.color='var(--accent)';m.textContent='Frequency saved.';}catch(e){m.style.color='var(--danger)';m.textContent='Error: '+e.message;}
+}
+async function saveBackupCfg(){
+  var m=document.getElementById('bkCfgMsg');m.style.color='var(--text3)';m.textContent='Saving...';var now=new Date().toISOString();
+  var rows=[{key:'gdrive_client_email',value:document.getElementById('gdEmail').value.trim(),updated_at:now},{key:'gdrive_private_key',value:document.getElementById('gdKey').value.trim(),updated_at:now},{key:'gdrive_folder_id',value:document.getElementById('gdFolder').value.trim(),updated_at:now}];
+  try{var {error}=await SB.from('private_settings').upsert(rows);if(error)throw error;m.style.color='var(--accent)';m.textContent='Saved.';setTimeout(showBackup,1200);}catch(e){m.style.color='var(--danger)';m.textContent='Error: '+e.message;}
+}
+async function saveR2(){
+  var m=document.getElementById('bkR2Msg');m.style.color='var(--text3)';m.textContent='Saving...';var now=new Date().toISOString();
+  var rows=[{key:'r2_account_id',value:document.getElementById('r2Account').value.trim(),updated_at:now},{key:'r2_access_key',value:document.getElementById('r2Key').value.trim(),updated_at:now},{key:'r2_secret_key',value:document.getElementById('r2Secret').value.trim(),updated_at:now},{key:'r2_bucket',value:document.getElementById('r2Bucket').value.trim(),updated_at:now}];
+  try{var {error}=await SB.from('private_settings').upsert(rows);if(error)throw error;m.style.color='var(--accent)';m.textContent='Saved.';setTimeout(showBackup,1200);}catch(e){m.style.color='var(--danger)';m.textContent='Error: '+e.message;}
+}
+async function testR2(){
+  var m=document.getElementById('bkR2Msg');m.style.color='var(--text3)';m.textContent='Testing R2...';
+  var r=await callBackup('test_r2');
+  if(r.ok){m.style.color='var(--accent)';m.textContent='R2 reachable & writable.';}else{m.style.color='var(--danger)';m.textContent='R2 error: '+(r.body.error||'failed');}
+}
+async function loadBackupList(){
+  var el=document.getElementById('bkList');
+  try{
+    var items=((await callBackup('list')).body.data)||[];
+    if(!items.length){el.innerHTML='<div style="font-size:.78rem;color:var(--text3)">No backups yet.</div>';return;}
+    var h='';items.forEach(function(f){h+='<div class="mrow" style="cursor:default"><i data-lucide="file-json"></i><div class="mb"><div class="mn">'+esc(f.name)+'</div></div><a class="d-btn" href="'+esc(f.url)+'" target="_blank">Download</a></div>';});
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div style="font-size:.78rem;color:var(--danger)">'+esc(e.message)+'</div>';}
+}
 
 // ═══════════ DASHBOARD ═══════════
 function mrow(x){var b=x.b,t=x.t;return '<div class="mrow" onclick="openTask(\''+t.id+'\')"><span class="mslot">'+ft(b.booking_time)+'</span><div class="mb"><div class="mn">'+esc(b.customer_name)+'</div><div class="ma"><i data-lucide="map-pin"></i><span class="txt">'+esc(b.customer_address)+'</span></div></div>'+taskBadge(t.status)+'</div>';}
@@ -1145,6 +1237,7 @@ async function checkAccess(){
     else if(h==='#staff')showStaff();
     else if(h==='#reports')showReports();
     else if(h==='#settings')showSettings();
+    else if(h==='#backup')showBackup();
     else showDashboard();
   }catch(e){showLogin()}
 }
