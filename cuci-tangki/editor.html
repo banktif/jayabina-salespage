@@ -65,8 +65,8 @@
     .gjs-layer:hover{background:#2d2d2d!important}.gjs-layer.gjs-selected{background:#3a3a3a!important}
     .gjs-trt-traits{background:#1e1e1e!important}
     /* Wider right panel */
-    .gjs-pn-views-container,.gjs-pn-views,.gjs-pn-panel.gjs-pn-views{min-width:400px!important;width:400px!important}
-    .gjs-pn-panels .gjs-pn-panel:last-child{min-width:400px!important}
+    .gjs-pn-views-container,.gjs-pn-views,.gjs-pn-panel.gjs-pn-views{min-width:310px!important;width:310px!important}
+    .gjs-pn-panels .gjs-pn-panel:last-child{min-width:310px!important}
   </style>
 </head>
 <body>
@@ -276,7 +276,7 @@ function buildEditor(html){
     // Wider right panel
     setTimeout(function(){
       var p=document.querySelector('.gjs-pn-views-container');
-      if(p){p.style.minWidth='400px';p.style.width='400px'}
+      if(p){p.style.minWidth='310px';p.style.width='310px'}
     },200);
 
     var bm=editor.Blocks;
