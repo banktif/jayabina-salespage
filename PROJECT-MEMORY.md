@@ -67,8 +67,8 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 - Cloudflare **cache rule**: bypass cache for `/sw.js`, `/theme.css`, and all HTML (`ends_with "/"` or `.html`) → updates always fresh. Static assets still edge-cached.
 - If stale: purge Cloudflare + clear browser SW/site data once.
 
-## GrapesJS Editor — LOCKED
-`editor.html` is **hard-locked** to edit ONLY the sales page (`index.html` on `banktif/jayaclean-salespage`). No multi-site, no repo picker. Save preserves original `<script>` tags. **Never use it on admin/worker/customer.**
+## GrapesJS Editor — multi-site + GUARD
+`editor.html` supports **multiple sales pages** (add any GitHub repo via token). A safety guard (`protectReason()`) blocks editing app/system files on BOTH load & save: any `admin/worker/customer/dashboard/login/staff/app/api` path, app-named `.html`, `sw.js`/`theme.css`/`manifest.json`, non-HTML files, and (in `jayaclean-salespage` repo) anything except `index.html`. Save preserves original `<script>` tags. So you can edit many sales pages but it can NEVER overwrite the JAYACLEAN app.
 
 ## Pending / notes
 1. Enter Google Drive + Cloudflare R2 creds in Backup page to activate DB backups.

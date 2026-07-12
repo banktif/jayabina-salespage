@@ -52,7 +52,7 @@ Domain: `cuci.jayabina.com` (GitHub Pages; CNAME file present)
 - **Pricing:** Total RM300, deposit RM150, balance RM150 (configurable via `app_settings`).
 - **Theme:** Forest-green (accent `#166534`). `theme.css` is the single source of truth (tokens incl. `--menu-bg`/`--menu-overlay`). Favicon `/favicon.svg` = single letter **J**.
 - **URL structure:** Clean URLs. Apps in folders (`admin/`, `worker/`, `customer/`), served from repo root. Editing the wrong file = broken app.
-- **GrapesJS editor:** HARD-LOCKED to the sales page only (`index.html` on `banktif/jayaclean-salespage`). NEVER let it touch admin/worker/customer (it strips JS and destroys apps). `editor.html` has the lock baked in.
+- **GrapesJS editor:** Multi-site (add any repo) for editing SALES PAGES, but has a **safety GUARD** (`protectReason()` in `editor.html`) that blocks app/system files: any path with `admin/worker/customer/dashboard/login/staff/app/api`, files `*.html` named admin/worker/customer/login/staff/dashboard, `sw.js`, `theme.css`, `manifest.json`, non-`.html` files, and (in the `jayaclean-salespage` repo) anything except `index.html`. Guard runs on BOTH load and save. This lets the owner edit many sales-page repos without ever destroying the JAYACLEAN app.
 - **DB backup destinations:** Google Drive + Cloudflare R2 ONLY. **Do NOT use Supabase Storage** (protect the 1 GB free quota). Retention keep-48 + auto-delete on both.
 - **PWA:** `sw.js` MUST stay network-first (never cache-first) so updates show. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML.
 

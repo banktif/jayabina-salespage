@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <title>JAYACLEAN — Sales Page Editor</title>
+  <title>JAYACLEAN — Multi-Site Sales Page Editor</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -16,31 +16,30 @@
     #gjs ::-webkit-scrollbar-track{background:#1e1e1e}
     .gjs-cv-canvas{overflow:auto!important;padding-bottom:20px!important;background-color:#f0f0f0!important}
     .gjs-frame{max-width:none!important}
-    /* PASSWORD GATE */
     #pwGate{position:fixed;inset:0;z-index:99999;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
     #pwGate input{padding:14px 20px;border:2px solid #3a3a3a;border-radius:12px;background:#252525;color:#fff;font-size:1rem;width:280px;text-align:center;font-family:inherit;outline:none}
     #pwGate input:focus{border-color:#166534}
     #pwGate button{padding:14px 40px;background:#166534;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit}
     #pwGate h2{color:#fff;font-size:1.4rem}#pwGate .sub{color:#888;font-size:.8rem}#pwGate .err{color:#e5484d;font-size:.8rem;display:none}
     #pwGate.hidden{display:none}
-    /* PAT MODAL */
-    #patModal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
-    #patModal.show{display:flex}
-    #patModal .box{background:#2d2d2d;border-radius:16px;padding:24px;width:460px;max-width:90vw}
-    #patModal h3{color:#fff;font-size:1.05rem;margin-bottom:14px}
-    #patModal input{padding:10px 12px;border-radius:8px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.82rem;font-family:inherit;width:100%}
-    #patModal input:focus{border-color:#166534;outline:none}
-    #patModal .r{display:flex;gap:8px;margin-top:12px}
-    /* TOP BAR */
+    #siteModal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+    #siteModal.show{display:flex}
+    #siteModal .box{background:#2d2d2d;border-radius:16px;padding:24px;width:560px;max-width:92vw;max-height:82vh;overflow-y:auto}
+    #siteModal h3{color:#fff;font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+    #siteModal input,#siteModal select{padding:8px 12px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.78rem;font-family:inherit;width:100%}
+    #siteModal input:focus,#siteModal select:focus{border-color:#166534;outline:none}
+    .sm-row{display:grid;grid-template-columns:1fr 1.2fr .9fr auto;gap:8px;margin-bottom:8px;align-items:center}
+    .sm-btn{padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.72rem;font-weight:600;font-family:inherit}
+    .sm-btn.green{background:#166534;color:#fff}.sm-btn.gray{background:#555;color:#fff}.sm-btn.red{background:#c62828;color:#fff;padding:6px 10px}
+    .warnbox{background:#3a2a10;border:1px solid #7a5a20;color:#f0c060;font-size:.68rem;padding:8px 10px;border-radius:8px;margin-bottom:12px;line-height:1.5}
     #topbar{display:none;align-items:center;gap:10px;padding:7px 12px;background:#2d2d2d;border-bottom:1px solid #3a3a3a;position:relative}
-    #topbar .brand{color:#4ade80;font-weight:800;font-size:.85rem;letter-spacing:.3px}
-    #topbar .lock{font-size:.66rem;color:#888;background:#1e1e1e;border:1px solid #333;padding:3px 9px;border-radius:20px}
-    #topbar button{font-family:inherit;padding:6px 14px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.72rem;cursor:pointer;font-weight:600}
+    #topbar .brand{color:#4ade80;font-weight:800;font-size:.85rem}
+    #topbar select,#topbar button{font-family:inherit;padding:6px 12px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.72rem;cursor:pointer;font-weight:600}
     #topbar button.prim{background:#166534;color:#fff;border:none}#topbar button.prim:hover{background:#14532d}
     #topbar button.prim:disabled{opacity:.5;cursor:not-allowed}
     #topbar .sep{width:1px;height:20px;background:#3a3a3a}
     #topbar .info{font-size:.68rem;color:#888;margin-left:auto}
-    .toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;z-index:99999;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;z-index:99999;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;max-width:360px}
     .toast.ok{background:#166534;color:#fff}.toast.err{background:#c62828;color:#fff}.toast.show{opacity:1}
     .gjs-one-bg{background:#1e1e1e!important}.gjs-two-color{color:#4ade80!important}
     .gjs-three-bg{background:#2d2d2d!important;color:#e0e0e0!important}
@@ -70,25 +69,33 @@
   <button onclick="checkPassword()">Unlock</button>
 </div>
 
-<!-- PAT MODAL -->
-<div id="patModal" onclick="if(event.target===this)document.getElementById('patModal').classList.remove('show')">
+<!-- SITE MANAGER -->
+<div id="siteModal" onclick="if(event.target===this)closeSiteModal()">
   <div class="box">
-    <h3>GitHub Token (to save)</h3>
-    <input type="password" id="patInput" placeholder="ghp_...">
-    <div style="color:#666;font-size:.65rem;margin-top:6px">Needs <b>repo</b> scope. Saved locally in this browser only. <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#4ade80">Create token</a></div>
-    <div class="r"><button onclick="savePAT()" style="flex:1;background:#166534;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:600;cursor:pointer">Save</button><button onclick="document.getElementById('patModal').classList.remove('show')" style="flex:1;background:#555;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer">Close</button></div>
+    <h3>Manage Sales Pages <button class="sm-btn gray" onclick="closeSiteModal()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
+    <div class="warnbox">&#128737; Safe editing: only <b>sales pages</b> (HTML) can be added. System/app pages (admin, worker, customer, dashboard, login, sw.js, theme.css) are <b>blocked automatically</b>. In the <b>jayaclean-salespage</b> repo, only <code>index.html</code> is allowed.</div>
+    <div style="margin-bottom:12px;display:flex;gap:6px">
+      <button class="sm-btn green" onclick="fetchRepos()" id="fetchReposBtn">&#128193; Fetch My GitHub Repos</button>
+      <select id="repoSelect" style="display:none;flex:1;font-size:.75rem" onchange="onRepoSelect()"><option value="">Select a repo to add...</option></select>
+    </div>
+    <div id="siteList"></div>
+    <button class="sm-btn green" style="width:100%;margin-top:8px;padding:10px" onclick="addSiteRow()">+ Add Site (manual)</button>
+    <div style="margin-top:14px">
+      <label style="color:#888;font-size:.7rem;display:block;margin-bottom:4px">GitHub Personal Access Token (needs <b>repo</b> scope, stored locally only)</label>
+      <div style="display:flex;gap:6px"><input type="password" id="patInput" placeholder="ghp_..." style="flex:1"><button class="sm-btn green" onclick="savePAT()">Save</button></div>
+    </div>
   </div>
 </div>
 
-<!-- TOP BAR (locked to Sales Page) -->
+<!-- TOP BAR -->
 <div id="topbar">
   <span class="brand">JAYACLEAN</span>
-  <span class="lock">&#128274; LOCKED: Sales Page only (index.html)</span>
+  <select id="siteSelect" onchange="onSiteChange()"><option value="">-- Select Sales Page --</option></select>
   <span class="sep"></span>
-  <button onclick="loadSite()" class="prim">Load Sales Page</button>
+  <button onclick="loadSite()" class="prim">Load</button>
   <button onclick="saveToGitHub()" id="saveBtn" class="prim" disabled>Save</button>
   <span class="sep"></span>
-  <button onclick="document.getElementById('patInput').value=pat;document.getElementById('patModal').classList.add('show')">&#128273; Token</button>
+  <button onclick="openSiteModal()">&#9881; Sites</button>
   <button onclick="doLogout()">Logout</button>
   <span class="info" id="siteInfo"></span>
 </div>
@@ -99,99 +106,135 @@
 <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/grapes.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/grapesjs-preset-webpage@1.0.3/dist/index.min.js"></script>
 <script>
-// ============================================================
-// LOCKED TARGET — this editor can ONLY edit the sales page.
-// It can never touch admin/worker/customer or any other repo/file.
-// ============================================================
-var SITE=Object.freeze({name:'Sales Page',repo:'banktif/jayaclean-salespage',file:'index.html',branch:'master'});
-
 if(!grapesjs||!grapesjs.plugins){alert('GrapesJS failed to load. Check internet connection.')}
-var editor=null,pat='',currentHTML='',PASSWORD_HASH='';
+var sites=[],currentSite=null,editor=null,pat='',currentHTML='',PASSWORD_HASH='';
 
-function toast(m,ok){var t=document.getElementById('toast');if(!t){alert(m);return}t.textContent=m;t.className='toast '+(ok?'ok':'err')+' show';setTimeout(function(){if(t)t.className='toast'},3000)}
+function toast(m,ok){var t=document.getElementById('toast');if(!t){alert(m);return}t.textContent=m;t.className='toast '+(ok?'ok':'err')+' show';setTimeout(function(){if(t)t.className='toast'},3500)}
 function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
 function hashPw(s){var t='JBED'+s+'salespage',h='';for(var i=0;i<t.length;i++)h+=((t.charCodeAt(i)*7)%16).toString(16);return h}
+
+// ═══════════ SAFETY GUARD — block editing system/app files ═══════════
+function protectReason(repo,file){
+  file=(file||'index.html').toString().trim().replace(/^\/+/,'').toLowerCase();
+  repo=(repo||'').toString().trim().replace(/\.git$/i,'');
+  if(!/\.html?$/.test(file))return 'Only .html pages can be edited (not '+file+').';
+  if(/(^|\/)(admin|worker|customer|dashboard|login|staff|app|api)(\/|$)/.test(file))return 'App/system pages are protected.';
+  var base=file.split('/').pop();
+  if(['admin.html','worker.html','customer.html','login.html','staff.html','dashboard.html','manifest.json','sw.js','theme.css'].indexOf(base)>-1)return 'System file is protected.';
+  if(/jayaclean-salespage$/i.test(repo)&&file!=='index.html')return 'In the JAYACLEAN repo, only the sales page (index.html) is editable.';
+  return null;
+}
 
 function checkPassword(){
   var v=document.getElementById('pwInput').value;if(!v)return;
   if(!PASSWORD_HASH){PASSWORD_HASH=hashPw(v);localStorage.setItem('editor_pw_hash',PASSWORD_HASH);unlockEditor();return}
   if(hashPw(v)===PASSWORD_HASH){unlockEditor()}else{document.getElementById('pwErr').style.display='block'}
 }
-function unlockEditor(){
-  document.getElementById('pwGate').classList.add('hidden');
-  document.getElementById('topbar').style.display='flex';
-  localStorage.setItem('editor_unlock_time',Date.now());
-  document.getElementById('siteInfo').textContent=SITE.repo+'/'+SITE.file;
-}
+function unlockEditor(){document.getElementById('pwGate').classList.add('hidden');document.getElementById('topbar').style.display='flex';localStorage.setItem('editor_unlock_time',Date.now())}
 function doLogout(){document.getElementById('pwGate').classList.remove('hidden');document.getElementById('topbar').style.display='none';if(editor){editor.destroy();editor=null}document.getElementById('gjs').innerHTML='';document.getElementById('pwInput').value='';document.getElementById('pwErr').style.display='none';localStorage.removeItem('editor_unlock_time')}
-function savePAT(){pat=document.getElementById('patInput').value.trim();localStorage.setItem('gh_pat',pat);document.getElementById('patModal').classList.remove('show');toast('Token saved',true)}
+function savePAT(){pat=document.getElementById('patInput').value.trim();localStorage.setItem('gh_pat',pat);toast('Token saved',true)}
+function fillPAT(){document.getElementById('patInput').value=pat}
 
+// ═══════════ SITES (localStorage) ═══════════
+function loadSites(){try{sites=JSON.parse(localStorage.getItem('editor_sites')||'[]')}catch(e){sites=[]}refreshSiteSelect()}
+function saveSites(){localStorage.setItem('editor_sites',JSON.stringify(sites));refreshSiteSelect()}
+function refreshSiteSelect(){
+  var sel=document.getElementById('siteSelect');
+  if(!sites.length){sel.innerHTML='<option value="">-- No sites. Click &#9881; Sites --</option>';document.getElementById('saveBtn').disabled=true;return}
+  sel.innerHTML='<option value="">-- Select Sales Page --</option>';
+  sites.forEach(function(s,i){sel.innerHTML+='<option value="'+i+'">'+esc(s.name)+' ('+esc(s.repo)+'/'+esc(s.file||'index.html')+')</option>'});
+}
+function onSiteChange(){document.getElementById('saveBtn').disabled=true;document.getElementById('siteInfo').textContent=''}
+function openSiteModal(){document.getElementById('siteModal').classList.add('show');renderSiteList();fillPAT()}
+function closeSiteModal(){document.getElementById('siteModal').classList.remove('show')}
+function renderSiteList(){
+  var el=document.getElementById('siteList'),h='';
+  sites.forEach(function(s,i){
+    var bad=protectReason(s.repo,s.file);
+    h+='<div class="sm-row"><input value="'+esc(s.name)+'" placeholder="Name" data-idx="'+i+'" data-field="name" onchange="updateSite(this)"><input value="'+esc(s.repo)+'" placeholder="user/repo" data-idx="'+i+'" data-field="repo" onchange="updateSite(this)"><input value="'+esc(s.file||'index.html')+'" placeholder="file" data-idx="'+i+'" data-field="file" onchange="updateSite(this)"><button class="sm-btn red" onclick="removeSite('+i+')" title="Remove">&times;</button></div>';
+    if(bad)h+='<div style="color:#f0605a;font-size:.64rem;margin:-4px 0 8px 2px">&#9888; '+esc(bad)+'</div>';
+  });
+  el.innerHTML=h||'<p style="color:#888;font-size:.8rem;text-align:center;padding:10px">No sites yet. Fetch repos or Add Site.</p>';
+}
+function addSiteRow(){sites.push({name:'New Site',repo:'user/repo',file:'index.html',branch:'master'});renderSiteList();saveSites()}
+function updateSite(el){var i=parseInt(el.dataset.idx),f=el.dataset.field;sites[i][f]=el.value.trim();saveSites();renderSiteList()}
+function removeSite(i){sites.splice(i,1);renderSiteList();saveSites()}
+function onRepoSelect(){
+  var sel=document.getElementById('repoSelect');var fullName=sel.value;if(!fullName)return;
+  var name=(fullName.split('/')[1]||fullName).replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});
+  sites.push({name:name,repo:fullName,file:'index.html',branch:'master'});
+  renderSiteList();saveSites();sel.value='';sel.style.display='none';toast('Added: '+name,true);
+}
+async function fetchRepos(){
+  if(!pat){toast('Set GitHub token first (paste below then Save)',false);return}
+  var btn=document.getElementById('fetchReposBtn');btn.disabled=true;btn.textContent='Loading...';
+  try{
+    var repos=[],page=1;
+    while(page<=5){var r=await fetch('https://api.github.com/user/repos?per_page=100&sort=updated&page='+page,{headers:{Authorization:'Bearer '+pat}});if(!r.ok)throw new Error('HTTP '+r.status);var data=await r.json();if(!data.length)break;repos=repos.concat(data);page++;}
+    var sel=document.getElementById('repoSelect');sel.innerHTML='<option value="">Select repo to add...</option>';
+    repos.forEach(function(repo){sel.innerHTML+='<option value="'+repo.full_name+'">'+repo.full_name+'</option>'});
+    sel.style.display='block';toast('Found '+repos.length+' repos. Pick one to add.',true);
+  }catch(e){toast('Failed: '+e.message,false)}
+  btn.disabled=false;btn.textContent='\uD83D\uDCC1 Fetch My GitHub Repos';
+}
+
+// ═══════════ INIT ═══════════
 function initEditor(){
-  PASSWORD_HASH=localStorage.getItem('editor_pw_hash')||'';
-  pat=localStorage.getItem('gh_pat')||'';
+  PASSWORD_HASH=localStorage.getItem('editor_pw_hash')||'';pat=localStorage.getItem('gh_pat')||'';loadSites();
   if(!PASSWORD_HASH){document.getElementById('pwSub').textContent='Set a password to protect this editor'}
   else{var last=parseInt(localStorage.getItem('editor_unlock_time')||'0');if(Date.now()-last<43200000)unlockEditor()}
 }
 
+// ═══════════ LOAD & EDIT ═══════════
 async function loadSite(){
+  var idx=document.getElementById('siteSelect').value;if(idx==='')return;
+  currentSite=sites[parseInt(idx)];
+  var reason=protectReason(currentSite.repo,currentSite.file);
+  if(reason){toast('Blocked: '+reason,false);document.getElementById('siteInfo').textContent='Protected';return}
   var info=document.getElementById('siteInfo');info.textContent='Loading...';
-  var url='https://raw.githubusercontent.com/'+SITE.repo+'/'+SITE.branch+'/'+SITE.file+'?t='+Date.now();
+  var url='https://raw.githubusercontent.com/'+currentSite.repo+'/'+(currentSite.branch||'master')+'/'+(currentSite.file||'index.html')+'?t='+Date.now();
   try{
     var r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);
-    currentHTML=await r.text();
-    info.textContent=SITE.repo+'/'+SITE.file;
-    document.getElementById('saveBtn').disabled=false;
-    buildEditor(currentHTML);
+    currentHTML=await r.text();info.textContent=currentSite.name;document.getElementById('saveBtn').disabled=false;buildEditor(currentHTML);
   }catch(e){toast('Load failed: '+e.message,false);info.textContent='Error'}
 }
-
 function buildEditor(html){
   if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
   var bodyM=html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);var bodyHTML=bodyM?bodyM[1]:html;
   var styleM=html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);var styleCSS=styleM?styleM[1]:'';
-  editor=grapesjs.init({
-    container:'#gjs',height:'100%',width:'auto',fromElement:false,
-    storageManager:{type:'local',autosave:false,stepsBeforeSave:1},
-    plugins:['gjs-preset-webpage'],pluginsOpts:{'gjs-preset-webpage':{}},
-    canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap']},
-    deviceManager:{devices:[{name:'Desktop',width:''},{name:'Tablet',width:'768px',widthMedia:'768px'},{name:'Mobile',width:'375px',widthMedia:'375px'}]},
-    showOffsets:true,showStylesOnChange:true,clearOnRender:true
-  });
+  editor=grapesjs.init({container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:{type:'local',autosave:false},plugins:['gjs-preset-webpage'],pluginsOpts:{'gjs-preset-webpage':{}},canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap']},deviceManager:{devices:[{name:'Desktop',width:''},{name:'Tablet',width:'768px',widthMedia:'768px'},{name:'Mobile',width:'375px',widthMedia:'375px'}]},showOffsets:true,showStylesOnChange:true,clearOnRender:true});
   editor.on('load',function(){
-    if(styleCSS)editor.setStyle(styleCSS);
-    editor.addComponents(bodyHTML);
+    if(styleCSS)editor.setStyle(styleCSS);editor.addComponents(bodyHTML);
     var bm=editor.Blocks;
-    bm.add('hero',{label:'★ Hero',category:'Extra',content:'<section style="padding:100px 0;text-align:center;background:#f0fdf4"><div style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#166534;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'});
-    bm.add('grid3',{label:'⊟ 3 Cols',category:'Extra',content:'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div style="text-align:center;padding:20px"><h3>Feature 1</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 2</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 3</h3><p>Description</p></div></div>'});
-    bm.add('cta',{label:'📢 CTA',category:'Extra',content:'<section style="background:#166534;color:#fff;text-align:center;padding:60px 20px;border-radius:16px"><h2 style="font-size:2rem;margin-bottom:12px">Ready to start?</h2><a href="#" style="display:inline-block;padding:16px 36px;background:#fff;color:#166534;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></section>'});
+    bm.add('hero',{label:'\u2605 Hero',category:'Extra',content:'<section style="padding:100px 0;text-align:center;background:#f0fdf4"><div style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#166534;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'});
+    bm.add('grid3',{label:'\u229F 3 Cols',category:'Extra',content:'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div style="text-align:center;padding:20px"><h3>Feature 1</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 2</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 3</h3><p>Description</p></div></div>'});
+    bm.add('cta',{label:'\uD83D\uDCE2 CTA',category:'Extra',content:'<section style="background:#166534;color:#fff;text-align:center;padding:60px 20px;border-radius:16px"><h2 style="font-size:2rem;margin-bottom:12px">Ready to start?</h2><a href="#" style="display:inline-block;padding:16px 36px;background:#fff;color:#166534;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></section>'});
     bm.add('faq',{label:'? FAQ',category:'Extra',content:'<div style="max-width:600px"><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700">Question 1?</div><p style="margin-top:8px;color:#666">Answer.</p></div></div>'});
   });
   window.editor=editor;
   document.onkeydown=function(e){if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveToGitHub()}}
 }
 
+// ═══════════ SAVE (guarded) ═══════════
 async function saveToGitHub(){
-  if(!editor){toast('Load the page first',false);return}
-  if(!pat){toast('Set GitHub token first (🔑 Token)',false);document.getElementById('patModal').classList.add('show');return}
-  // HARD LOCK: always sales page, never anything else
-  var repo=SITE.repo,file=SITE.file,branch=SITE.branch;
-  if(repo!=='banktif/jayaclean-salespage'||file!=='index.html'){toast('Locked to sales page only.',false);return}
+  if(!currentSite||!editor){toast('Load a page first',false);return}
+  if(!pat){toast('Set GitHub token first (\u2699 Sites)',false);openSiteModal();return}
+  var reason=protectReason(currentSite.repo,currentSite.file);
+  if(reason){toast('Blocked: '+reason,false);return}
   var html=editor.getHtml(),css=editor.getCss();
   var headM=currentHTML.match(/<head[^>]*>([\s\S]*?)<\/head>/i);var headContent=headM?headM[1]:'';
   var scripts=(currentHTML.match(/<script[\s\S]*?<\/script>/gi)||[]).join('\n');
   headContent=headContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'');
   var htmlAM=currentHTML.match(/<html([^>]*)>/i);var htmlAttrs=htmlAM?htmlAM[1]:' lang="ms"';
-  // Preserve original <script> tags (booking/Supabase logic) so functionality is not lost
   var fullHTML='<!DOCTYPE html>\n<html'+htmlAttrs+'>\n<head>\n'+headContent.trim()+'\n  <style>\n'+css+'\n  </style>\n</head>\n<body>\n'+html+'\n'+scripts+'\n</body>\n</html>';
-  var apiUrl='https://api.github.com/repos/'+repo+'/contents/'+file;
+  var apiUrl='https://api.github.com/repos/'+currentSite.repo+'/contents/'+(currentSite.file||'index.html');
   try{
-    var getRes=await fetch(apiUrl,{headers:{Authorization:'Bearer '+pat}});
-    var getData=await getRes.json();
+    var getRes=await fetch(apiUrl,{headers:{Authorization:'Bearer '+pat}});var getData=await getRes.json();
     if(!getData.sha)throw new Error(getData.message||'Cannot read file');
     var content=btoa(unescape(encodeURIComponent(fullHTML)));
-    var putRes=await fetch(apiUrl,{method:'PUT',headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},body:JSON.stringify({message:'Update sales page via GrapesJS',content:content,sha:getData.sha,branch:branch})});
+    var putRes=await fetch(apiUrl,{method:'PUT',headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},body:JSON.stringify({message:'Update sales page via GrapesJS',content:content,sha:getData.sha,branch:currentSite.branch||'master'})});
     if(!putRes.ok){var err=await putRes.json();throw new Error(err.message||'HTTP '+putRes.status)}
-    currentHTML=fullHTML;toast('Saved! Sales page deploying...',true);
+    currentHTML=fullHTML;toast('Saved! '+currentSite.repo+' deploying...',true);
   }catch(e){toast('Save failed: '+e.message,false)}
 }
 
