@@ -81,6 +81,10 @@
 <div id="siteModal" onclick="if(event.target===this)closeSiteModal()">
   <div class="box">
     <h3>Manage Sites <button class="sm-btn gray" onclick="closeSiteModal()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
+    <div style="margin-bottom:12px;display:flex;gap:6px">
+      <button class="sm-btn green" onclick="fetchRepos()" id="fetchReposBtn">📂 Fetch My GitHub Repos</button>
+      <select id="repoSelect" style="display:none;flex:1;font-size:.75rem" onchange="onRepoSelect()"><option value="">Select a repo...</option></select>
+    </div>
     <div id="siteList"></div>
     <button class="sm-btn green" style="width:100%;margin-top:8px;padding:10px" onclick="addSiteRow()">+ Add Site</button>
     <div style="margin-top:12px;display:flex;gap:8px">
@@ -164,6 +168,36 @@ function renderSiteList(){
   el.innerHTML=h||'<p style="color:#888;font-size:.8rem;text-align:center">No sites yet. Click + Add Site</p>';
 }
 function addSiteRow(){sites.push({name:'New Site',repo:'user/repo',file:'index.html',branch:'master'});renderSiteList()}
+function onRepoSelect(){
+  var sel=document.getElementById('repoSelect');
+  var fullName=sel.value;if(!fullName)return;
+  var name=fullName.split('/')[1]||fullName;
+  name=name.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});
+  sites.push({name:name,repo:fullName,file:'index.html',branch:'master'});
+  renderSiteList();saveSites();
+  sel.value='';sel.style.display='none';
+  toast('Added: '+name,true);
+}
+async function fetchRepos(){
+  if(!pat){toast('Set GitHub PAT first',false);return}
+  var btn=document.getElementById('fetchReposBtn');btn.disabled=true;btn.textContent='Loading...';
+  try{
+    var repos=[],page=1;
+    while(page<=5){
+      var r=await fetch('https://api.github.com/user/repos?per_page=100&sort=updated&page='+page,{headers:{Authorization:'Bearer '+pat}});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      var data=await r.json();
+      if(!data.length)break;
+      repos=repos.concat(data);page++;
+    }
+    var sel=document.getElementById('repoSelect');
+    sel.innerHTML='<option value="">Select repo to add...</option>';
+    repos.forEach(function(repo){sel.innerHTML+='<option value="'+repo.full_name+'">'+repo.full_name+(repo.description?' - '+repo.description.substring(0,50):'')+'</option>'});
+    sel.style.display='block';
+    toast('Found '+repos.length+' repos. Pick one to add.',true);
+  }catch(e){toast('Failed: '+e.message,false)}
+  btn.disabled=false;btn.textContent='📂 Fetch My GitHub Repos';
+}
 function updateSite(el){var i=parseInt(el.dataset.idx),f=el.dataset.field;sites[i][f]=el.value.trim()}
 function removeSite(i){sites.splice(i,1);renderSiteList()}
 function exportSites(){var blob=new Blob([JSON.stringify(sites,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='editor-sites.json';a.click()}
