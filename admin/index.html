@@ -344,11 +344,23 @@
     .btn-primary:hover{background:var(--accent-hover);box-shadow:0 6px 20px var(--accent-glow)}
     .btn-primary:active{transform:scale(.98)}
     .btn-primary svg{width:1.05em;height:1.05em}
-    /* Green-tinted menu backgrounds (match theme) */
-    .d-sidebar,.drawer{background:var(--menu-bg)}
+    /* Menu theming */
+    .drawer{background:var(--menu-bg)}
     .hdr,.bnav{background:var(--menu-overlay)}
-    .d-nav-item.active{background:var(--accent);color:#fff}
+    /* Deep green desktop sidebar with light text + sticky brand */
+    .d-sidebar{background:#14532d}
+    .d-brand{position:sticky;top:0;z-index:2;background:#14532d;border-bottom-color:rgba(255,255,255,.14)}
+    .d-brand-text h1{color:#fff}
+    .d-brand-text span{color:rgba(255,255,255,.6)}
+    .d-nav-item{color:rgba(255,255,255,.82)}
+    .d-nav-item .dni{color:inherit}
+    .d-nav-item:hover{background:rgba(255,255,255,.09);color:#fff}
+    .d-nav-item.active{background:rgba(255,255,255,.16);color:#fff}
     .d-nav-item.active .dni{color:#fff}
+    .d-nav-badge{background:rgba(255,255,255,.2);color:#fff}
+    .d-sidebar-footer{border-top-color:rgba(255,255,255,.14)}
+    .d-sidebar-footer button{color:rgba(255,255,255,.72)}
+    .d-sidebar-footer button:hover{background:rgba(255,255,255,.09);color:#fff}
   </style>
 </head>
 <body>
