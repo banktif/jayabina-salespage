@@ -3,27 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
   <title>GrapesJS — Multi-Site Editor</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{height:100%;overflow:hidden;font-family:system-ui,sans-serif;background:#1e1e1e}
+    html,body{height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#1e1e1e}
+    /* ─── PASSWORD GATE ─── */
+    #pwGate{position:fixed;inset:0;z-index:99999;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+    #pwGate input{padding:14px 20px;border:2px solid #3a3a3a;border-radius:12px;background:#252525;color:#fff;font-size:1rem;width:280px;text-align:center;font-family:inherit;outline:none}
+    #pwGate input:focus{border-color:#4CAF50}
+    #pwGate button{padding:14px 40px;background:#4CAF50;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit}
+    #pwGate button:hover{background:#43a047}
+    #pwGate h2{color:#fff;font-size:1.5rem;margin-bottom:4px}
+    #pwGate .sub{color:#888;font-size:.8rem;margin-bottom:8px}
+    #pwGate .err{color:#e5484d;font-size:.8rem;display:none}
+    #pwGate.hidden{display:none}
+    /* ─── SITE MANAGER MODAL ─── */
+    #siteModal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+    #siteModal.show{display:flex}
+    #siteModal .box{background:#2d2d2d;border-radius:16px;padding:24px;width:520px;max-width:90vw;max-height:80vh;overflow-y:auto;scrollbar-width:none}
+    #siteModal .box::-webkit-scrollbar{display:none}
+    #siteModal h3{color:#fff;font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+    #siteModal input,#siteModal select{padding:8px 12px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.78rem;font-family:inherit;width:100%}
+    #siteModal input:focus,#siteModal select:focus{border-color:#4CAF50;outline:none}
+    .sm-row{display:grid;grid-template-columns:1fr 1.2fr .8fr;gap:8px;margin-bottom:8px;align-items:center}
+    .sm-row .sm-actions{display:flex;gap:4px}
+    .sm-btn{padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.72rem;font-weight:600;font-family:inherit}
+    .sm-btn.green{background:#4CAF50;color:#fff}.sm-btn.gray{background:#555;color:#fff}.sm-btn.red{background:#c62828;color:#fff;padding:6px 10px}
+    /* ─── TOP BAR ─── */
     #topbar{display:flex;align-items:center;gap:10px;padding:6px 12px;background:#2d2d2d;border-bottom:1px solid #3a3a3a;z-index:10;position:relative}
-    #topbar select,#topbar input,#topbar button{padding:6px 10px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.75rem;font-family:inherit}
-    #topbar select:focus,#topbar input:focus{border-color:#4CAF50;outline:none}
-    #topbar button{background:#4CAF50;color:#fff;border:none;cursor:pointer;font-weight:600}
-    #topbar button:hover{background:#43a047}
+    #topbar select,#topbar button,input.sm{font-family:inherit;padding:6px 10px;border-radius:6px;border:1px solid #3a3a3a;background:#252525;color:#e0e0e0;font-size:.72rem;cursor:pointer}
+    #topbar button{font-weight:600}
+    #topbar button.prim{background:#4CAF50;color:#fff;border:none}
+    #topbar button.prim:hover{background:#43a047}
+    #topbar button.warn{background:#e65100;color:#fff;border:none}
     #topbar .sep{width:1px;height:20px;background:#3a3a3a}
-    #topbar .info{font-size:.7rem;color:#888;margin-left:auto}
+    #topbar .info{font-size:.68rem;color:#888;margin-left:auto}
+    /* ─── GRAPESJS ─── */
     #gjs{height:calc(100% - 37px);width:100%}
+    /* ─── TOAST ─── */
     .toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;z-index:9999;font-weight:600;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none}
     .toast.ok{background:#2E7D32;color:#fff}.toast.err{background:#c62828;color:#fff}.toast.show{opacity:1}
-    .spin{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px}.spin-text{color:#888}
-    .spin-circle{width:40px;height:40px;border:3px solid #333;border-top-color:#4CAF50;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-
-    /* GrapesJS dark theme */
-    .gjs-one-bg{background:#1e1e1e!important}
-    .gjs-two-color{color:#4CAF50!important}
+    /* ─── DARK THEME ─── */
+    .gjs-one-bg{background:#1e1e1e!important}.gjs-two-color{color:#4CAF50!important}
     .gjs-three-bg{background:#2d2d2d!important;color:#e0e0e0!important}
     .gjs-four-color,.gjs-four-color-h:hover{color:#4CAF50!important}
     .gjs-cv-canvas{background-color:#f0f0f0!important}
@@ -44,105 +67,203 @@
   </style>
 </head>
 <body>
-<div id="topbar">
-  <select id="siteSelect" onchange="loadSite()"><option value="">-- Select Site --</option></select>
+
+<!-- PASSWORD GATE -->
+<div id="pwGate">
+  <h2>🔒 Editor Access</h2>
+  <p class="sub" id="pwSub">Enter password to continue</p>
+  <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+  <div class="err" id="pwErr">Wrong password</div>
+  <button onclick="checkPassword()">Unlock</button>
+</div>
+
+<!-- SITE MANAGER MODAL -->
+<div id="siteModal" onclick="if(event.target===this)closeSiteModal()">
+  <div class="box">
+    <h3>Manage Sites <button class="sm-btn gray" onclick="closeSiteModal()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
+    <div id="siteList"></div>
+    <button class="sm-btn green" style="width:100%;margin-top:8px;padding:10px" onclick="addSiteRow()">+ Add Site</button>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="sm-btn gray" onclick="exportSites()" style="flex:1">Export Config</button>
+      <button class="sm-btn gray" onclick="importSites()" style="flex:1">Import Config</button>
+    </div>
+    <div style="margin-top:12px">
+      <label style="color:#888;font-size:.7rem;display:block;margin-bottom:4px">GitHub Personal Access Token</label>
+      <div style="display:flex;gap:6px"><input type="password" id="patInput" placeholder="ghp_..." style="flex:1"><button class="sm-btn green" onclick="savePAT()">Save</button></div>
+      <div style="color:#666;font-size:.65rem;margin-top:4px">Needs <b>repo</b> scope. <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#4CAF50">Create token</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar" style="display:none">
+  <select id="siteSelect" onchange="onSiteChange()"><option value="">-- Select Site --</option></select>
   <span class="sep"></span>
-  <input type="password" id="patInput" placeholder="GitHub PAT" style="width:200px">
-  <button onclick="savePAT()">Save Token</button>
+  <button onclick="loadSite()" class="prim">Load</button>
+  <button onclick="saveToGitHub()" id="saveBtn" class="prim" disabled>Save to GitHub</button>
   <span class="sep"></span>
-  <button onclick="loadSite()">Load</button>
-  <button onclick="saveToGitHub()" id="saveBtn" disabled>Save to GitHub</button>
+  <button onclick="openSiteModal()">⚙ Sites</button>
+  <button onclick="doLogout()">Logout</button>
   <span class="info" id="siteInfo"></span>
 </div>
+
 <div id="gjs"></div>
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/grapes.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/grapesjs-preset-webpage@1.0.3/dist/index.min.js"></script>
 <script>
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
 var sites=[],currentSite=null,editor=null,pat='',currentHTML='';
+var PASSWORD_HASH='';
 
 function toast(m,ok){var t=document.getElementById('toast');t.textContent=m;t.className='toast '+(ok?'ok':'err')+' show';setTimeout(function(){t.className='toast'},3000)}
 
-async function loadSettings(){
-  try{var{data}=await SB.from('app_settings').select('value').eq('key','editor_sites').single();if(data&&data.value)sites=JSON.parse(data.value)}catch(e){}
+// ═══════════ PASSWORD GATE ═══════════
+async function sha256(m){var buf=new TextEncoder().encode(m);var hash=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0')}).join('')}
+
+async function checkPassword(){
+  var pw=document.getElementById('pwInput').value;
+  if(!pw)return;
+  var hash=await sha256(pw);
+  if(!PASSWORD_HASH){PASSWORD_HASH=hash;localStorage.setItem('editor_pw_hash',hash);unlockEditor();return}
+  if(hash===PASSWORD_HASH){unlockEditor();return}
+  document.getElementById('pwErr').style.display='block'
+}
+
+function unlockEditor(){
+  document.getElementById('pwGate').classList.add('hidden');
+  document.getElementById('topbar').style.display='flex';
+  initEditor();
+}
+
+function doLogout(){document.getElementById('pwGate').classList.remove('hidden');document.getElementById('topbar').style.display='none';if(editor){editor.destroy();editor=null}document.getElementById('gjs').innerHTML='';document.getElementById('pwInput').value='';document.getElementById('pwErr').style.display='none'}
+
+// ═══════════ SITE MANAGEMENT (localStorage) ═══════════
+function loadSites(){
+  try{sites=JSON.parse(localStorage.getItem('editor_sites')||'[]')}catch(e){sites=[]}
+  refreshSiteSelect();
+}
+function saveSites(){localStorage.setItem('editor_sites',JSON.stringify(sites));refreshSiteSelect()}
+function refreshSiteSelect(){
   var sel=document.getElementById('siteSelect');
   sel.innerHTML='<option value="">-- Select Site --</option>';
   sites.forEach(function(s,i){sel.innerHTML+='<option value="'+i+'">'+s.name+' ('+s.repo+')</option>'});
-  pat=localStorage.getItem('gh_pat')||'';
-  document.getElementById('patInput').value=pat;
+}
+function onSiteChange(){document.getElementById('saveBtn').disabled=true;document.getElementById('siteInfo').textContent=''}
+
+function openSiteModal(){
+  document.getElementById('siteModal').classList.add('show');
+  renderSiteList();
+}
+function closeSiteModal(){document.getElementById('siteModal').classList.remove('show')}
+function renderSiteList(){
+  var el=document.getElementById('siteList'),h='';
+  sites.forEach(function(s,i){
+    h+='<div class="sm-row"><input value="'+esc(s.name)+'" placeholder="Site Name" data-idx="'+i+'" data-field="name" onchange="updateSite(this)"><input value="'+esc(s.repo)+'" placeholder="user/repo" data-idx="'+i+'" data-field="repo" onchange="updateSite(this)"><div class="sm-actions"><input value="'+(s.file||'index.html')+'" placeholder="file" style="font-size:.68rem" data-idx="'+i+'" data-field="file" onchange="updateSite(this)"><button class="sm-btn red" onclick="removeSite('+i+')" title="Remove">×</button></div></div>';
+  });
+  el.innerHTML=h||'<p style="color:#888;font-size:.8rem;text-align:center">No sites yet. Click + Add Site</p>';
+}
+function addSiteRow(){sites.push({name:'New Site',repo:'user/repo',file:'index.html',branch:'master'});renderSiteList()}
+function updateSite(el){var i=parseInt(el.dataset.idx),f=el.dataset.field;sites[i][f]=el.value.trim()}
+function removeSite(i){sites.splice(i,1);renderSiteList()}
+function exportSites(){var blob=new Blob([JSON.stringify(sites,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='editor-sites.json';a.click()}
+function importSites(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=function(){var r=new FileReader();r.onload=function(){try{sites=JSON.parse(r.result);renderSiteList()}catch(e){alert('Invalid JSON')}};r.readAsText(inp.files[0])};
+  inp.click();
 }
 
-function savePAT(){pat=document.getElementById('patInput').value;localStorage.setItem('gh_pat',pat);toast('Token saved',true)}
+// ═══════════ INIT ═══════════
+function initEditor(){
+  PASSWORD_HASH=localStorage.getItem('editor_pw_hash')||'';
+  pat=localStorage.getItem('gh_pat')||'';
+  loadSites();
+  if(!PASSWORD_HASH){document.getElementById('pwSub').textContent='Set a password to protect this editor'}
+  // Fill PAT input when modal opens
+  var orig=openSiteModal;openSiteModal=function(){orig();document.getElementById('patInput').value=pat}
+}
 
+// ═══════════ LOAD & EDIT ═══════════
 async function loadSite(){
   var idx=document.getElementById('siteSelect').value;
   if(idx==='')return;
   currentSite=sites[parseInt(idx)];
-  var info=document.getElementById('siteInfo');
-  info.textContent='Loading '+currentSite.name+'...';
-
+  var info=document.getElementById('siteInfo');info.textContent='Loading...';
   var url='https://raw.githubusercontent.com/'+currentSite.repo+'/'+(currentSite.branch||'master')+'/'+(currentSite.file||'index.html');
   try{
     var r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);
     currentHTML=await r.text();
     info.textContent=currentSite.name;
     document.getElementById('saveBtn').disabled=false;
-    initEditor(currentHTML);
+    buildEditor(currentHTML);
   }catch(e){toast('Load failed: '+e.message,false);info.textContent='Error'}
 }
 
-function initEditor(html){
+function buildEditor(html){
   if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
   var bodyM=html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   var bodyHTML=bodyM?bodyM[1]:html;
   var styleM=html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   var styleCSS=styleM?styleM[1]:'';
-  var htmlAM=html.match(/<html([^>]*)>/i);
-  var htmlAttrs=htmlAM?htmlAM[1]:' lang="ms"';
-  var headM=html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
-  var headContent=headM?headM[1]:'';
-  headContent=headContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'');
-  headContent=headContent.replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'');
 
   editor=grapesjs.init({
-    container:'#gjs',height:'100%',width:'auto',
-    storageManager:{type:'local',autosave:false},
+    container:'#gjs',height:'100%',width:'auto',fromElement:false,
+    storageManager:{type:'local',autosave:false,stepsBeforeSave:1},
     plugins:['gjs-preset-webpage'],
-    pluginsOpts:{'gjs-preset-webpage':{blocks:['link-block','quote','text-basic']}},
-    canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap']},
+    pluginsOpts:{'gjs-preset-webpage':{blocks:['link-block','quote','text-basic'],modalImportTitle:'Import HTML'}},
+    canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap','https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap']},
     deviceManager:{devices:[{name:'Desktop',width:''},{name:'Tablet',width:'768px',widthMedia:'768px'},{name:'Mobile',width:'375px',widthMedia:'375px'}]},
     blockManager:{blocks:[
-      {id:'text',label:'<b>T</b> Text',category:'Basic',content:{type:'text',content:'Insert text'}},
-      {id:'image',label:'Image',category:'Basic',content:{type:'image'}},
-      {id:'section',label:'Section',category:'Basic',content:'<section style="padding:60px 0"><div class="container"><h2>Section</h2><p>Content here.</p></div></section>'},
-      {id:'button',label:'Button',category:'Basic',content:'<a class="btn" style="display:inline-block;padding:14px 32px;border-radius:50px;background:#2E7D32;color:#fff;font-weight:700;text-decoration:none">Click</a>'},
-      {id:'columns',label:'2 Cols',category:'Basic',content:'<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px"><div>Left</div><div>Right</div></div>'}
+      {id:'section',label:'<b>▣</b> Section',category:'Layout',content:'<section style="padding:60px 0"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h2>Section Title</h2><p>Your content here.</p></div></section>'},
+      {id:'hero',label:'<b>★</b> Hero',category:'Layout',content:'<section style="padding:100px 0;text-align:center;background:#f5f5f5"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'},
+      {id:'grid2',label:'<b>⊞</b> 2 Cols',category:'Layout',content:'<div style="display:grid;grid-template-columns:1fr 1fr;gap:30px"><div><h3>Column 1</h3><p>Content</p></div><div><h3>Column 2</h3><p>Content</p></div></div>'},
+      {id:'grid3',label:'<b>⊟</b> 3 Cols',category:'Layout',content:'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div style="text-align:center;padding:20px"><h3>Feature 1</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 2</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 3</h3><p>Description</p></div></div>'},
+      {id:'text',label:'<b>T</b> Text',category:'Basic',content:{type:'text',content:'Insert text here'}},
+      {id:'image',label:'🖼 Image',category:'Basic',content:{type:'image'}},
+      {id:'video',label:'▶ Video',category:'Basic',content:{type:'video'}},
+      {id:'map',label:'📍 Map',category:'Basic',content:{type:'map'}},
+      {id:'button',label:'<b>▶</b> Button',category:'Basic',content:'<a href="#" style="display:inline-block;padding:14px 32px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700;font-family:Poppins,sans-serif">Click Here</a>'},
+      {id:'list',label:'≡ List',category:'Basic',content:'<ul style="padding-left:20px"><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>'},
+      {id:'card',label:'<b>▨</b> Card',category:'Components',content:'<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);max-width:360px"><img src="https://placehold.co/360x200/2E7D32/fff?text=Image" style="width:100%;display:block"><div style="padding:20px"><h3 style="margin-bottom:8px">Card Title</h3><p style="color:#666;font-size:.9rem;margin-bottom:16px">Card description</p><a href="#" style="color:#2E7D32;font-weight:700;text-decoration:none">Learn More →</a></div></div>'},
+      {id:'form',label:'📝 Form',category:'Components',content:'<form style="max-width:400px"><input placeholder="Name" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"><input placeholder="Email" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"><textarea placeholder="Message" rows="4" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"></textarea><button style="padding:14px 32px;background:#2E7D32;color:#fff;border:none;border-radius:50px;font-weight:700;font-family:inherit;cursor:pointer">Submit</button></form>'},
+      {id:'navbar',label:'☰ Navbar',category:'Components',content:'<nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08)"><div style="font-weight:800;font-size:1.2rem">LOGO</div><div style="display:flex;gap:24px"><a href="#" style="color:#333;text-decoration:none;font-weight:600">Home</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">About</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">Contact</a></div></nav>'},
+      {id:'footer',label:'<b>▔</b> Footer',category:'Components',content:'<footer style="background:#1a1a1a;color:#999;padding:40px 20px;text-align:center;font-size:.85rem"><p>&copy; 2026 Your Company. All rights reserved.</p></footer>'},
+      {id:'faq',label:'? FAQ',category:'Components',content:'<div style="max-width:600px"><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 1?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 2?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div></div>'},
+      {id:'pricing',label:'💳 Pricing',category:'Components',content:'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px"><div style="text-align:center;padding:30px 20px;border:1px solid #ddd;border-radius:16px"><h3>Basic</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM99</div><p style="color:#666">per month</p><ul style="list-style:none;padding:0;margin:16px 0"><li>✓ Feature 1</li><li>✓ Feature 2</li></ul><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div></div>'},
+      {id:'testimonial',label:'💬 Testimonial',category:'Components',content:'<div style="max-width:500px;text-align:center;padding:30px"><p style="font-size:1.1rem;font-style:italic;color:#555">"Great service! Highly recommended."</p><div style="margin-top:16px;font-weight:700">— Customer Name</div></div>'}
     ]},
-    styleManager:{sectors:[{name:'General',open:true,properties:[
-      {property:'width'},{property:'height'},{property:'margin'},{property:'padding'},
-      {property:'background-color',name:'BG Color'},{property:'color',name:'Text Color'},
-      {property:'font-family'},{property:'font-size'},{property:'font-weight'},
-      {property:'text-align'},{property:'border-radius'},{property:'border'}
-    ]}]}
+    styleManager:{sectors:[
+      {name:'Layout',open:true,properties:[
+        {property:'display',type:'select',def:'block',options:[{value:'block'},{value:'inline-block'},{value:'flex'},{value:'grid'},{value:'none'}]},
+        {property:'flex-direction'},{property:'flex-wrap'},{property:'justify-content'},{property:'align-items'},{property:'gap'},
+        {property:'width'},{property:'max-width'},{property:'height'},{property:'min-height'},
+        {property:'margin'},{property:'padding'},
+        {property:'float',type:'radio',def:'none',options:[{value:'none'},{value:'left'},{value:'right'}]},
+        {property:'position',type:'select',def:'static',options:[{value:'static'},{value:'relative'},{value:'absolute'},{value:'fixed'},{value:'sticky'}]},
+        {property:'top'},{property:'right'},{property:'bottom'},{property:'left'},{property:'z-index'}
+      ]},
+      {name:'Typography',open:false,properties:[
+        {property:'font-family'},{property:'font-size'},{property:'font-weight',type:'select',def:'400',options:[{value:'400',name:'Normal'},{value:'500'},{value:'600'},{value:'700',name:'Bold'},{value:'800'},{value:'900'}]},
+        {property:'color',name:'Text Color'},{property:'text-align'},{property:'text-decoration'},{property:'line-height'},{property:'letter-spacing'},{property:'text-transform',type:'select',def:'none',options:[{value:'none'},{value:'uppercase'},{value:'lowercase'},{value:'capitalize'}]}
+      ]},
+      {name:'Background',open:false,properties:[
+        {property:'background-color'},{property:'background-image'},{property:'background-size'},{property:'background-position'},{property:'background-repeat',type:'select',def:'no-repeat',options:[{value:'no-repeat'},{value:'repeat'},{value:'repeat-x'},{value:'repeat-y'}]}
+      ]},
+      {name:'Border & Shadow',open:false,properties:[
+        {property:'border'},{property:'border-radius'},{property:'box-shadow'},{property:'opacity'}
+      ]}
+    ]}
   });
 
-  editor.on('load',function(){
-    if(styleCSS)editor.setStyle(styleCSS);
-    editor.addComponents(bodyHTML);
-  });
-
+  editor.on('load',function(){if(styleCSS)editor.setStyle(styleCSS);editor.addComponents(bodyHTML)});
   window.editor=editor;
-
-  // Ctrl+S → save
   document.onkeydown=function(e){if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveToGitHub()}}
 }
 
+// ═══════════ GITHUB SAVE ═══════════
 async function saveToGitHub(){
   if(!currentSite||!editor)return;
-  if(!pat){toast('Set GitHub PAT first',false);return}
+  if(!pat){toast('Set GitHub PAT first (⚙ Sites → paste in token field below)',false);return}
   var html=editor.getHtml(),css=editor.getCss();
   var headM=currentHTML.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
   var headContent=headM?headM[1]:'';
@@ -154,24 +275,21 @@ async function saveToGitHub(){
 
   var apiUrl='https://api.github.com/repos/'+currentSite.repo+'/contents/'+(currentSite.file||'index.html');
   try{
-    // Get current SHA
     var getRes=await fetch(apiUrl,{headers:{Authorization:'Bearer '+pat}});
     var getData=await getRes.json();
-    var sha=getData.sha;
-
+    if(!getData.sha)throw new Error(getData.message||'Cannot read file');
     var content=btoa(unescape(encodeURIComponent(fullHTML)));
-    var putRes=await fetch(apiUrl,{
-      method:'PUT',
-      headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},
-      body:JSON.stringify({message:'Update via GrapesJS Editor',content:content,sha:sha,branch:currentSite.branch||'master'})
-    });
+    var putRes=await fetch(apiUrl,{method:'PUT',headers:{Authorization:'Bearer '+pat,'Content-Type':'application/json'},body:JSON.stringify({message:'Update via GrapesJS Editor',content:content,sha:getData.sha,branch:currentSite.branch||'master'})});
     if(!putRes.ok){var err=await putRes.json();throw new Error(err.message||'HTTP '+putRes.status)}
-    currentHTML=fullHTML;
-    toast('Saved to '+currentSite.repo+'! GitHub Pages deploying...',true);
+    currentHTML=fullHTML;toast('Saved! '+currentSite.repo+' → GitHub Pages deploying...',true);
   }catch(e){toast('Save failed: '+e.message,false)}
 }
 
-loadSettings();
+// ═══════════ HELPERS ═══════════
+function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+function savePAT(){pat=document.getElementById('patInput').value;localStorage.setItem('gh_pat',pat);toast('Token saved',true)}
+
+initEditor();
 </script>
 </body>
 </html>
