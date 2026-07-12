@@ -244,49 +244,34 @@ function buildEditor(html){
     container:'#gjs',height:'100%',width:'auto',fromElement:false,
     storageManager:{type:'local',autosave:false,stepsBeforeSave:1},
     plugins:['gjs-preset-webpage'],
-    pluginsOpts:{'gjs-preset-webpage':{blocks:['link-block','quote','text-basic'],modalImportTitle:'Import HTML'}},
-    canvas:{styles:['https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap','https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap']},
-    deviceManager:{devices:[{name:'Desktop',width:''},{name:'Tablet',width:'768px',widthMedia:'768px'},{name:'Mobile',width:'375px',widthMedia:'375px'}]},
-    blockManager:{blocks:[
-      {id:'section',label:'<b>▣</b> Section',category:'Layout',content:'<section style="padding:60px 0"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h2>Section Title</h2><p>Your content here.</p></div></section>'},
-      {id:'hero',label:'<b>★</b> Hero',category:'Layout',content:'<section style="padding:100px 0;text-align:center;background:#f5f5f5"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'},
-      {id:'grid2',label:'<b>⊞</b> 2 Cols',category:'Layout',content:'<div style="display:grid;grid-template-columns:1fr 1fr;gap:30px"><div><h3>Column 1</h3><p>Content</p></div><div><h3>Column 2</h3><p>Content</p></div></div>'},
-      {id:'grid3',label:'<b>⊟</b> 3 Cols',category:'Layout',content:'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div style="text-align:center;padding:20px"><h3>Feature 1</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 2</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 3</h3><p>Description</p></div></div>'},
-      {id:'text',label:'<b>T</b> Text',category:'Basic',content:{type:'text',content:'Insert text here'}},
-      {id:'image',label:'🖼 Image',category:'Basic',content:{type:'image'}},
-      {id:'video',label:'▶ Video',category:'Basic',content:{type:'video'}},
-      {id:'map',label:'📍 Map',category:'Basic',content:{type:'map'}},
-      {id:'button',label:'<b>▶</b> Button',category:'Basic',content:'<a href="#" style="display:inline-block;padding:14px 32px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700;font-family:Poppins,sans-serif">Click Here</a>'},
-      {id:'list',label:'≡ List',category:'Basic',content:'<ul style="padding-left:20px"><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>'},
-      {id:'card',label:'<b>▨</b> Card',category:'Components',content:'<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);max-width:360px"><img src="https://placehold.co/360x200/2E7D32/fff?text=Image" style="width:100%;display:block"><div style="padding:20px"><h3 style="margin-bottom:8px">Card Title</h3><p style="color:#666;font-size:.9rem;margin-bottom:16px">Card description</p><a href="#" style="color:#2E7D32;font-weight:700;text-decoration:none">Learn More →</a></div></div>'},
-      {id:'form',label:'📝 Form',category:'Components',content:'<form style="max-width:400px"><input placeholder="Name" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"><input placeholder="Email" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"><textarea placeholder="Message" rows="4" style="display:block;width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit"></textarea><button style="padding:14px 32px;background:#2E7D32;color:#fff;border:none;border-radius:50px;font-weight:700;font-family:inherit;cursor:pointer">Submit</button></form>'},
-      {id:'navbar',label:'☰ Navbar',category:'Components',content:'<nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08)"><div style="font-weight:800;font-size:1.2rem">LOGO</div><div style="display:flex;gap:24px"><a href="#" style="color:#333;text-decoration:none;font-weight:600">Home</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">About</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">Contact</a></div></nav>'},
-      {id:'footer',label:'<b>▔</b> Footer',category:'Components',content:'<footer style="background:#1a1a1a;color:#999;padding:40px 20px;text-align:center;font-size:.85rem"><p>&copy; 2026 Your Company. All rights reserved.</p></footer>'},
-      {id:'faq',label:'? FAQ',category:'Components',content:'<div style="max-width:600px"><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 1?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 2?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div></div>'},
-      {id:'pricing',label:'💳 Pricing',category:'Components',content:'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px"><div style="text-align:center;padding:30px 20px;border:1px solid #ddd;border-radius:16px"><h3>Basic</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM99</div><p style="color:#666">per month</p><ul style="list-style:none;padding:0;margin:16px 0"><li>✓ Feature 1</li><li>✓ Feature 2</li></ul><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div></div>'},
-      {id:'testimonial',label:'💬 Testimonial',category:'Components',content:'<div style="max-width:500px;text-align:center;padding:30px"><p style="font-size:1.1rem;font-style:italic;color:#555">"Great service! Highly recommended."</p><div style="margin-top:16px;font-weight:700">— Customer Name</div></div>'}
+    pluginsOpts:{'gjs-preset-webpage':{}},
+    canvas:{styles:[
+      'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap',
+      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
     ]},
-    styleManager:{sectors:[
-      {name:'Layout',open:true,properties:[
-        {property:'display',type:'select',def:'block',options:[{value:'block'},{value:'inline-block'},{value:'flex'},{value:'grid'},{value:'none'}]},
-        {property:'flex-direction'},{property:'flex-wrap'},{property:'justify-content'},{property:'align-items'},{property:'gap'},
-        {property:'width'},{property:'max-width'},{property:'height'},{property:'min-height'},
-        {property:'margin'},{property:'padding'},
-        {property:'float',type:'radio',def:'none',options:[{value:'none'},{value:'left'},{value:'right'}]},
-        {property:'position',type:'select',def:'static',options:[{value:'static'},{value:'relative'},{value:'absolute'},{value:'fixed'},{value:'sticky'}]},
-        {property:'top'},{property:'right'},{property:'bottom'},{property:'left'},{property:'z-index'}
-      ]},
-      {name:'Typography',open:false,properties:[
-        {property:'font-family'},{property:'font-size'},{property:'font-weight',type:'select',def:'400',options:[{value:'400',name:'Normal'},{value:'500'},{value:'600'},{value:'700',name:'Bold'},{value:'800'},{value:'900'}]},
-        {property:'color',name:'Text Color'},{property:'text-align'},{property:'text-decoration'},{property:'line-height'},{property:'letter-spacing'},{property:'text-transform',type:'select',def:'none',options:[{value:'none'},{value:'uppercase'},{value:'lowercase'},{value:'capitalize'}]}
-      ]},
-      {name:'Background',open:false,properties:[
-        {property:'background-color'},{property:'background-image'},{property:'background-size'},{property:'background-position'},{property:'background-repeat',type:'select',def:'no-repeat',options:[{value:'no-repeat'},{value:'repeat'},{value:'repeat-x'},{value:'repeat-y'}]}
-      ]},
-      {name:'Border & Shadow',open:false,properties:[
-        {property:'border'},{property:'border-radius'},{property:'box-shadow'},{property:'opacity'}
-      ]}
+    deviceManager:{devices:[
+      {name:'Desktop',width:''},
+      {name:'Tablet',width:'768px',widthMedia:'768px'},
+      {name:'Mobile',width:'375px',widthMedia:'375px'}
     ]}
+  });
+
+  // Add extra custom blocks on top of preset defaults
+  editor.on('load',function(){
+    if(styleCSS)editor.setStyle(styleCSS);
+    editor.addComponents(bodyHTML);
+
+    var bm=editor.Blocks;
+    bm.add('Layout',{id:'hero',label:'★ Hero',category:'Extra',content:'<section style="padding:100px 0;text-align:center;background:#f5f5f5"><div class="container" style="max-width:1100px;margin:0 auto;padding:0 20px"><h1 style="font-size:3rem;font-weight:800;margin-bottom:16px">Hero Title</h1><p style="font-size:1.2rem;color:#666;margin-bottom:24px">Hero subtitle</p><a href="#" style="display:inline-block;padding:16px 36px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Get Started</a></div></section>'});
+    bm.add('Extra',{id:'grid3',label:'⊟ 3 Cols',content:'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px"><div style="text-align:center;padding:20px"><h3>Feature 1</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 2</h3><p>Description</p></div><div style="text-align:center;padding:20px"><h3>Feature 3</h3><p>Description</p></div></div>'});
+    bm.add('Extra',{id:'card',label:'▨ Card',content:'<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);max-width:360px"><img src="https://placehold.co/360x200/2E7D32/fff?text=Image" style="width:100%;display:block"><div style="padding:20px"><h3 style="margin-bottom:8px">Card Title</h3><p style="color:#666;font-size:.9rem;margin-bottom:16px">Card description</p><a href="#" style="color:#2E7D32;font-weight:700;text-decoration:none">Learn More →</a></div></div>'});
+    bm.add('Extra',{id:'navbar',label:'☰ Navbar',content:'<nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08)"><div style="font-weight:800;font-size:1.2rem">LOGO</div><div style="display:flex;gap:24px"><a href="#" style="color:#333;text-decoration:none;font-weight:600">Home</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">About</a><a href="#" style="color:#333;text-decoration:none;font-weight:600">Contact</a></div></nav>'});
+    bm.add('Extra',{id:'footer',label:'▔ Footer',content:'<footer style="background:#1a1a1a;color:#999;padding:40px 20px;text-align:center;font-size:.85rem"><p>&copy; 2026 Your Company. All rights reserved.</p></footer>'});
+    bm.add('Extra',{id:'pricing',label:'💳 Pricing',content:'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px"><div style="text-align:center;padding:30px 20px;border:1px solid #ddd;border-radius:16px"><h3>Basic</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM99</div><p style="color:#666">per month</p><ul style="list-style:none;padding:0;margin:16px 0"><li>✓ Feature 1</li><li>✓ Feature 2</li></ul><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div><div style="text-align:center;padding:30px 20px;border:1px solid #ddd;border-radius:16px"><h3>Pro</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM199</div><p style="color:#666">per month</p><ul style="list-style:none;padding:0;margin:16px 0"><li>✓ Feature 1</li><li>✓ Feature 2</li></ul><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div><div style="text-align:center;padding:30px 20px;border:1px solid #ddd;border-radius:16px"><h3>Premium</h3><div style="font-size:2rem;font-weight:800;margin:12px 0">RM299</div><p style="color:#666">per month</p><ul style="list-style:none;padding:0;margin:16px 0"><li>✓ Feature 1</li><li>✓ Feature 2</li></ul><a href="#" style="display:block;padding:12px;background:#2E7D32;color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Choose</a></div></div>'});
+    bm.add('Extra',{id:'faq',label:'? FAQ',content:'<div style="max-width:600px"><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 1?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div><div style="border-bottom:1px solid #ddd;padding:16px 0"><div style="font-weight:700;cursor:pointer">Question 2?</div><p style="margin-top:8px;color:#666">Answer goes here.</p></div></div>'});
+    bm.add('Extra',{id:'testi',label:'💬 Testimonial',content:'<div style="max-width:500px;text-align:center;padding:30px"><p style="font-size:1.1rem;font-style:italic;color:#555">"Great service!"</p><div style="margin-top:16px;font-weight:700">- Customer Name</div></div>'});
+    bm.add('Extra',{id:'cta',label:'📢 CTA Banner',content:'<section style="background:#2E7D32;color:#fff;text-align:center;padding:60px 20px;border-radius:16px"><h2 style="font-size:2rem;margin-bottom:12px">Ready to start?</h2><p style="font-size:1.1rem;opacity:.9;margin-bottom:24px">Join thousands of happy customers.</p><a href="#" style="display:inline-block;padding:16px 36px;background:#fff;color:#2E7D32;border-radius:50px;text-decoration:none;font-weight:700">Get Started Free</a></section>'});
+    bm.add('Extra',{id:'stats',label:'📊 Stats',content:'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center"><div><div style="font-size:2.5rem;font-weight:800;color:#2E7D32">99%</div><div style="color:#666;margin-top:4px">Satisfaction</div></div><div><div style="font-size:2.5rem;font-weight:800;color:#2E7D32">10K+</div><div style="color:#666;margin-top:4px">Customers</div></div><div><div style="font-size:2.5rem;font-weight:800;color:#2E7D32">24/7</div><div style="color:#666;margin-top:4px">Support</div></div><div><div style="font-size:2.5rem;font-weight:800;color:#2E7D32">5★</div><div style="color:#666;margin-top:4px">Rating</div></div></div>'});
   });
 
   editor.on('load',function(){if(styleCSS)editor.setStyle(styleCSS);editor.addComponents(bodyHTML)});
