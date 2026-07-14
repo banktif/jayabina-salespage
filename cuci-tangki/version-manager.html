@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Homepage Version Manager — JAYACUCI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+:root{--bg:#0B1413;--surf:#101B1A;--border:rgba(255,255,255,.08);--teal:#0E8C86;--teal-s:rgba(14,140,134,.15);--green:#16a34a;--green-bg:rgba(22,163,74,.15);--amber:#f59e0b;--amber-bg:rgba(245,158,11,.15);--text:#E8F6F4;--t2:rgba(232,246,244,.6);--t3:rgba(232,246,244,.35)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Figtree',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 24px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto}
+h1{font-weight:800;font-size:1.5rem;margin-bottom:6px;letter-spacing:-.3px}
+.sub{color:var(--t2);font-size:.85rem;margin-bottom:32px}
+h1 span{background:var(--teal-s);color:var(--teal);padding:2px 10px;border-radius:6px;font-size:.7rem;vertical-align:middle;margin-left:8px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.5px}
+
+.live-banner{background:var(--green-bg);border:1px solid rgba(22,163,74,.2);border-radius:14px;padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:12px}
+.live-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.live-text{font-weight:600;font-size:.88rem;color:var(--green)}
+.live-text span{color:var(--t2);font-weight:400;font-size:.78rem}
+
+.version-grid{display:flex;flex-direction:column;gap:10px}
+.v-card{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:all .15s}
+.v-card:hover{border-color:rgba(255,255,255,.15)}
+.v-card.live{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.03)}
+.v-info{flex:1;min-width:0}
+.v-name{font-weight:700;font-size:.95rem}
+.v-name .live-tag{display:inline-block;background:var(--green);color:#fff;padding:2px 8px;border-radius:4px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-left:6px;vertical-align:middle}
+.v-desc{color:var(--t2);font-size:.75rem;margin-top:2px}
+.v-actions{display:flex;gap:8px;flex-shrink:0}
+.btn{padding:8px 18px;border-radius:8px;font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .15s;font-family:'Figtree',sans-serif;white-space:nowrap}
+.btn-preview{background:var(--border);color:var(--text)}
+.btn-preview:hover{background:rgba(255,255,255,.15)}
+.btn-publish{background:var(--teal);color:#fff}
+.btn-publish:hover{background:#0A6A65;transform:translateY(-1px)}
+.btn-live{background:var(--green);color:#fff;cursor:default;opacity:.8}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:14px 24px;border-radius:12px;font-weight:600;font-size:.85rem;box-shadow:0 8px 32px rgba(22,163,74,.3);opacity:0;transform:translateY(10px);transition:all .3s;z-index:99}
+.toast.show{opacity:1;transform:translateY(0)}
+
+.empty{text-align:center;padding:60px;color:var(--t3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚙️ Homepage Version <span>Main Domain</span></h1>
+  <p class="sub">Pilih version sales page untuk dipublish ke homepage utama (cuci.jayabina.com).</p>
+
+  <div class="live-banner" id="liveBanner">
+    <div class="live-dot"></div>
+    <div class="live-text">Live now: <span id="liveLabel">v4</span></div>
+  </div>
+
+  <div class="version-grid" id="versionGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var VERSIONS = [
+  {file:'v1.html',name:'Version 1',author:'DeepSeek',desc:'First version — 10 sections, formal BM, Poppins, forest green theme'},
+  {file:'v2.html',name:'Version 2',author:'Claude',desc:'Wudhu headline added, casual BM, image placeholders, mobile-native'},
+  {file:'v3.html',name:'Version 3',author:'Codex',desc:'Supabase booking connected, test-cal, booking form live, Bayarcash attempt'},
+  {file:'v4.html',name:'Version 4 KILLER',author:'Expert Team (4 audits)',desc:'Teal theme, Bricolage+Figtree+IBM Plex Mono, 13 sections, dark→light narrative, glassmorphism, before/after, Jaminan Kepuasan'}
+];
+
+var liveVersion = localStorage.getItem('homepage_version') || 'v4.html';
+
+function render(){
+  var grid = document.getElementById('versionGrid');
+  var html = '';
+  VERSIONS.forEach(function(v){
+    var isLive = v.file === liveVersion;
+    html += '<div class="v-card' + (isLive ? ' live' : '') + '">';
+    html += '<div class="v-info">';
+    html += '<div class="v-name">' + v.name + (isLive ? '<span class="live-tag">LIVE</span>' : '') + ' <span style="color:var(--t3);font-size:.65rem;font-weight:400">' + v.author + '</span></div>';
+    html += '<div class="v-desc">' + v.desc + '</div>';
+    html += '</div>';
+    html += '<div class="v-actions">';
+    html += '<a href="/home/' + v.file + '" target="_blank" class="btn btn-preview">👁 Preview</a>';
+    if(isLive){
+      html += '<span class="btn btn-live">✅ Published</span>';
+    } else {
+      html += '<button class="btn btn-publish" onclick="publish(\'' + v.file + '\',\'' + v.name + '\')">📤 Publish to Live</button>';
+    }
+    html += '</div></div>';
+  });
+  grid.innerHTML = html;
+  document.getElementById('liveLabel').textContent = liveVersion.replace('.html','');
+}
+
+function publish(file, name){
+  liveVersion = file;
+  localStorage.setItem('homepage_version', file);
+  render();
+  var toast = document.getElementById('toast');
+  toast.textContent = '✅ Published! ' + name + ' is now LIVE on cuci.jayabina.com';
+  toast.classList.add('show');
+  setTimeout(function(){toast.classList.remove('show')}, 3000);
+  // Also set in sessionStorage for admin panel detection
+  sessionStorage.setItem('homepage_version', file);
+}
+
+render();
+</script>
+</body>
+</html>
