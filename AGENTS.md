@@ -11,6 +11,7 @@
 1. `AGENTS.md` (this file) — rules, schema, locked decisions
 2. `BUILD-PLAN.md` — phased build runbook + current progress
 3. `PROJECT-MEMORY.md` — quick status + credentials location
+4. `cuci-tangki/SALES-PAGE-COPY.md` — complete sales page copywriting reference (all headlines, body copy, FAQ, image placeholders)
 
 ---
 
