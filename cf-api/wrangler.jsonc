@@ -16,9 +16,6 @@
   ],
   "r2_buckets": [],
   "vars": {
-    "BAYARCASH_PAT": "",
-    "BAYARCASH_API_SECRET": "",
-    "BAYARCASH_PORTAL_KEY": "",
     "BAYARCASH_PAYMENT_CHANNEL": "5",
     "WA_PHONE_NUMBER_ID": "",
     "WA_ACCESS_TOKEN": "",
