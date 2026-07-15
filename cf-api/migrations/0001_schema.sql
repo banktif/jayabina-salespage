@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 CREATE INDEX IF NOT EXISTS idx_profiles_phone ON profiles(phone);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_email_unique ON profiles(email) WHERE email <> '';
 
 -- default admin seed (password: Salman43! will be hashed at deploy)
 INSERT OR IGNORE INTO profiles (id, full_name, phone, role, is_active, email, created_at)
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS slots (
 );
 
 CREATE INDEX IF NOT EXISTS idx_slots_date ON slots(date);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_slots_date_time_booked ON slots(date, time_slot) WHERE is_booked = 1;
 
 -- ============================================================
 -- tasks

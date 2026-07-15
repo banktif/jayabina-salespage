@@ -200,7 +200,7 @@
     }
 
     if (this._action === 'select') {
-      // GET with query params (except bookings with id → public endpoint for anon)
+      // GET with query params (except single-resource routes)
       if (t === 'bookings' && this._id && this._single) {
         // Single booking lookup — try auth first, fall back to public
         var token = c.auth.getToken();
@@ -211,27 +211,40 @@
           return this._wrap(d, t);
         }
       }
+      if (t === 'customers' && this._id && this._single) {
+        var r = await c._fetch('GET', '/api/customers/' + encodeURIComponent(this._id));
+        var d = await r.json();
+        return this._wrap(d, t);
+      }
 
       // Build query string
       var params = [];
       for (var k in this._filters) {
         if (k === 'or') continue;
-        if (k === 'assigned_to') { params.push('assigned_to=' + encodeURIComponent(this._filters[k])); }
-        else if (k === 'customer_id') { params.push('customer_id=' + encodeURIComponent(this._filters[k])); }
-        else if (k === 'task_id') { params.push('task_id=' + encodeURIComponent(this._filters[k])); }
-        else if (k === 'booking_date') { params.push('date=' + encodeURIComponent(this._filters[k])); }
+        if (t === 'bookings' && k === 'id' && String(this._filters[k]).indexOf(',') >= 0) { params.push('ids=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'bookings' && k === 'customer_phone') { params.push('customer_phone=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'bookings' && k === 'customer_id') { params.push('customer_id=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'bookings' && k === 'booking_date') { params.push('date=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'tasks' && k === 'assigned_to') { params.push('assigned_to=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'tasks' && k === 'booking_id') { params.push('booking_id=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'task_photos' && k === 'task_id') { params.push('task_id=' + encodeURIComponent(this._filters[k])); }
+        else if (t === 'profiles' && k === 'role') { params.push('role=' + encodeURIComponent(this._filters[k])); }
         else if (k === 'status') { params.push('status=' + encodeURIComponent(this._filters[k])); }
         else { params.push('eq.' + k + '=' + encodeURIComponent(this._filters[k])); }
       }
       if (this._order) { params.push('order=' + this._order); params.push('dir=' + this._orderDir); }
       if (this._limit) params.push('limit=' + this._limit);
-      if (this._range) { params.push('page=' + (Math.floor(this._range.from / 20) + 1)); }
+      if (this._range) {
+        var pageSize = this._range.to - this._range.from + 1;
+        params.push('limit=' + pageSize);
+        params.push('page=' + (Math.floor(this._range.from / pageSize) + 1));
+      }
 
       // Handle or filter for customers search
       if (this._filters['or']) {
         var orStr = this._filters['or'];
-        var searchMatch = orStr.match(/search=([^&]+)/);
-        if (searchMatch) params.push('search=' + searchMatch[1]);
+        var searchMatch = orStr.match(/\.ilike\.%([^%]+)%/);
+        if (searchMatch) params.push('search=' + encodeURIComponent(searchMatch[1]));
       }
 
       var qs = params.length ? '?' + params.join('&') : '';
@@ -278,6 +291,15 @@
     }
 
     if (this._action === 'delete') {
+      if (t === 'customers' && this._filters.id && String(this._filters.id).indexOf(',') >= 0) {
+        var ids = String(this._filters.id).split(',').filter(Boolean);
+        for (var i = 0; i < ids.length; i++) {
+          var rr = await c._fetch('DELETE', apiPath + '/' + encodeURIComponent(ids[i]));
+          var dd = await rr.json();
+          if (!rr.ok) return this._wrap(dd, t);
+        }
+        return { data: ids, error: null };
+      }
       var r = await c._fetch('DELETE', apiPath + '/' + this._id);
       var d = await r.json();
       return this._wrap(d, t);
@@ -288,6 +310,13 @@
 
   QueryBuilder.prototype._wrap = function(d, table) {
     if (d.status === 'ok') {
+      if (d.data && Array.isArray(d.data.data)) {
+        return {
+          data: d.data.data,
+          count: Number(d.data.total || 0),
+          error: null
+        };
+      }
       if (this._single && d.data && !Array.isArray(d.data)) {
         return { data: d.data, error: null };
       }

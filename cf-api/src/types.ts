@@ -93,16 +93,16 @@ export interface JWTPayload {
 
 export interface Env {
   DB: D1Database;
-  BACKUP_R2: R2Bucket;
+  BACKUP_R2?: R2Bucket;
   JWT_SECRET: string;
   BAYARCASH_PAT: string;
   BAYARCASH_API_SECRET: string;
   BAYARCASH_PORTAL_KEY: string;
   BAYARCASH_PAYMENT_CHANNEL: string;
-  WA_PHONE_NUMBER_ID: string;
-  WA_ACCESS_TOKEN: string;
+  WA_PHONE_NUMBER_ID?: string;
+  WA_ACCESS_TOKEN?: string;
   BACKUP_SECRET: string;
-  GH_PAT: string;
+  GH_PAT?: string;
   SITE_URL: string;
 }
 

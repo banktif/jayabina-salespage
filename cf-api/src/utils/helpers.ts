@@ -1,10 +1,11 @@
-import type { JWTPayload } from './types';
+import type { JWTPayload } from '../types';
 
 const ENC = new TextEncoder();
 const DEC = new TextDecoder();
 
-function b64u(buf: ArrayBuffer): string {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+function b64u(buf: ArrayBuffer | Uint8Array): string {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  return btoa(String.fromCharCode(...bytes))
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 

@@ -11,6 +11,7 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
       const payload = await requireAuth(req, env);
       const statusFilter = url.searchParams.get('status');
       const assignedTo = url.searchParams.get('assigned_to');
+      const bookingId = url.searchParams.get('booking_id');
 
       let q = `SELECT t.*, b.customer_name, b.customer_phone, b.customer_address, b.booking_date, b.booking_time,
         p.full_name as staff_name FROM tasks t LEFT JOIN bookings b ON t.booking_id = b.id LEFT JOIN profiles p ON t.assigned_to = p.id`;
@@ -24,6 +25,7 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
 
       if (statusFilter) { conds.push('t.status = ?'); params.push(statusFilter); }
       if (assignedTo && payload.role === 'admin') { conds.push('t.assigned_to = ?'); params.push(assignedTo); }
+      if (bookingId && payload.role === 'admin') { conds.push('t.booking_id = ?'); params.push(bookingId); }
 
       if (conds.length) q += ' WHERE ' + conds.join(' AND ');
       q += ' ORDER BY b.booking_date DESC, b.booking_time ASC';
@@ -54,13 +56,18 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
 
       const sets: string[] = ['updated_at = ?'];
       const params: any[] = [now];
+      let nextStatus: string | null = null;
 
       if (body.assigned_to !== undefined && payload.role === 'admin') {
         sets.push('assigned_to = ?'); params.push(body.assigned_to);
-        sets.push('status = ?'); params.push('assigned');
+        nextStatus = body.assigned_to ? 'assigned' : 'unassigned';
       }
 
       if (body.status !== undefined) {
+        if (payload.role === 'staff' && !['in_progress', 'awaiting_review'].includes(body.status)) {
+          return err('Staff can only start a job or submit it for review', 403);
+        }
+        nextStatus = body.status;
         switch (body.status) {
           case 'in_progress':
             sets.push('started_at = ?'); params.push(body.started_at || now);
@@ -70,14 +77,13 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
             // Auto-complete check
             const autoComplete = await env.DB.prepare("SELECT value FROM app_settings WHERE key = 'auto_complete_task'").first<{value: string}>();
             if (autoComplete?.value === 'true') {
-              sets.push('status = ?, completed_at = ?');
-              params.push('completed', now);
-              // Also complete booking
+              nextStatus = 'completed';
+              sets.push('completed_at = ?'); params.push(now);
               await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
                 .bind(now, task.booking_id).run();
-              await env.DB.prepare('SELECT id FROM bookings WHERE id = ?').bind(task.booking_id).first<{customer_id: string | null}>().then(bk => {
-                if (bk?.customer_id) refreshCustomerStats(env.DB, bk.customer_id);
-              });
+              const autoBooking = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?')
+                .bind(task.booking_id).first<{customer_id: string | null}>();
+              if (autoBooking?.customer_id) await refreshCustomerStats(env.DB, autoBooking.customer_id);
             }
             break;
           case 'completed':
@@ -85,16 +91,14 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
             sets.push('completed_at = ?'); params.push(now);
             await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
               .bind(now, task.booking_id).run();
+            const completedBooking = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?')
+              .bind(task.booking_id).first<{customer_id: string | null}>();
+            if (completedBooking?.customer_id) await refreshCustomerStats(env.DB, completedBooking.customer_id);
             break;
         }
-        if (body.status !== 'completed' || !(await env.DB.prepare("SELECT value FROM app_settings WHERE key = 'auto_complete_task'").first<{value: string}>())?.value) {
-          // Only set status explicitly if not auto-completed
-          const statusIdx = params.findIndex(p => p === 'completed' && sets.indexOf('status = ?') >= 0);
-          if (statusIdx < 0) {
-            sets.push('status = ?'); params.push(body.status);
-          }
-        }
       }
+
+      if (nextStatus !== null) { sets.push('status = ?'); params.push(nextStatus); }
 
       if (sets.length > 1) {
         params.push(taskId);
@@ -117,9 +121,15 @@ export async function handleTaskPhotos(req: Request, env: Env, path: string): Pr
   // GET /api/task-photos?task_id=
   if (path === '/api/task-photos' && req.method === 'GET') {
     try {
-      await requireAuth(req, env);
+      const payload = await requireAuth(req, env);
       const taskId = url.searchParams.get('task_id');
       if (!taskId) return err('Missing task_id');
+
+      if (payload.role === 'staff') {
+        const task = await env.DB.prepare('SELECT assigned_to FROM tasks WHERE id = ?')
+          .bind(taskId).first<{assigned_to: string | null}>();
+        if (!task || task.assigned_to !== payload.sub) return err('Access denied', 403);
+      }
 
       const photos = await env.DB.prepare('SELECT * FROM task_photos WHERE task_id = ? ORDER BY created_at ASC')
         .bind(taskId).all();

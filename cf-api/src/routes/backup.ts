@@ -11,16 +11,24 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
       await checkBackupAuth(req, env);
       const body = await req.json().catch(() => ({})) as any;
       const force = body.force === true;
+      if (!env.BACKUP_R2) return err('R2 backup binding is not configured', 503);
+      if (!force && !(await isBackupDue(env.DB))) {
+        return ok({ skipped: true, reason: 'not due' });
+      }
 
       const now = nowISO();
       const tables = ['profiles', 'app_settings', 'bookings', 'slots', 'tasks', 'task_photos', 'customers'];
       const dump: Record<string, any[]> = {};
+      const tableQueries: Record<string, string> = {
+        profiles: 'SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles'
+      };
 
       for (const table of tables) {
         let offset = 0;
         const rows: any[] = [];
         while (true) {
-          const batch = await env.DB.prepare(`SELECT * FROM ${table} LIMIT 1000 OFFSET ?`).bind(offset).all();
+          const query = tableQueries[table] || `SELECT * FROM ${table}`;
+          const batch = await env.DB.prepare(`${query} LIMIT 1000 OFFSET ?`).bind(offset).all();
           rows.push(...batch.results as any[]);
           if (batch.results.length < 1000) break;
           offset += 1000;
@@ -32,19 +40,18 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
       const compressed = await gzip(json);
       const filename = `db-backup-${now.replace(/[:.]/g, '-')}.json.gz`;
 
-      // Upload to R2 if configured
+      // Upload through the native Cloudflare R2 binding.
       const r2Key = `db/${filename}`;
-      if (env.BACKUP_R2) {
-        try {
-          await env.BACKUP_R2.put(r2Key, compressed, {
-            httpMetadata: { contentType: 'application/gzip' }
-          });
-          await recordBackupLog(env.DB, 'r2', filename, 'ok', compressed.byteLength);
-          await updateBackupStatus(env.DB, 'r2', now, 'ok');
-        } catch (e: any) {
-          await recordBackupLog(env.DB, 'r2', filename, 'error', e.message);
-          await updateBackupStatus(env.DB, 'r2', now, e.message);
-        }
+      try {
+        await env.BACKUP_R2.put(r2Key, compressed, {
+          httpMetadata: { contentType: 'application/gzip' }
+        });
+        await recordBackupLog(env.DB, 'r2', filename, 'ok', compressed.byteLength);
+        await updateBackupStatus(env.DB, 'r2', now, `ok (${Math.round(compressed.byteLength / 1024)} KB)`);
+      } catch (e: any) {
+        await recordBackupLog(env.DB, 'r2', filename, 'error', 0, e.message || 'Upload failed');
+        await updateBackupStatus(env.DB, 'r2', now, `error: ${e.message || 'Upload failed'}`);
+        return err('R2 upload failed', 502);
       }
 
       // Prune old backups in R2 (keep 48)
@@ -69,9 +76,13 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
 
       const objects = await env.BACKUP_R2.list({ prefix: 'db/', limit: 60 });
       const files = [];
-      for (const obj of objects.objects) {
+      const sorted = objects.objects.sort((a, b) => b.uploaded.getTime() - a.uploaded.getTime());
+      for (const obj of sorted) {
+        const expires = Math.floor(Date.now() / 1000) + 3600;
+        const sig = await signDownload(obj.key, expires, env.JWT_SECRET);
         files.push({
-          key: obj.key,
+          name: obj.key.replace(/^db\//, ''),
+          url: `${url.origin}/api/backup/download?key=${encodeURIComponent(obj.key)}&expires=${expires}&sig=${sig}`,
           size: obj.size,
           uploaded: obj.uploaded.toISOString()
         });
@@ -94,12 +105,98 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
       const status: Record<string, string> = {};
       for (const r of rows.results as any[]) status[r.key] = r.value;
 
-      const r2Configured = !!(await getPrivateSetting(env.DB, 'r2_account_id'));
-      const driveConfigured = !!(await getPrivateSetting(env.DB, 'gdrive_client_email'));
+      const r2Configured = !!env.BACKUP_R2;
+      const driveConfigured = false;
 
       return ok({ ...status, r2_configured: r2Configured, drive_configured: driveConfigured });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/backup/test_r2
+  if (path === '/api/backup/test_r2' && req.method === 'POST') {
+    try {
+      await checkBackupAuth(req, env);
+      if (!env.BACKUP_R2) return err('R2 backup binding is not configured', 503);
+      const key = 'db/.healthcheck';
+      await env.BACKUP_R2.put(key, 'ok');
+      await env.BACKUP_R2.delete(key);
+      return ok({ r2: 'reachable' });
+    } catch (e: any) {
+      return err(e.msg || e.message || 'R2 test failed', e.status || 500);
+    }
+  }
+
+  // GET /api/backup/download (short-lived signed link from the authenticated list call)
+  if (path === '/api/backup/download' && req.method === 'GET') {
+    if (!env.BACKUP_R2) return err('R2 backup binding is not configured', 503);
+    const key = url.searchParams.get('key') || '';
+    const expires = parseInt(url.searchParams.get('expires') || '0', 10);
+    const sig = url.searchParams.get('sig') || '';
+    if (!key.startsWith('db/') || expires < Math.floor(Date.now() / 1000)) return err('Link expired or invalid', 403);
+    const expected = await signDownload(key, expires, env.JWT_SECRET);
+    if (!safeEqual(sig, expected)) return err('Link expired or invalid', 403);
+    const object = await env.BACKUP_R2.get(key);
+    if (!object) return err('Backup not found', 404);
+    return new Response(object.body, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'application/gzip',
+        'Content-Disposition': `attachment; filename="${key.split('/').pop() || 'backup.json.gz'}"`,
+        'Cache-Control': 'private, no-store'
+      }
+    });
+  }
+
+  // POST /api/backup/code
+  if (path === '/api/backup/code' && req.method === 'POST') {
+    try {
+      await checkBackupAuth(req, env);
+      if (!env.GH_PAT) return err('GitHub token is not configured in Cloudflare Worker secrets', 503);
+      const response = await fetch('https://api.github.com/repos/banktif/jayaclean-salespage/actions/workflows/mirror-to-gitlab.yml/dispatches', {
+        method: 'POST',
+        headers: githubHeaders(env.GH_PAT),
+        body: JSON.stringify({ ref: 'master' })
+      });
+      const now = nowISO();
+      await setSetting(env.DB, 'backup_last_code_at', now);
+      await setSetting(env.DB, 'backup_last_code_status', response.status === 204 ? 'triggered' : `error ${response.status}`);
+      if (response.status !== 204) return err('GitHub backup workflow could not be triggered', 502);
+      return ok({ triggered: true });
+    } catch (e: any) {
+      return err(e.msg || e.message || 'Code backup failed', e.status || 500);
+    }
+  }
+
+  // POST /api/backup/publish-home
+  if (path === '/api/backup/publish-home' && req.method === 'POST') {
+    try {
+      await checkBackupAuth(req, env);
+      if (!env.GH_PAT) return err('GitHub token is not configured in Cloudflare Worker secrets', 503);
+      const { version } = await req.json() as {version?: string};
+      const clean = String(version || '').toLowerCase();
+      if (!['v1', 'v2', 'v3', 'v4'].includes(clean)) return err('Invalid homepage version');
+      const headers = githubHeaders(env.GH_PAT);
+      const srcResponse = await fetch(`https://api.github.com/repos/banktif/jayaclean-salespage/contents/home/${clean}.html`, { headers });
+      const src: any = await srcResponse.json();
+      if (!srcResponse.ok || !src.content) return err(`Source home/${clean}.html not found`, 404);
+      const indexResponse = await fetch('https://api.github.com/repos/banktif/jayaclean-salespage/contents/index.html', { headers });
+      const index: any = await indexResponse.json();
+      if (!indexResponse.ok || !index.sha) return err('Live homepage metadata could not be read', 502);
+      const publish = await fetch('https://api.github.com/repos/banktif/jayaclean-salespage/contents/index.html', {
+        method: 'PUT', headers,
+        body: JSON.stringify({
+          message: `Publish homepage ${clean} to live`,
+          content: String(src.content).replace(/\n/g, ''),
+          sha: index.sha,
+          branch: 'master'
+        })
+      });
+      if (!publish.ok) return err('Homepage publish failed', 502);
+      await setSetting(env.DB, 'active_homepage', clean);
+      return ok({ published: clean });
+    } catch (e: any) {
+      return err(e.msg || e.message || 'Homepage publish failed', e.status || 500);
     }
   }
 
@@ -115,9 +212,9 @@ async function checkBackupAuth(req: Request, env: Env): Promise<void> {
   requireAdmin(payload);
 }
 
-async function recordBackupLog(db: D1Database, destination: string, filename: string, status: string, sizeBytes?: number): Promise<void> {
-  await db.prepare('INSERT INTO backup_log (id, destination, filename, status, size_bytes) VALUES (?,?,?,?,?)')
-    .bind(uuid(), destination, filename, status, sizeBytes || 0).run();
+async function recordBackupLog(db: D1Database, destination: string, filename: string, status: string, sizeBytes = 0, errorMsg: string | null = null): Promise<void> {
+  await db.prepare('INSERT INTO backup_log (id, destination, filename, status, size_bytes, error_msg) VALUES (?,?,?,?,?,?)')
+    .bind(uuid(), destination, filename, status, sizeBytes, errorMsg).run();
 }
 
 async function updateBackupStatus(db: D1Database, dest: string, ts: string, status: string): Promise<void> {
@@ -140,6 +237,45 @@ async function pruneBackups(env: Env, prefix: string, keep: number): Promise<voi
   for (const obj of toDelete) {
     try { await env.BACKUP_R2.delete(obj.key); } catch {}
   }
+}
+
+async function isBackupDue(db: D1Database): Promise<boolean> {
+  const frequency = await getSetting(db, 'backup_freq_r2') || 'daily';
+  const last = await getSetting(db, 'backup_last_r2_at');
+  if (!last) return true;
+  const hours: Record<string, number> = { hourly: 1, daily: 24, weekly: 168, monthly: 720 };
+  const dueMs = (hours[frequency] || 24) * 3600 * 1000 - 5 * 60 * 1000;
+  return Date.now() - new Date(last).getTime() >= dueMs;
+}
+
+async function setSetting(db: D1Database, key: string, value: string): Promise<void> {
+  const now = nowISO();
+  await db.prepare('INSERT INTO app_settings (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at')
+    .bind(key, value, now).run();
+}
+
+function githubHeaders(token: string): Record<string, string> {
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
+    'User-Agent': 'jayaclean-cloudflare-worker',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
+
+async function signDownload(key: string, expires: number, secret: string): Promise<string> {
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const signature = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(`${key}|${expires}`));
+  return Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return result === 0;
 }
 
 async function gzip(data: string): Promise<Uint8Array> {

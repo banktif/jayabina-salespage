@@ -21,11 +21,10 @@ export async function handleAuth(req: Request, env: Env, path: string): Promise<
 
     if (!user) return err('Invalid credentials', 401);
 
-    // First login check - if no password set, set default
+    // Password hashes cannot be exported from Supabase Auth. Migrated staff
+    // accounts must be reset by an admin instead of allowing first-use claims.
     if (!(user as any).password) {
-      const hashed = await hashPassword(password || 'changeme123');
-      await env.DB.prepare('UPDATE profiles SET password = ? WHERE id = ?').bind(hashed, (user as any).id).run();
-      (user as any).password = hashed;
+      return err('Password reset required. Contact the administrator.', 403);
     }
 
     const valid = await verifyPassword(password, (user as any).password);

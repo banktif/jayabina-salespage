@@ -14,11 +14,14 @@ export async function handleSlots(req: Request, env: Env, path: string): Promise
     const maxSlotsPerDay = parseInt(await getSetting(env.DB, 'max_slots_per_day') || '4');
     const slotList = slotsStr.split(',').map(s => s.trim());
 
+    const booked = await env.DB.prepare('SELECT time_slot FROM slots WHERE date = ? AND is_booked = 1')
+      .bind(date).all<{time_slot: string}>();
+    const bookedSet = new Set((booked.results || []).map(r => r.time_slot));
     const bookedCount = await env.DB.prepare('SELECT COUNT(*) as cnt FROM slots WHERE date = ? AND is_booked = 1')
       .bind(date).first<{cnt: number}>();
-    const available = (bookedCount?.cnt || 0) < maxSlotsPerDay;
+    const dayAvailable = (bookedCount?.cnt || 0) < maxSlotsPerDay;
 
-    const result = slotList.map(s => ({ time_slot: s, available }));
+    const result = slotList.map(s => ({ time_slot: s, available: dayAvailable && !bookedSet.has(s) }));
 
     return ok(result);
   }

@@ -1,5 +1,18 @@
 # JAYACLEAN — Project Memory
 
+## Current production architecture (updated 2026-07-16)
+
+- `cuci.jayabina.com` is on Cloudflare Pages (`jayaclean`).
+- The live frontend uses `/jc-api.js` and Cloudflare Worker `jayaclean-api`; it no longer loads the Supabase SDK or calls Supabase endpoints.
+- Production data/auth is Cloudflare D1 (`jayaclean-db`) with PBKDF2 passwords and signed JWT sessions.
+- Supabase remains a legacy source/rollback system only. Do not add Supabase URLs back into production pages.
+- R2 bucket `jayaclean-backups` is attached as native binding `BACKUP_R2`. Backups exclude password hashes and `private_settings`.
+- Legacy data was synced idempotently on 2026-07-16. Preserve Cloudflare-native rows during future re-syncs.
+- One migrated staff account needs an Admin > Staff password reset before worker login.
+- Worker source lives in `cf-api/`; set secrets with `wrangler secret put`, never blank vars in `wrangler.jsonc`.
+
+> Older Supabase sections below are historical context and do not override this section.
+
 > Full rules & schema: see `AGENTS.md`. Build progress: see `BUILD-PLAN.md`.
 > Last updated: 2026-07-12
 

@@ -1,10 +1,25 @@
 # JAYACLEAN — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
-# Last updated: 2026-07-14
+# Last updated: 2026-07-16
 # ⚠️ Site refactored to CLEAN URLS — real apps live in folders: admin/index.html,
 #    worker/index.html (staff), customer/index.html. Root *.html are redirect stubs.
 #    Hosted on Cloudflare Pages (migrated from GitHub Pages). See section 13 for
 #    current architecture. See section 14 for Hugo blog system.
+
+## CURRENT CLOUDFLARE MIGRATION OVERRIDE (2026-07-16)
+
+This section supersedes older Supabase architecture and deploy notes below.
+
+- Frontend: Cloudflare Pages project `jayaclean`, custom domain `cuci.jayabina.com`.
+- API: Cloudflare Worker `jayaclean-api` (`cf-api/`).
+- Database/Auth: Cloudflare D1 `jayaclean-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
+- Frontend client: `/jc-api.js`; served apps are `admin/index.html`, `worker/index.html`, and `customer/index.html`.
+- Backup: native R2 binding `BACKUP_R2` to bucket `jayaclean-backups`; password hashes and `private_settings` are excluded from archive payloads.
+- Secrets: use `wrangler secret put`. Never add empty secret placeholders to `wrangler.jsonc`, because a deploy can overwrite a real secret binding.
+- Worker deploy: `cd cf-api && wrangler deploy`.
+- Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayaclean --branch master`.
+- D1 sync must be idempotent. Do not truncate D1 during future legacy-data imports.
+- Supabase Auth password hashes are not portable. Reset migrated staff passwords from Admin > Staff; never restore first-login password claiming.
 
 ---
 

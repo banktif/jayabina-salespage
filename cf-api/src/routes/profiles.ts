@@ -15,7 +15,11 @@ export async function handleProfiles(req: Request, env: Env, path: string): Prom
           .bind(payload.sub).first();
         return profile ? ok(profile) : err('Not found', 404);
       }
-      const profiles = await env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles ORDER BY created_at DESC').all();
+      const role = url.searchParams.get('role');
+      const query = role === 'admin' || role === 'staff'
+        ? env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles WHERE role = ? ORDER BY created_at DESC').bind(role)
+        : env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles ORDER BY created_at DESC');
+      const profiles = await query.all();
       return ok(profiles.results);
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);

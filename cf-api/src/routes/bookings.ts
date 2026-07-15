@@ -57,9 +57,7 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
       const dir = orderDir === 'desc' ? 'DESC' : 'ASC';
       q += ` ORDER BY ${col} ${dir}`;
 
-      const stmt = env.DB.prepare(q);
-      for (const p of params) stmt.bind(p);
-      const result = await stmt.all();
+      const result = await env.DB.prepare(q).bind(...params).all();
       return ok(result.results);
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
@@ -84,9 +82,16 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
     }
 
     const maxSlots = parseInt(await getSetting(env.DB, 'max_slots_per_day') || '4');
+    const allowedSlots = (await getSetting(env.DB, 'slots') || '9am,11am,2pm,4pm')
+      .split(',').map(s => s.trim()).filter(Boolean);
+    if (!allowedSlots.includes(booking_time)) return err('Invalid booking time');
+
     const existing = await env.DB.prepare('SELECT COUNT(*) as cnt FROM slots WHERE date = ? AND is_booked = 1')
       .bind(booking_date).first<{cnt: number}>();
     if (existing && existing.cnt >= maxSlots) return err('No slots available for this date', 409);
+    const existingSlot = await env.DB.prepare('SELECT id FROM slots WHERE date = ? AND time_slot = ? AND is_booked = 1')
+      .bind(booking_date, booking_time).first();
+    if (existingSlot) return err('This time slot is already booked', 409);
 
     const priceTotal = parseFloat(await getSetting(env.DB, 'price_total') || '300');
     const priceDeposit = parseFloat(await getSetting(env.DB, 'price_deposit') || '150');
@@ -109,12 +114,18 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
         .bind(customer_name, customer_name, customer_address, customer_address, cust.id).run();
     }
 
-    await env.DB.prepare(`INSERT INTO bookings (id, customer_name, customer_phone, customer_address, booking_date, booking_time, amount, deposit_amount, customer_id, created_at, updated_at)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(bookingId, customer_name, phoneDigits, customer_address, booking_date, booking_time, priceTotal, priceDeposit, cust.id, now, now).run();
-
-    await env.DB.prepare('INSERT INTO slots (id, date, time_slot, is_booked, booking_id) VALUES (?,?,?,1,?)')
-      .bind(slotId, booking_date, booking_time, bookingId).run();
+    try {
+      await env.DB.batch([
+        env.DB.prepare(`INSERT INTO bookings (id, customer_name, customer_phone, customer_address, booking_date, booking_time, amount, deposit_amount, customer_id, created_at, updated_at)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+          .bind(bookingId, customer_name, phoneDigits, customer_address, booking_date, booking_time, priceTotal, priceDeposit, cust.id, now, now),
+        env.DB.prepare('INSERT INTO slots (id, date, time_slot, is_booked, booking_id) VALUES (?,?,?,1,?)')
+          .bind(slotId, booking_date, booking_time, bookingId)
+      ]);
+    } catch (e: any) {
+      if (String(e?.message || e).includes('UNIQUE constraint')) return err('This time slot is already booked', 409);
+      throw e;
+    }
 
     // Update customer stats
     await refreshCustomerStats(env.DB, cust.id);
@@ -144,11 +155,6 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
 
       if (body.status !== undefined) {
         sets.push('status = ?'); params.push(body.status);
-        if (body.status === 'completed') {
-          // Trigger: on completed, update customer stats
-          const bk = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?').bind(bookingId).first<{customer_id: string | null}>();
-          if (bk?.customer_id) await refreshCustomerStats(env.DB, bk.customer_id);
-        }
         // Trigger: on confirmed, create task if none
         if (body.status === 'confirmed') {
           const existingTask = await env.DB.prepare('SELECT id FROM tasks WHERE booking_id = ?').bind(bookingId).first();
@@ -177,6 +183,24 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
       params.push(bookingId);
       await env.DB.prepare(`UPDATE bookings SET ${sets.join(', ')} WHERE id = ?`).bind(...params).run();
 
+      if (body.booking_date !== undefined || body.booking_time !== undefined) {
+        const current = await env.DB.prepare('SELECT booking_date, booking_time FROM bookings WHERE id = ?')
+          .bind(bookingId).first<{booking_date: string; booking_time: string}>();
+        if (current) {
+          await env.DB.prepare('UPDATE slots SET date = ?, time_slot = ? WHERE booking_id = ?')
+            .bind(current.booking_date, current.booking_time, bookingId).run();
+        }
+      }
+      if (body.status === 'cancelled') {
+        await env.DB.prepare('UPDATE slots SET is_booked = 0 WHERE booking_id = ?').bind(bookingId).run();
+      } else if (body.status === 'confirmed') {
+        await env.DB.prepare('UPDATE slots SET is_booked = 1 WHERE booking_id = ?').bind(bookingId).run();
+      }
+      if (body.status === 'completed') {
+        const bk = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?').bind(bookingId).first<{customer_id: string | null}>();
+        if (bk?.customer_id) await refreshCustomerStats(env.DB, bk.customer_id);
+      }
+
       const updated = await env.DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(bookingId).first();
       return ok(updated);
     } catch (e: any) {
@@ -192,8 +216,14 @@ export async function handleCreateIntent(req: Request, env: Env): Promise<Respon
   const { booking_id } = await req.json() as any;
   if (!booking_id) return err('Missing booking_id');
 
-  const booking = await env.DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(booking_id).first<{id: string; deposit_amount: number; bayarcash_ref: string | null; payment_status: string}>();
+  if (!env.BAYARCASH_PAT || !env.BAYARCASH_PORTAL_KEY) return err('Payment gateway not configured', 500);
+
+  const booking = await env.DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(booking_id).first<{
+    id: string; customer_name: string; customer_phone: string; deposit_amount: number;
+    bayarcash_ref: string | null; payment_status: string;
+  }>();
   if (!booking) return err('Booking not found', 404);
+  if (booking.payment_status === 'paid') return err('Already paid', 409);
   if (!booking.deposit_amount || booking.deposit_amount <= 0) return err('Invalid deposit amount');
 
   // Generate short order ref
@@ -201,16 +231,23 @@ export async function handleCreateIntent(req: Request, env: Env): Promise<Respon
 
   await env.DB.prepare('UPDATE bookings SET bayarcash_ref = ? WHERE id = ?').bind(orderRef, booking_id).run();
 
-  const siteUrl = env.SITE_URL || 'https://cuci.jayabina.com';
-  const body = {
+  const siteUrl = (env.SITE_URL || 'https://cuci.jayabina.com').replace(/\/$/, '');
+  const amount = Number(booking.deposit_amount).toFixed(2);
+  const payerName = String(booking.customer_name || 'Pelanggan').slice(0, 100);
+  const payerEmail = `${booking.id.slice(0, 8)}@jayabina.local`;
+  const phone = malaysiaPhone(booking.customer_phone || '');
+  const channel = parseInt(env.BAYARCASH_PAYMENT_CHANNEL || '5', 10);
+  const body: Record<string, unknown> = {
+    payment_channel: channel,
+    portal_key: env.BAYARCASH_PORTAL_KEY,
     order_number: orderRef,
-    amount: Math.round(booking.deposit_amount * 100), // cents
-    name: 'Deposit JAYACLEAN',
-    phone: '60139373275',
+    amount,
+    payer_name: payerName,
+    payer_email: payerEmail,
     return_url: `${siteUrl}/success.html?order=${booking_id}`,
     callback_url: `${urlForReq(req)}/api/payments/bayarcash-callback`,
-    payment_channel: env.BAYARCASH_PAYMENT_CHANNEL || '5'
   };
+  if (phone) body.payer_telephone_number = phone;
 
   const headers: Record<string, string> = {
     'Authorization': `Bearer ${env.BAYARCASH_PAT}`,
@@ -218,16 +255,23 @@ export async function handleCreateIntent(req: Request, env: Env): Promise<Respon
   };
 
   if (env.BAYARCASH_API_SECRET) {
-    const checksum = await generateChecksum(body, env.BAYARCASH_API_SECRET);
-    headers['X-Checksum'] = checksum;
+    body.checksum = await hmacSha256Hex(ksortJoin({
+      amount,
+      order_number: orderRef,
+      payer_email: payerEmail,
+      payer_name: payerName,
+      payment_channel: channel
+    }), env.BAYARCASH_API_SECRET);
   }
 
   const resp = await fetch('https://api.console.bayar.cash/v3/payment-intents', {
     method: 'POST', headers, body: JSON.stringify(body)
   });
-  const data = await resp.json() as any;
-  if (!resp.ok) return err(data.message || 'Bayarcash error', resp.status);
-  return ok({ url: data.url, id: data.id });
+  const text = await resp.text();
+  let data: any;
+  try { data = JSON.parse(text); } catch { return err('Payment gateway returned an invalid response', 502); }
+  if (!resp.ok || !data.url) return err(data.message || 'Payment creation failed', 502);
+  return json({ url: data.url, id: data.id || null });
 }
 
 export async function handleBayarcashCallback(req: Request, env: Env): Promise<Response> {
@@ -241,10 +285,24 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
     for (const [k, v] of new URLSearchParams(text)) body[k] = v;
   }
 
-  // Verify checksum if configured
-  if (env.BAYARCASH_API_SECRET && body.checksum) {
-    const computed = await generateChecksum(body, env.BAYARCASH_API_SECRET);
-    if (computed !== body.checksum) return err('Invalid checksum', 403);
+  // A configured secret makes a checksum mandatory; never accept unsigned callbacks.
+  if (env.BAYARCASH_API_SECRET) {
+    const computed = await hmacSha256Hex(ksortJoin({
+      amount: body.amount,
+      currency: body.currency,
+      datetime: body.datetime,
+      exchange_reference_number: body.exchange_reference_number,
+      exchange_transaction_id: body.exchange_transaction_id,
+      order_number: body.order_number,
+      payer_bank_name: body.payer_bank_name,
+      payer_email: body.payer_email,
+      payer_name: body.payer_name,
+      record_type: body.record_type,
+      status: body.status,
+      status_description: body.status_description,
+      transaction_id: body.transaction_id
+    }), env.BAYARCASH_API_SECRET);
+    if (computed !== String(body.checksum || '')) return err('Invalid checksum', 401);
   }
 
   const orderRef = body.order_number as string;
@@ -253,7 +311,7 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
 
   const booking = await env.DB.prepare('SELECT * FROM bookings WHERE bayarcash_ref = ? AND payment_status = ?')
     .bind(orderRef, 'pending').first<{id: string}>();
-  if (!booking) return err('Booking not found', 404);
+  if (!booking) return json({ ok: true });
 
   if (status === 3) { // paid
     const autoConfirm = await getSetting(env.DB, 'auto_confirm_payment');
@@ -281,7 +339,7 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
       .bind('failed', transactionId, nowISO(), booking.id).run();
   }
 
-  return ok({ received: true });
+  return json({ ok: true });
 }
 
 // Helpers
@@ -292,13 +350,25 @@ async function generateOrderRef(db: D1Database, prefix: string): Promise<string>
   return (prefix + ts + rand).substring(0, 30);
 }
 
-async function generateChecksum(data: Record<string, any>, secret: string): Promise<string> {
-  const keys = Object.keys(data).sort();
-  const str = keys.map(k => `${k}:${data[k]}`).join('|');
+function ksortJoin(data: Record<string, unknown>): string {
+  return Object.keys(data).sort().map(k => {
+    const value = data[k];
+    return value === null || value === undefined ? '' : String(value);
+  }).join('|');
+}
+
+async function hmacSha256Hex(message: string, secret: string): Promise<string> {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(str));
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
   return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function malaysiaPhone(raw: string): string {
+  let digits = normPhone(raw);
+  if (digits.startsWith('0')) digits = `6${digits}`;
+  else if (digits && !digits.startsWith('60')) digits = `60${digits}`;
+  return digits;
 }
 
 function urlForReq(req: Request): string {

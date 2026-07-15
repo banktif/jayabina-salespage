@@ -16,6 +16,10 @@ export async function handleCustomers(req: Request, env: Env, path: string): Pro
       const page = parseInt(url.searchParams.get('page') || '1');
       const limit = parseInt(url.searchParams.get('limit') || '20');
       const offset = (page - 1) * limit;
+      const requestedOrder = url.searchParams.get('order') || 'last_booking_date';
+      const safeOrder = ['last_booking_date', 'total_bookings', 'total_spent', 'name', 'created_at'];
+      const order = safeOrder.includes(requestedOrder) ? requestedOrder : 'last_booking_date';
+      const direction = url.searchParams.get('dir') === 'asc' ? 'ASC' : 'DESC';
 
       let q = 'SELECT *, COUNT(*) OVER() as total_count FROM customers';
       const conds: string[] = [];
@@ -28,7 +32,7 @@ export async function handleCustomers(req: Request, env: Env, path: string): Pro
       if (status) { conds.push('status = ?'); params.push(status); }
 
       if (conds.length) q += ' WHERE ' + conds.join(' AND ');
-      q += ' ORDER BY last_booking_date DESC NULLS LAST, created_at DESC';
+      q += ` ORDER BY ${order} ${direction} NULLS LAST, created_at DESC`;
       q += ' LIMIT ? OFFSET ?';
       params.push(limit, offset);
 

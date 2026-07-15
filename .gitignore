@@ -1,4 +1,6 @@
 node_modules/
+.wrangler/
+public/
 .env
 *.log
 connect_test.js

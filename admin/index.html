@@ -744,7 +744,7 @@ async function showBackup(){
   try{
     var st=((await callBackup('status')).body.data)||{};
     var priv={};try{var pv=await SB.from('private_settings').select('key,value');(pv.data||[]).forEach(function(r){priv[r.key]=r.value});}catch(e){}
-    var driveOn=st.drive_configured==='true';var r2On=st.r2_configured==='true';
+    var driveOn=st.drive_configured===true||st.drive_configured==='true';var r2On=st.r2_configured===true||st.r2_configured==='true';
     function freqSel(id,val){var o=['hourly','daily','weekly','monthly'];var s='<select id="'+id+'" class="mv-sel">';o.forEach(function(f){s+='<option value="'+f+'"'+((val||'daily')===f?' selected':'')+'>'+f.charAt(0).toUpperCase()+f.slice(1)+'</option>'});return s+'</select>';}
     var h='<div class="panels">'+bkPanel('Google Drive','hard-drive',st.backup_last_drive_at,driveOn?(st.backup_last_drive_status||'Waiting'):'Not configured')+bkPanel('Cloudflare R2','cloud',st.backup_last_r2_at,r2On?(st.backup_last_r2_status||'Waiting'):'Not configured')+bkPanel('Code Backup (GitLab)','git-branch',st.backup_last_code_at,st.backup_last_code_status)+'</div>';
     h+='<div class="sGrp"><div class="sGrpH">Run Backup Now</div><div style="display:flex;gap:10px;flex-wrap:wrap">';
@@ -763,12 +763,13 @@ async function showBackup(){
     h+='<button class="btn-primary" style="width:auto" onclick="saveBackupCfg()"><i data-lucide="save"></i> Save Google Drive</button><div id="bkCfgMsg" style="font-size:.75rem;color:var(--text3)"></div>';
     h+='<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Setup: Google Cloud &rarr; create Service Account + JSON key &rarr; enable Drive API. Copy <code>client_email</code> + <code>private_key</code> here. Share your Drive folder with that email (Editor), paste folder ID.</div></div></div>';
     h+='<div class="sGrp"><div class="sGrpH">Cloudflare R2 '+(r2On?'&#9989; Connected':'&#9888; Not configured')+'</div><div class="sFields">';
-    h+='<div><label class="sLbl">Account ID</label><input id="r2Account" class="sInp" value="'+esc(priv.r2_account_id||'')+'" placeholder="Cloudflare account ID"></div>';
-    h+='<div><label class="sLbl">Access Key ID</label><input id="r2Key" class="sInp" value="'+esc(priv.r2_access_key||'')+'" placeholder="R2 access key id"></div>';
-    h+='<div><label class="sLbl">Secret Access Key</label><input id="r2Secret" type="password" class="sInp" value="'+esc(priv.r2_secret_key||'')+'" placeholder="R2 secret access key"></div>';
-    h+='<div><label class="sLbl">Bucket Name</label><input id="r2Bucket" class="sInp" value="'+esc(priv.r2_bucket||'')+'" placeholder="e.g. jayaclean-backup"></div>';
-    h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" style="width:auto" onclick="saveR2()"><i data-lucide="save"></i> Save R2</button><button class="d-btn" onclick="testR2()">Test Connection</button></div><div id="bkR2Msg" style="font-size:.75rem;color:var(--text3)"></div>';
-    h+='<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Setup: Cloudflare &rarr; R2 &rarr; create bucket. R2 &rarr; Manage API Tokens &rarr; create token (Object Read &amp; Write) &rarr; copy Access Key ID + Secret. Account ID from the R2 S3 endpoint. 10 GB free, no egress fees.</div></div></div>';
+    if(r2On){
+      h+='<div style="font-size:.78rem;color:var(--text2);line-height:1.7">Connected securely through the native Cloudflare Worker binding. No access key is stored in this dashboard.</div>';
+      h+='<div><button class="d-btn" onclick="testR2()">Test Connection</button></div><div id="bkR2Msg" style="font-size:.75rem;color:var(--text3)"></div>';
+    }else{
+      h+='<div style="font-size:.78rem;color:var(--danger)">R2 binding is missing from the Cloudflare Worker configuration.</div><div id="bkR2Msg" style="font-size:.75rem;color:var(--text3)"></div>';
+    }
+    h+='</div></div>';
     h+='<div class="sGrp"><div class="sGrpH">Recent Database Backups</div><div id="bkList"><div style="font-size:.78rem;color:var(--text3)">Loading...</div></div></div>';
     l.innerHTML=h;
     loadBackupList();
@@ -777,7 +778,7 @@ async function showBackup(){
 async function backupNow(kind){
   var msg=document.getElementById('bkMsg');msg.style.color='var(--text3)';msg.textContent=(kind==='db'?'Backing up database...':'Triggering code backup...');
   var token=await authToken();
-  var res=await fetch(API_URL+'/api/backup/db',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({force:true})});
+  var res=await fetch(API_URL+'/api/backup/'+(kind==='code'?'code':'db'),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({force:true})});
   var r={ok:res.ok,body:await res.json()};
   if(r.ok){msg.style.color='var(--accent)';msg.textContent=(kind==='db'?'Database backup done.':'Code backup triggered (GitHub Actions running).');setTimeout(showBackup,1400);}
   else{msg.style.color='var(--danger)';msg.textContent='Error: '+(r.body.error||'failed');}
@@ -1137,7 +1138,7 @@ async function showSettings(){
     h+=grp('Payment / Bank',[fld('bank_name'),fld('bank_account_no'),fld('bank_account_holder'),fld('qr_image_url'),fld('price_total','Price Total (RM)','text'),fld('price_deposit','Deposit (RM)','text'),fld('price_balance','Balance (RM)','text'),'<div><label class="sLbl">Bank QR Image</label><button class="btn-primary" style="width:auto;padding:10px 16px;font-size:.72rem" onclick="uploadQR()"><i data-lucide="upload"></i> Upload QR</button><div id="qrMsg" style="font-size:.72rem;color:var(--text3);margin-top:6px"></div></div>']);
     h+=grp('WhatsApp Templates (Malay)',[fld('wa_tmpl_baki','Bank Transfer (Manual)','textarea'),fld('wa_tmpl_balance_link','Payment Link (Bayarcash)','textarea'),fld('wa_tmpl_staff','Staff Assignment','textarea')]);
     h+=grp('Scheduling',[fld('slots'),fld('max_slots_per_day'),fld('coverage_area'),fld('service_areas','Service Areas','textarea')]);
-    h+=grp('WhatsApp API',[fld('wa_api_enabled','Enable Cloud API','select_onoff'),'<div style="font-size:.68rem;color:var(--text3);padding:6px 0">Set WA_PHONE_NUMBER_ID + WA_ACCESS_TOKEN in Supabase Edge Function secrets. Templates share settings with WhatsApp Templates above.</div>']);
+    h+=grp('WhatsApp API',[fld('wa_api_enabled','Enable Cloud API','select_onoff'),'<div style="font-size:.68rem;color:var(--text3);padding:6px 0">Set WA_PHONE_NUMBER_ID + WA_ACCESS_TOKEN as Cloudflare Worker secrets. Templates share settings with WhatsApp Templates above.</div>']);
     h+=grp('Automation',[fld('auto_confirm_payment','Auto-confirm Payment','select_onoff'),fld('auto_assign_enabled','Auto-assign Staff','select_onoff'),fld('auto_assign_rule','Assignment Rule','select_rule'),fld('auto_complete_task','Auto-complete Task','select_onoff'),fld('auto_send_wa_balance','Auto-send WA Balance','select_onoff')]);
     h+=grp('Cloudinary',[fld('cloud_name'),fld('upload_preset'),fld('folder')]);
     h+='<div><button class="btn-primary" style="width:auto;padding:12px 26px" onclick="saveSettings()"><i data-lucide="save"></i> Save All Settings</button></div>';
@@ -1369,7 +1370,7 @@ async function autoAssignAll(){
   }catch(e){alert('Error: '+e.message);}
 }
 
-// AUTH (Supabase)
+// AUTH (Cloudflare Worker + D1)
 async function doLogin(){
   var msg=document.getElementById('authErr');
   var em=document.getElementById('loginEmail').value.trim();

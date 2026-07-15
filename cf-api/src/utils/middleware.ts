@@ -7,7 +7,12 @@ export async function requireAuth(req: Request, env: Env): Promise<JWTPayload> {
     throw { status: 401, msg: 'Missing auth token' };
   }
   try {
-    return await verifyJWT(auth.slice(7), env.JWT_SECRET);
+    const payload = await verifyJWT(auth.slice(7), env.JWT_SECRET);
+    const profile = await env.DB.prepare(
+      'SELECT full_name, role, is_active FROM profiles WHERE id = ?'
+    ).bind(payload.sub).first<{full_name: string; role: 'admin' | 'staff'; is_active: number}>();
+    if (!profile || !profile.is_active) throw new Error('Account disabled or not found');
+    return { ...payload, role: profile.role, name: profile.full_name };
   } catch (e: any) {
     throw { status: 401, msg: e.message || 'Invalid token' };
   }

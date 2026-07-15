@@ -112,7 +112,7 @@ async function login(){
 
 async function loadMyBookings(){
   try{
-    var resp=await SB.from('bookings').select('*').order('booking_date',{ascending:false}).order('booking_time',{ascending:false});
+    var resp=await SB.from('bookings').select('*').eq('customer_phone',myPhone).order('booking_date',{ascending:false}).order('booking_time',{ascending:false});
     var data=resp.data||[];
     myBookings=data.filter(function(b){return b.customer_phone&&b.customer_phone.replace(/\D/g,'')===myPhone});
     var ids=myBookings.map(function(b){return b.id});
