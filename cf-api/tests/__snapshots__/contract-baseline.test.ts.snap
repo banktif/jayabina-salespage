@@ -1,0 +1,826 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`legacy Worker behavior snapshot > freezes every route group before Hono and Drizzle routing changes 1`] = `
+{
+  "auth": {
+    "changeValidation": {
+      "body": {
+        "error": "Password must be at least 8 characters",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "invalidLogin": {
+      "body": {
+        "error": "Invalid credentials",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 401,
+    },
+    "me": {
+      "body": {
+        "data": {
+          "address": "",
+          "avatar_url": "",
+          "created_at": "<iso-timestamp>",
+          "email": "admin@example.test",
+          "full_name": "Contract Admin",
+          "id": "<uuid>",
+          "is_active": 1,
+          "phone": "60110000001",
+          "role": "admin",
+          "service_area": "",
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "resetValidation": {
+      "body": {
+        "error": "Password must be at least 8 characters",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "validLogin": {
+      "body": {
+        "data": {
+          "token": "<jwt>",
+          "user": {
+            "avatar_url": "",
+            "email": "admin@example.test",
+            "full_name": "Contract Admin",
+            "id": "<uuid>",
+            "phone": "60110000001",
+            "role": "admin",
+            "service_area": "",
+          },
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+  },
+  "backup": {
+    "codeUnavailable": {
+      "body": {
+        "error": "GitHub token is not configured in Cloudflare Worker secrets",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 503,
+    },
+    "databaseBackup": {
+      "body": {
+        "data": {
+          "filename": "<backup-file>",
+          "r2": "ok",
+          "tables": 7,
+          "timestamp": "<iso-timestamp>",
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "driveTest": {
+      "body": {
+        "error": "Google Drive service account is not configured",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 503,
+    },
+    "emptyList": {
+      "body": {
+        "data": [],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "invalidDownload": {
+      "body": {
+        "error": "Link expired or invalid",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 403,
+    },
+    "populatedList": {
+      "body": {
+        "data": [
+          {
+            "name": "<backup-file>",
+            "size": "<bytes>",
+            "uploaded": "<iso-timestamp>",
+            "url": "https://api.example.test/api/backup/download?key=db%2F<backup-file>&expires=<unix>&sig=<signature>",
+          },
+        ],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "publishUnavailable": {
+      "body": {
+        "error": "GitHub token is not configured in Cloudflare Worker secrets",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 503,
+    },
+    "r2Test": {
+      "body": {
+        "data": {
+          "r2": "reachable",
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "status": {
+      "body": {
+        "data": {
+          "drive_configured": false,
+          "r2_configured": true,
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+  },
+  "bookingsPayments": {
+    "balanceUnauthorized": {
+      "body": {
+        "error": "Missing auth token",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 401,
+    },
+    "bookings": {
+      "body": {
+        "data": [],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "callbackValidation": {
+      "body": {
+        "error": "D1_TYPE_ERROR: Type 'undefined' not supported for value 'undefined'",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 500,
+    },
+    "createValidation": {
+      "body": {
+        "error": "Missing required fields: customer_name, customer_phone, customer_address, booking_date, booking_time",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "intentValidation": {
+      "body": {
+        "error": "Missing booking_id",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "patchMissing": {
+      "body": {
+        "error": "Booking not found",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 404,
+    },
+    "publicMissing": {
+      "body": {
+        "error": "Missing id",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+  },
+  "core": {
+    "health": {
+      "body": {
+        "data": {
+          "database": "ok",
+          "service": "jayaclean-api",
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "notFound": {
+      "body": {
+        "error": "Not found",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 404,
+    },
+    "options": {
+      "body": null,
+      "headers": {
+        "cacheControl": null,
+        "contentType": null,
+        "cors": "*",
+        "noSniff": null,
+        "referrerPolicy": null,
+      },
+      "status": 204,
+    },
+  },
+  "profilesCustomersWhatsapp": {
+    "bulkValidation": {
+      "body": {
+        "error": "No staff provided",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "customerMissing": {
+      "body": {
+        "error": "Not found",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 404,
+    },
+    "customers": {
+      "body": {
+        "data": {
+          "data": [],
+          "limit": 20,
+          "page": 1,
+          "total": 0,
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "profilePatchMissing": {
+      "body": {
+        "error": "Profile not found",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 404,
+    },
+    "profileValidation": {
+      "body": {
+        "error": "full_name and phone required",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "profiles": {
+      "body": {
+        "data": [
+          {
+            "address": "",
+            "avatar_url": "",
+            "created_at": "<db-timestamp>",
+            "email": "banktifweb1@gmail.com",
+            "full_name": "Abdul Latif",
+            "id": "<uuid>",
+            "is_active": 1,
+            "phone": "60139373275",
+            "role": "admin",
+            "service_area": "",
+          },
+          {
+            "address": "",
+            "avatar_url": "",
+            "created_at": "<iso-timestamp>",
+            "email": "staff@example.test",
+            "full_name": "Contract Staff",
+            "id": "<uuid>",
+            "is_active": 1,
+            "phone": "60110000002",
+            "role": "staff",
+            "service_area": "Klang",
+          },
+          {
+            "address": "",
+            "avatar_url": "",
+            "created_at": "<iso-timestamp>",
+            "email": "admin@example.test",
+            "full_name": "Contract Admin",
+            "id": "<uuid>",
+            "is_active": 1,
+            "phone": "60110000001",
+            "role": "admin",
+            "service_area": "",
+          },
+        ],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "whatsappValidation": {
+      "body": {
+        "error": "Missing phone number",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+  },
+  "settingsSlots": {
+    "availableMissingDate": {
+      "body": {
+        "error": "Missing date parameter",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "checkMissingDate": {
+      "body": {
+        "error": "Missing date parameter",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "privateSettings": {
+      "body": {
+        "data": [],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "publicSettings": {
+      "body": {
+        "data": {
+          "business_name": "Jaya Bina Services",
+          "coverage_area": "Lembah Klang",
+          "max_slots_per_day": "4",
+          "price_balance": "150",
+          "price_deposit": "150",
+          "price_total": "300",
+          "slots": "9am,11am,2pm,4pm",
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "settings": {
+      "body": {
+        "data": [
+          {
+            "key": "active_homepage",
+            "updated_at": "<db-timestamp>",
+            "value": "v1",
+          },
+          {
+            "key": "auto_assign_enabled",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
+            "key": "auto_assign_rule",
+            "updated_at": "<db-timestamp>",
+            "value": "round_robin",
+          },
+          {
+            "key": "auto_complete_task",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
+            "key": "auto_confirm_payment",
+            "updated_at": "<db-timestamp>",
+            "value": "true",
+          },
+          {
+            "key": "auto_send_wa_balance",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
+            "key": "bank_account_holder",
+            "updated_at": "<db-timestamp>",
+            "value": "",
+          },
+          {
+            "key": "bank_account_no",
+            "updated_at": "<db-timestamp>",
+            "value": "",
+          },
+          {
+            "key": "bank_name",
+            "updated_at": "<db-timestamp>",
+            "value": "",
+          },
+          {
+            "key": "business_name",
+            "updated_at": "<db-timestamp>",
+            "value": "Jaya Bina Services",
+          },
+          {
+            "key": "cloud_name",
+            "updated_at": "<db-timestamp>",
+            "value": "dkibczut",
+          },
+          {
+            "key": "coverage_area",
+            "updated_at": "<db-timestamp>",
+            "value": "Lembah Klang",
+          },
+          {
+            "key": "folder",
+            "updated_at": "<db-timestamp>",
+            "value": "jayaclean/tasks",
+          },
+          {
+            "key": "max_slots_per_day",
+            "updated_at": "<db-timestamp>",
+            "value": "4",
+          },
+          {
+            "key": "price_balance",
+            "updated_at": "<db-timestamp>",
+            "value": "150",
+          },
+          {
+            "key": "price_deposit",
+            "updated_at": "<db-timestamp>",
+            "value": "150",
+          },
+          {
+            "key": "price_total",
+            "updated_at": "<db-timestamp>",
+            "value": "300",
+          },
+          {
+            "key": "qr_image_url",
+            "updated_at": "<db-timestamp>",
+            "value": "",
+          },
+          {
+            "key": "service_areas",
+            "updated_at": "<db-timestamp>",
+            "value": "",
+          },
+          {
+            "key": "slots",
+            "updated_at": "<db-timestamp>",
+            "value": "9am,11am,2pm,4pm",
+          },
+          {
+            "key": "upload_preset",
+            "updated_at": "<db-timestamp>",
+            "value": "jayaclean_tasks",
+          },
+          {
+            "key": "wa_api_enabled",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
+            "key": "wa_business_number",
+            "updated_at": "<db-timestamp>",
+            "value": "60139373275",
+          },
+          {
+            "key": "wa_tmpl_baki",
+            "updated_at": "<db-timestamp>",
+            "value": "Salam {nama}, kerja cuci tangki air di {alamat} telah siap. Sila jelaskan baki bayaran RM{baki} ke akaun {bank} {akaun} ({pemegang}). QR bank: {qr_url}. Terima kasih kerana memilih {business}.",
+          },
+          {
+            "key": "wa_tmpl_staff",
+            "updated_at": "<db-timestamp>",
+            "value": "Salam {nama_staff}, anda ditugaskan kerja cuci tangki: Pelanggan {nama} di {alamat} pada {tarikh} ({slot}). Lokasi: {maps}",
+          },
+        ],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "settingsUnauthorized": {
+      "body": {
+        "error": "Missing auth token",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 401,
+    },
+    "settingsValidation": {
+      "body": {
+        "error": "No settings provided",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+  },
+  "tasksPhotos": {
+    "distribute": {
+      "body": {
+        "data": {
+          "assigned": 0,
+        },
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "patchMissing": {
+      "body": {
+        "error": "Task not found",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 404,
+    },
+    "photoValidation": {
+      "body": {
+        "error": "Missing task_id, type, or url",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "photosMissingTask": {
+      "body": {
+        "error": "Missing task_id",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 400,
+    },
+    "tasks": {
+      "body": {
+        "data": [],
+        "status": "ok",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 200,
+    },
+    "tasksUnauthorized": {
+      "body": {
+        "error": "Missing auth token",
+      },
+      "headers": {
+        "cacheControl": "no-store",
+        "contentType": "application/json; charset=utf-8",
+        "cors": "*",
+        "noSniff": "nosniff",
+        "referrerPolicy": "no-referrer",
+      },
+      "status": 401,
+    },
+  },
+}
+`;
