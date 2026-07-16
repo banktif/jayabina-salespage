@@ -14,7 +14,10 @@ assert.equal(files.builtHtml, files.html, 'admin-public/index.html must match ad
 assert.equal(files.builtTheme, files.theme, 'built theme.css must match the source');
 assert.equal(files.builtModern, files.modern, 'built admin-modern.css must match the source');
 
-for (const token of ['--surface-hover:', '--canvas-glow:', '--nav-glass:', '--header-fade:', '--login-card:', '--login-card-border:']) {
+for (const token of [
+  '--surface-hover:', '--canvas-glow:', '--nav-glass:', '--header-fade:', '--login-card:', '--login-card-border:',
+  '--card-bg:', '--card-muted:', '--card-border:', '--card-border-hover:', '--card-shadow:', '--card-shadow-hover:', '--card-radius:'
+]) {
   assert.ok(files.theme.includes(token), `missing shared theme token ${token}`);
 }
 
@@ -45,5 +48,26 @@ for (const required of [
 ]) {
   assert.ok(files.modern.includes(required), `missing semantic color usage: ${required}`);
 }
+
+for (const cardSelector of [
+  '.admin-app .stat', '.admin-app .card', '.admin-app .d-card', '.admin-app .cal-wrap',
+  '.admin-app .tk-card', '.admin-app .sGrp', '.admin-app .kpi', '.admin-app .panel',
+  '.admin-app .bk-card', '.admin-app .cust-row', '.admin-app .m-sheet'
+]) {
+  assert.ok(files.modern.includes(cardSelector), `card system must cover ${cardSelector}`);
+}
+
+for (const cardRule of [
+  'background:var(--card-bg)',
+  'border:1px solid var(--card-border)',
+  'border-radius:var(--card-radius)',
+  'box-shadow:var(--card-shadow)',
+  'box-shadow:var(--card-shadow-hover)',
+  'background:var(--card-muted)'
+]) {
+  assert.ok(files.modern.includes(cardRule), `missing unified card rule ${cardRule}`);
+}
+
+assert.ok(files.html.includes('?v=20260716-cards1'), 'admin must cache-bust the unified card release');
 
 console.log('Admin theme contract: PASS');

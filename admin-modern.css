@@ -75,23 +75,85 @@ body.admin-app{
   box-shadow:var(--shadow);
 }
 
+/* One card language across dashboard, bookings, CRM, staff, reports and settings. */
 .admin-app .stat,
+.admin-app .card,
+.admin-app .d-card,
+.admin-app .cal-wrap,
+.admin-app .tk-card,
+.admin-app .sGrp,
 .admin-app .kpi,
 .admin-app .panel,
 .admin-app .bk-card,
-.admin-app .sGrp,
-.admin-app .d-card,
-.admin-app .cal-wrap{
-  border-color:var(--border);
-  box-shadow:var(--shadow);
+.admin-app .cust-row,
+.admin-app .m-sheet{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--card-radius);
+  box-shadow:var(--card-shadow);
+}
+
+.admin-app .stat,
+.admin-app .card,
+.admin-app .tk-card,
+.admin-app .kpi,
+.admin-app .panel,
+.admin-app .bk-card,
+.admin-app .cust-row{
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease;
 }
 
 .admin-app .stat:hover,
+.admin-app .card:hover,
+.admin-app .tk-card:hover,
 .admin-app .kpi:hover,
 .admin-app .panel:hover,
-.admin-app .bk-card:hover{
-  box-shadow:var(--shadow-lg);
+.admin-app .bk-card:hover,
+.admin-app .cust-row:hover{
+  border-color:var(--card-border-hover);
+  box-shadow:var(--card-shadow-hover);
+  transform:translateY(-2px);
 }
+
+.admin-app .stat:focus-within,
+.admin-app .card:focus-within,
+.admin-app .tk-card:focus-within,
+.admin-app .kpi:focus-within,
+.admin-app .panel:focus-within,
+.admin-app .bk-card:focus-within,
+.admin-app .cust-row:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow),var(--card-shadow);
+}
+
+.admin-app .stat.today,
+.admin-app .kpi.blue{--card-accent:var(--accent2);--card-tint:var(--accent2-light)}
+.admin-app .stat.total,
+.admin-app .kpi.green{--card-accent:var(--accent);--card-tint:var(--accent-light)}
+.admin-app .stat.wait,
+.admin-app .kpi.amber{--card-accent:var(--warning);--card-tint:var(--warning-light)}
+.admin-app .kpi.red{--card-accent:var(--danger);--card-tint:var(--danger-light)}
+.admin-app .kpi.plain{--card-accent:var(--text2);--card-tint:var(--card-muted)}
+
+.admin-app .stat::before,
+.admin-app .kpi::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:3px;
+  background:var(--card-accent,var(--accent));
+}
+
+.admin-app .stat-icon,
+.admin-app .kpi .kpi-ic{
+  display:grid;
+  place-items:center;
+  background:var(--card-tint,var(--accent-light));
+  color:var(--card-accent,var(--accent));
+}
+
+.admin-app .stat-val,
+.admin-app .kpi .kpi-v{color:var(--card-accent,var(--text))}
 
 .admin-app .sec-title,
 .admin-app .sGrpH{
@@ -100,23 +162,70 @@ body.admin-app{
   letter-spacing:.08em;
 }
 
+.admin-app .panel-h,
+.admin-app .sGrpH,
+.admin-app .cal-head{
+  margin-bottom:16px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--card-border);
+}
+
+.admin-app .sGrpH{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.admin-app .sGrpH::before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-light);
+  flex:0 0 auto;
+}
+
 .admin-app .sec-count{font-size:12px;padding:4px 10px}
 .admin-app .bc-badge,
 .admin-app .cbadge{font-size:11px;line-height:1.35;padding:5px 10px}
 
-.admin-app .panel-h h3{font-size:15px}
+.admin-app .panel-h h3{font-size:15px;letter-spacing:-.015em}
+.admin-app .panel-h h3>svg{
+  width:32px;
+  height:32px;
+  padding:7px;
+  border-radius:10px;
+  background:var(--accent-light);
+  color:var(--accent);
+}
 .admin-app .panel-h .lnk{font-size:12px;min-height:36px;padding:0 8px}
+.admin-app .mrow{
+  margin-inline:-8px;
+  padding:11px 8px;
+  border-radius:10px;
+}
+.admin-app .mrow:hover{background:var(--card-muted)}
 .admin-app .mrow .mn{font-size:14px}
 .admin-app .mrow .ma{font-size:12px}
-.admin-app .mrow .mslot{font-size:12px;min-width:60px;padding:6px 9px}
+.admin-app .mrow .mslot{font-size:12px;min-width:60px;padding:6px 9px;background:var(--card-muted)}
 .admin-app .panel-empty{font-size:13px;min-height:96px;justify-content:center}
 
-.admin-app .kpi{min-height:138px;padding:20px}
+.admin-app .kpi{position:relative;min-height:138px;padding:20px;overflow:hidden}
 .admin-app .kpi .kpi-ic{width:42px;height:42px;border-radius:13px;margin-bottom:16px}
 .admin-app .kpi .kpi-v{font-size:30px;letter-spacing:-.045em}
 .admin-app .kpi .kpi-l{font-size:11px;line-height:1.4;letter-spacing:.06em;margin-top:8px}
 
-.admin-app .bk-card{padding:20px;border-radius:18px}
+.admin-app .bk-card{padding:20px}
+.admin-app .bk-card::before{width:3px;background:var(--card-accent,var(--text3))}
+.admin-app .bk-card.s-pending_payment{--card-accent:var(--warning)}
+.admin-app .bk-card.s-confirmed{--card-accent:var(--accent)}
+.admin-app .bk-card.s-completed{--card-accent:var(--accent2)}
+.admin-app .bk-card.s-cancelled{--card-accent:var(--danger)}
+.admin-app .bk-ava,
+.admin-app .bk-mrow .pill,
+.admin-app .tk-slot{background:var(--card-muted)}
+.admin-app .bk-foot{border-color:var(--card-border)}
 .admin-app .bk-name{font-size:15px}
 .admin-app .bk-sub{font-size:12px}
 .admin-app .bk-mrow{font-size:13px}
@@ -135,14 +244,23 @@ body.admin-app{
 .admin-app .cust-name{font-size:14px}
 .admin-app .cust-sub,
 .admin-app .cust-stat{font-size:12px}
-.admin-app .cust-row{min-height:66px;padding:12px 14px}
+.admin-app .cust-row{min-height:68px;padding:14px 16px;margin-bottom:10px}
+.admin-app .tk-card{min-height:68px;padding:14px 16px;margin-bottom:10px}
+.admin-app .card{padding:16px 18px}
+.admin-app .cal-wrap{max-width:none;padding:20px}
+.admin-app .cal-cell{background:var(--card-muted);border-color:var(--card-border)}
+.admin-app .cal-cell:not(.empty):hover{background:var(--accent-light);border-color:var(--card-border-hover)}
+.admin-app .adm-thumb,
+.admin-app .st-av{background:var(--card-muted);border-color:var(--card-border)}
 
-.admin-app thead th{font-size:11px;padding:14px 16px;background:var(--surface)}
+.admin-app .d-card{overflow:hidden}
+.admin-app thead th{font-size:11px;padding:14px 16px;background:var(--card-muted);border-color:var(--card-border)}
 .admin-app tbody td{font-size:13px;padding:16px}
-.admin-app tbody tr:hover{background:var(--surface-hover)}
+.admin-app tbody tr:hover{background:var(--card-muted)}
 .admin-app .d-btn{min-height:40px;font-size:12px}
 
-.admin-app .m-sheet h3{font-size:17px}
+.admin-app .m-sheet{border-color:var(--card-border);box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.admin-app .m-sheet h3{font-size:17px;padding-bottom:14px;border-bottom:1px solid var(--card-border)}
 .admin-app .m-row{font-size:14px}
 .admin-app .m-btn{min-height:44px;font-size:13px}
 
@@ -246,12 +364,12 @@ body.admin-app{
   .admin-app .d-hdr p{font-size:13px;margin-top:3px}
   .admin-app .stats-grid{gap:18px;margin-bottom:28px}
   .admin-app .stat{min-height:142px;padding:24px;text-align:left}
-  .admin-app .stat-icon{font-size:22px;margin-bottom:18px}
+  .admin-app .stat-icon{width:44px;height:44px;border-radius:14px;font-size:22px;margin-bottom:18px}
   .admin-app .stat-val{font-size:36px}
   .admin-app .stat-lbl{font-size:11px;margin-top:8px}
   .admin-app .dash-grid{gap:16px;margin-bottom:18px}
   .admin-app .panels{grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);gap:18px;margin-bottom:18px}
-  .admin-app .panel{padding:22px}
+  .admin-app .panel,.admin-app .sGrp{padding:22px}
   .admin-app .modal{left:272px}
   .admin-app .m-sheet{width:540px;padding:30px;border-radius:20px}
 }
@@ -294,8 +412,8 @@ body.admin-app{
   .admin-app .bnav-item .bnl{font-size:10px;letter-spacing:.04em;text-transform:none}
   .admin-app .d-main{padding:0}
   .admin-app .stats-grid{padding:18px 14px 0;gap:8px}
-  .admin-app .stat{min-height:110px;padding:15px 12px;text-align:left;border-radius:15px}
-  .admin-app .stat-icon{font-size:18px;margin-bottom:12px}
+  .admin-app .stat{min-height:110px;padding:15px 12px;text-align:left;border-radius:16px}
+  .admin-app .stat-icon{width:36px;height:36px;border-radius:11px;font-size:18px;margin-bottom:12px}
   .admin-app .stat-val{font-size:28px}
   .admin-app .stat-lbl{font-size:10px;letter-spacing:.04em;line-height:1.3}
   .admin-app .sec{padding:20px 16px 9px}
@@ -333,6 +451,8 @@ body.admin-app{
   .admin-app .login-avatar{width:56px;height:56px;margin-bottom:20px}
   .admin-app .login-box h2{font-size:23px}
   .admin-app .bk-card{padding:16px}
+  .admin-app .card,.admin-app .tk-card,.admin-app .cust-row{border-radius:16px}
+  .admin-app .cal-wrap{padding:16px;border-radius:16px}
   .admin-app .bk-foot,
   .admin-app .qact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .admin-app .crm-bar{display:grid;grid-template-columns:1fr 1fr;gap:9px}
