@@ -12,6 +12,7 @@ import { handleCustomers } from './routes/customers';
 import { handleSlots } from './routes/slots';
 import { handleWhatsapp } from './routes/whatsapp';
 import { handleBackup } from './routes/backup';
+import { handleWebsite } from './routes/website';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
 
@@ -100,6 +101,13 @@ const handleBackupRoute = (req: Request, env: Env) => {
 };
 app.all('/api/backup', (c) => handleBackupRoute(c.req.raw, c.env));
 app.all('/api/backup/*', (c) => handleBackupRoute(c.req.raw, c.env));
+
+const handleWebsiteRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleWebsite(req, env, path);
+};
+app.all('/api/website', (c) => handleWebsiteRoute(c.req.raw, c.env));
+app.all('/api/website/*', (c) => handleWebsiteRoute(c.req.raw, c.env));
 
 app.notFound(() => err('Not found', 404));
 

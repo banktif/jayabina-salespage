@@ -1,0 +1,24 @@
+- key: roof
+  name: Tukar Atap Baharu
+  kicker: TUKAR ATAP BAHARU
+  title: Dah berkali-kali baiki, tapi bocor masih kembali?
+  summary: Jika tampalan demi tampalan tidak menyelesaikan masalah, lihat pilihan menilai dan menukar atap baharu untuk keseluruhan rumah atau ofis.
+  url: /servis-tukar-atap/
+  image: /images/roof/roof-hero-800.webp
+  alt: Pemilik rumah melihat kesan kebocoran berulang pada siling rumah
+- key: tank
+  name: Cuci Tangki Air Rumah
+  kicker: CUCI TANGKI AIR
+  title: Air nampak jernih, tetapi bagaimana keadaan dasar tangki?
+  summary: Lihat cara tangki diperiksa, mendapan dikeluarkan dan bahagian dalam dicuci sebelum dibilas serta direkodkan.
+  url: /servis-cuci-tangki-air/
+  image: /images/tank/tank-emotional-1200.webp
+  alt: Ilustrasi penggunaan air bersih dan keadaan bahagian dalam tangki air
+- key: paint
+  name: Mengecat Rumah & Ofis
+  kicker: MENGECAT RUMAH & OFIS
+  title: Dinding pudar atau mengelupas buat ruang nampak tidak terjaga?
+  summary: Lihat servis mengecat untuk menyegarkan ruang dalaman atau luaran dengan persediaan, perlindungan dan skop yang jelas.
+  url: /servis-mengecat/
+  image: /images/paint/paint-hero-800.webp
+  alt: Juruteknik mengecat dinding rumah dengan ruang yang dilindungi

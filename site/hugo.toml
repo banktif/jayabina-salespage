@@ -1,0 +1,55 @@
+baseURL = "https://www.jayabina.com/"
+locale = "ms-MY"
+defaultContentLanguage = "ms"
+title = "JAYABINA"
+enableRobotsTXT = true
+enableGitInfo = false
+canonifyURLs = false
+summaryLength = 28
+
+[params]
+  description = "Servis tukar atap baharu, cuci tangki air rumah dan mengecat rumah atau ofis oleh Primex Jaya Bina Solutions."
+  brand = "JAYABINA"
+  company = "Primex Jaya Bina Solutions"
+  companyNumber = "JR0188646-T"
+  phoneDisplay = "013-937 3275"
+  phoneTel = "+60139373275"
+  whatsapp = "60139373275"
+  serviceArea = "Kuala Lumpur, Lembah Klang dan Selangor"
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = false
+
+[minify]
+  minifyOutput = true
+
+[[menus.main]]
+  name = "Utama"
+  pageRef = "/"
+  weight = 10
+[[menus.main]]
+  name = "Servis"
+  pageRef = "/servis"
+  weight = 20
+[[menus.main]]
+  name = "Tentang Kami"
+  pageRef = "/tentang-kami"
+  weight = 30
+[[menus.main]]
+  name = "Blog"
+  pageRef = "/blog"
+  weight = 40
+[[menus.main]]
+  name = "Hubungi"
+  pageRef = "/hubungi-kami"
+  weight = 50

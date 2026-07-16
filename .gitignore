@@ -2,6 +2,9 @@ node_modules/
 .wrangler/
 public/
 admin-public/
+site-public/
+site/resources/
+site/.hugo_build.lock
 assets/*.png
 !assets/jayaclean-apple-touch-icon.png
 !assets/jayaclean-favicon-64.png

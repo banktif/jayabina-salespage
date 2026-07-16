@@ -1,0 +1,98 @@
+{{ $b := hugo.Data.business }}
+{{ $wa := "Assalamualaikum JAYABINA. Saya mahu semak servis cuci tangki air rumah. Jenis rumah: ____. Lokasi/poskod: ____." }}
+<section class="service-hero" data-hero>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-badge">SERVIS CUCI TANGKI AIR RUMAH</span>
+      <h1>Air nampak jernih. Tapi bagaimana keadaan dasar tangki?</h1>
+      <p class="lead">Tangki air berada di tempat yang jarang dilihat, sedangkan airnya digunakan untuk mandi, berwuduk, membasuh dan rutin keluarga setiap hari.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="#hubungi">Semak Servis &amp; Lokasi</a><a class="btn btn-outline" href="#proses">Lihat Proses Cucian</a></div>
+      <p class="hero-note">Kongsi jenis rumah, lokasi atau poskod dan gambar tangki jika mudah diambil dengan selamat.</p>
+    </div>
+    <div class="hero-visual">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-emotional" "alt" "Seorang lelaki berwuduk dengan air bersih dan gambaran bahagian dalam tangki air yang kotor" "loading" "eager" "sizes" "(max-width: 1023px) calc(100vw - 40px), 45vw") }}<p class="image-disclosure">Visual konsep AI untuk menggambarkan penggunaan air harian dan keadaan tersembunyi dalam tangki.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container assessment-panel">
+    <div><span class="section-kicker">APA YANG SEPATUTNYA ANDA NAMPAK</span><h2>Proses yang boleh diterangkan dan direkodkan.</h2></div>
+    <ul class="assessment-list"><li>Pemeriksaan keadaan dan akses tangki</li><li>Gambar awal jika keadaan membenarkan</li><li>Air serta mendapan dikeluarkan</li><li>Bahagian dalam dicuci mengikut akses</li><li>Bilas dan semakan selepas kerja</li><li>Dokumentasi sebelum dan selepas</li></ul>
+  </div>
+</section>
+
+<section class="section section-grey">
+  <div class="container emotion-layout">
+    <div>{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-comparison" "alt" "Perbandingan visual air yang kelihatan bersih dengan mendapan kotor di dalam tangki" "sizes" "(max-width: 767px) calc(100vw - 32px), 46vw") }}<p class="image-disclosure">Visual konsep AI untuk membantu menerangkan keadaan yang mungkin tersembunyi.</p></div>
+    <div><span class="section-kicker">DIGUNAKAN SETIAP HARI, TETAPI JARANG DILIHAT</span><h2>Air yang menyentuh keluarga bermula daripada tempat yang terlindung.</h2><p class="lead">Kita berwuduk, berkumur, memandikan anak dan membersihkan rumah dengan air yang mengalir dari paip. Tetapi bahagian dalam tangki selalunya hanya difikirkan apabila ada tanda yang jelas.</p><p>Air yang kelihatan jernih tidak semestinya memberitahu anda keadaan dasar tangki. Pemeriksaan dan cucian membantu anda melihat sendiri apa yang selama ini tidak kelihatan.</p><div class="quote-callout">Bukan untuk menakutkan — tetapi untuk memberi gambaran, bukti visual dan langkah penjagaan yang lebih jelas.</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><span class="section-kicker">BILA WAJAR BUAT SEMAKAN?</span><h2>Mulakan apabila anda tidak pasti keadaan tangki.</h2><p>Tanda di bawah tidak menggantikan pemeriksaan. Ia membantu anda mengenal pasti bila pertanyaan awal mungkin berguna.</p></div>
+    <div class="feature-grid">
+      <article class="feature-card"><h3>Sudah lama tidak dicuci</h3><p>Anda tidak ingat bila kali terakhir bahagian dalam tangki diperiksa atau dibersihkan.</p></article>
+      <article class="feature-card"><h3>Rumah baru diduduki</h3><p>Anda berpindah masuk dan tidak mempunyai rekod penjagaan tangki daripada penghuni terdahulu.</p></article>
+      <article class="feature-card"><h3>Ada mendapan atau serpihan</h3><p>Anda ternampak sedimen, warna atau benda asing pada air atau di bahagian yang boleh dilihat.</p></article>
+      <article class="feature-card"><h3>Selepas gangguan air</h3><p>Bekalan terputus atau kerja paip berlaku dan anda mahu menyemak keadaan simpanan air.</p></article>
+      <article class="feature-card"><h3>Tangki sukar dilihat</h3><p>Lokasinya terlindung, tinggi atau jarang dibuka sehingga keadaan dalaman tidak diketahui.</p></article>
+      <article class="feature-card"><h3>Mahu bukti visual</h3><p>Anda mahu melihat gambar sebelum dan selepas untuk memahami apa yang telah dilakukan.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-dark" id="proses">
+  <div class="container">
+    <div class="section-head"><span class="section-kicker">LIHAT PROSESNYA</span><h2>Empat peringkat yang mudah difahami.</h2><p>Keadaan sebenar, akses dan jenis tangki akan menentukan cara kerja yang sesuai dan selamat.</p></div>
+    <div class="visual-gallery">
+      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-process-inspection" "alt" "Pemeriksaan awal keadaan bahagian dalam tangki air" "sizes" "(max-width: 767px) calc(100vw - 32px), 23vw") }}<figcaption>1. Keadaan, lokasi dan akses tangki diperiksa sebelum kerja.</figcaption></figure>
+      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-process-extraction" "alt" "Air dan mendapan dikeluarkan dari tangki air" "sizes" "(max-width: 767px) calc(100vw - 32px), 23vw") }}<figcaption>2. Air serta mendapan dikeluarkan mengikut keadaan tangki.</figcaption></figure>
+      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-process-cleaning" "alt" "Bahagian dalam tangki air sedang dibersihkan" "sizes" "(max-width: 767px) calc(100vw - 32px), 23vw") }}<figcaption>3. Permukaan dalaman yang boleh dicapai dicuci dan dibilas.</figcaption></figure>
+      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-process-documentation" "alt" "Dokumentasi keadaan tangki selepas proses cucian" "sizes" "(max-width: 767px) calc(100vw - 32px), 23vw") }}<figcaption>4. Keadaan selepas kerja disemak dan didokumentasikan.</figcaption></figure>
+    </div>
+    <p class="image-disclosure">Visual proses ialah imej konsep AI dan bukan foto projek pelanggan. Kaedah sebenar bergantung pada tapak.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><span class="section-kicker">DARIPADA PERTANYAAN KE DOKUMENTASI</span><h2>Proses servis yang tersusun.</h2></div>
+    <div class="process-grid">
+      <article class="process-card"><span class="step-number">1</span><h3>Hantar lokasi</h3><p>Nyatakan jenis rumah, lokasi atau poskod dan maklumat tangki jika diketahui.</p></article>
+      <article class="process-card"><span class="step-number">2</span><h3>Semakan awal</h3><p>Akses, lokasi tangki dan maklumat berkaitan disemak sebelum jadual dicadangkan.</p></article>
+      <article class="process-card"><span class="step-number">3</span><h3>Pemeriksaan tapak</h3><p>Keadaan sebenar dinilai dan skop dijelaskan sebelum kerja diteruskan.</p></article>
+      <article class="process-card"><span class="step-number">4</span><h3>Pengeluaran mendapan</h3><p>Air serta kotoran di bahagian yang boleh dicapai dikeluarkan.</p></article>
+      <article class="process-card"><span class="step-number">5</span><h3>Cuci &amp; bilas</h3><p>Bahagian dalaman dicuci mengikut akses, kemudian dibilas dan disemak.</p></article>
+      <article class="process-card"><span class="step-number">6</span><h3>Rekod selepas kerja</h3><p>Dokumentasi berkaitan dikongsi supaya anda boleh melihat perbezaannya.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-mint">
+  <div class="container cost-layout">
+    <div><span class="section-kicker">APA YANG MEMPENGARUHI SEBUT HARGA?</span><h2>Jenis tangki dan akses memainkan peranan.</h2><p class="lead">Tangki di aras tanah, siling atau bumbung mempunyai keadaan akses yang berbeza. Saiz, jumlah tangki dan tahap kesukaran juga perlu dipertimbangkan.</p><p class="muted">Kongsi gambar tangki jika selamat untuk diambil. Jangan memanjat atau membuka ruang yang berisiko semata-mata untuk mendapatkan gambar.</p></div>
+    <div class="cost-card"><h3>Antara faktor utama</h3><ul class="factor-list"><li>Jenis, saiz dan bilangan tangki</li><li>Lokasi serta akses yang selamat</li><li>Keadaan air dan mendapan</li><li>Ruang kerja di sekeliling tangki</li><li>Keperluan peralatan atau penyediaan tambahan</li><li>Lokasi rumah dan perjalanan</li></ul></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container faq-layout">
+    <div class="section-head"><span class="section-kicker">SOALAN LAZIM</span><h2>Sebelum servis cuci tangki.</h2></div>
+    <div class="faq-list">{{ $faqs := slice
+      (dict "q" "Berapa kerap tangki perlu dicuci?" "a" "Keperluan bergantung pada keadaan bekalan, jenis tangki, persekitaran dan sejarah penjagaan. Semakan visual membantu menentukan keadaan sebenar dengan lebih baik.")
+      (dict "q" "Adakah air rumah akan terputus semasa kerja?" "a" "Proses lazimnya memerlukan pengurusan bekalan air pada tangki. Keadaan dan persediaan akan diterangkan sebelum kerja bermula.")
+      (dict "q" "Boleh cuci semua jenis tangki?" "a" "Kesesuaian bergantung pada jenis, lokasi, keadaan dan akses yang selamat. Kongsi maklumat atau gambar untuk semakan awal.")
+      (dict "q" "Adakah saya dapat gambar sebelum dan selepas?" "a" "Dokumentasi visual akan dibuat apabila keadaan dan akses membenarkan. Cara dokumentasi perlu disahkan semasa semakan skop.")
+      (dict "q" "Perlu kosongkan rumah semasa kerja?" "a" "Kebiasaannya tidak, tetapi penggunaan air dan akses ke kawasan tangki mungkin perlu diselaraskan. Arahan khusus bergantung pada keadaan rumah.")
+    }}{{ range $i,$faq := $faqs }}<div class="faq-item"><button class="faq-question" type="button" data-faq-button aria-expanded="false" aria-controls="tank-faq-{{ $i }}"><span>{{ $faq.q }}</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="tank-faq-{{ $i }}" hidden>{{ $faq.a }}</div></div>{{ end }}</div>
+  </div>
+</section>
+
+<section class="section lead-section" id="hubungi" data-lead-section>
+  <div class="container lead-card">
+    <div><span class="section-kicker">SEMAK JENIS TANGKI &amp; LOKASI</span><h2>Mahu tahu keadaan tangki rumah anda?</h2><p class="lead">Hantar jenis rumah, lokasi atau poskod dan gambar tangki jika mudah serta selamat diambil. Kami akan bantu semak langkah seterusnya.</p><div class="lead-actions"><a class="btn btn-secondary" href="https://wa.me/{{ $b.whatsapp }}?text={{ $wa | urlquery }}" target="_blank" rel="noopener">Tanya Melalui WhatsApp</a><a class="btn btn-outline" style="color:white;border-color:white" href="tel:{{ $b.phone_tel }}">Telefon {{ $b.phone_display }}</a></div></div>
+    <div class="contact-options"><div><strong>Maklumat berguna</strong>Jenis rumah, bilangan tangki, lokasi tangki dan poskod.</div><div><strong>Utamakan keselamatan</strong>Jangan memanjat untuk mengambil gambar jika kawasan tidak selamat.</div><div><strong>Kawasan fokus</strong>{{ $b.service_area }}</div></div>
+  </div>
+</section>
+
+<section class="section section-mint">{{ partial "other-services.html" "tank" }}</section>

@@ -1,0 +1,135 @@
+{{ define "main" }}
+{{ $b := hugo.Data.business }}
+<section class="home-hero" data-hero>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-badge">{{ $b.legal_name }} · {{ $b.company_number }}</span>
+      <h1>Satu pasukan untuk rumah yang lebih terlindung, bersih dan kemas.</h1>
+      <p class="lead">Daripada atap yang bocor, tangki air yang lama tidak dicuci hingga dinding yang kusam — pilih servis yang anda perlukan dan lihat cara kami menilai kerja sebelum bermula.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#servis">Lihat 3 Servis Kami</a>
+        <a class="btn btn-outline" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis untuk rumah/ofis saya. Lokasi/poskod: ____." | urlquery }}" target="_blank" rel="noopener">Tanya Melalui WhatsApp</a>
+      </div>
+      <p class="hero-note">Kongsi jenis masalah, lokasi atau poskod, dan gambar jika ada. Kami akan bantu tentukan langkah seterusnya.</p>
+    </div>
+    <div class="hero-mosaic" aria-label="Gambaran servis JAYABINA">
+      <div class="mosaic-large">{{ partial "responsive-image.html" (dict "base" "/images/roof/roof-inspection" "alt" "Pemeriksaan keadaan atap rumah sebelum skop kerja dicadangkan" "loading" "eager" "sizes" "(max-width: 767px) calc(100vw - 32px), 36vw") }}</div>
+      <div class="mosaic-small">{{ partial "responsive-image.html" (dict "base" "/images/tank/tank-process-cleaning" "alt" "Proses mencuci bahagian dalam tangki air rumah" "loading" "eager" "sizes" "(max-width: 767px) 48vw, 18vw") }}</div>
+      <div class="mosaic-small">{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-application" "alt" "Proses mengecat dinding rumah dengan kawasan kerja dilindungi" "loading" "eager" "sizes" "(max-width: 767px) 48vw, 18vw") }}</div>
+      <p class="image-disclosure">Visual atap dan mengecat ialah imej konsep AI. Visual tangki menunjukkan proses servis.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="servis">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-kicker">PILIH MENGIKUT KEPERLUAN</span>
+      <h2>Tiga servis penting. Satu standard komunikasi yang jelas.</h2>
+      <p>Setiap halaman di bawah menerangkan masalah yang kami tangani, proses kerja dan maklumat yang perlu anda sediakan sebelum meminta semakan.</p>
+    </div>
+    <div class="service-grid">
+      {{ range hugo.Data.services }}
+      {{ $base := "/images/roof/roof-hero" }}
+      {{ if eq .key "tank" }}{{ $base = "/images/tank/tank-emotional" }}{{ else if eq .key "paint" }}{{ $base = "/images/paint/paint-hero" }}{{ end }}
+      <article class="service-card">
+        <a class="service-image" href="{{ .url }}">{{ partial "responsive-image.html" (dict "base" $base "alt" .alt "sizes" "(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 48vw, 31vw") }}</a>
+        <div class="service-body">
+          <span class="card-kicker">{{ .kicker }}</span>
+          <h3>{{ .title }}</h3>
+          <p>{{ .summary }}</p>
+          <a class="btn btn-secondary" href="{{ .url }}">Lihat Servis Ini</a>
+        </div>
+      </article>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="section section-grey">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-kicker">MASALAH MANA YANG PALING MENGGANGGU?</span>
+      <h2>Mulakan daripada masalah yang anda nampak hari ini.</h2>
+    </div>
+    <div class="problem-grid">
+      <a class="problem-card" href="/servis-tukar-atap/">
+        <h3>“Setiap kali hujan, saya masih risau.”</h3>
+        <p>Repair sudah dibuat berkali-kali tetapi kesan bocor kembali. Nilai sama ada tampalan masih munasabah atau atap baharu patut dipertimbangkan.</p>
+      </a>
+      <a class="problem-card" href="/servis-cuci-tangki-air/">
+        <h3>“Air nampak jernih, tapi tangki bagaimana?”</h3>
+        <p>Mendapan di dasar tangki mudah terlepas pandang. Lihat proses pemeriksaan, pembuangan mendapan, cucian dan dokumentasi.</p>
+      </a>
+      <a class="problem-card" href="/servis-mengecat/">
+        <h3>“Ruang masih nampak lama dan tidak terurus.”</h3>
+        <p>Cat pudar, bertompok atau mengelupas boleh menjejaskan keseluruhan suasana rumah dan ofis. Ketahui skop persediaan sebelum mengecat.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-kicker">CARA BERMULA</span>
+      <h2>Mudah untuk bertanya. Jelas sebelum membuat keputusan.</h2>
+    </div>
+    <div class="step-grid">
+      <article class="step-card"><span class="step-number">1</span><h3>Ceritakan masalah</h3><p>Nyatakan servis, lokasi atau poskod dan bila masalah mula berlaku. Hantar gambar jika berkaitan.</p></article>
+      <article class="step-card"><span class="step-number">2</span><h3>Semakan awal</h3><p>Kami semak maklumat yang diberi dan tentukan sama ada lawatan atau ukuran lanjut diperlukan.</p></article>
+      <article class="step-card"><span class="step-number">3</span><h3>Nilai skop kerja</h3><p>Teliti cadangan dan skop yang diterangkan sebelum anda bersetuju meneruskan kerja.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-mint">
+  <div class="container">
+    <div class="company-panel">
+      <div class="company-copy">
+        <span class="section-kicker">SIAPA DI SEBALIK JAYABINA</span>
+        <h2>Jenama servis rumah oleh Primex Jaya Bina Solutions.</h2>
+        <p>JAYABINA menghimpunkan servis atap, tangki air dan mengecat di bawah satu identiti yang mudah dikenal. Kami mengutamakan penerangan yang terus, skop yang boleh difahami dan saluran hubungan yang jelas.</p>
+        <a class="btn btn-secondary" href="/tentang-kami/">Kenali Syarikat Kami</a>
+      </div>
+      <div class="company-facts">
+        <div><strong>Nama syarikat</strong>{{ $b.legal_name }}</div>
+        <div><strong>No. pendaftaran</strong>{{ $b.company_number }}</div>
+        <div><strong>Kawasan servis</strong>{{ $b.service_area }}</div>
+        <div><strong>Hubungan</strong>{{ $b.phone_display }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container faq-layout">
+    <div class="section-head">
+      <span class="section-kicker">SOALAN LAZIM</span>
+      <h2>Sebelum anda hubungi kami.</h2>
+      <p>Jawapan ringkas untuk membantu anda bersedia dengan maklumat yang betul.</p>
+    </div>
+    <div class="faq-list">
+      {{ $faqs := slice
+        (dict "q" "Apakah kawasan servis JAYABINA?" "a" "Fokus servis ialah Kuala Lumpur, Lembah Klang dan Selangor. Kongsi poskod supaya liputan untuk lokasi anda boleh disemak.")
+        (dict "q" "Maklumat apa yang perlu saya hantar?" "a" "Nyatakan jenis servis, lokasi atau poskod, penerangan ringkas masalah dan beberapa gambar yang jelas jika ada.")
+        (dict "q" "Bolehkah saya terus dapat harga melalui WhatsApp?" "a" "Anggaran yang bertanggungjawab bergantung pada keadaan tapak dan skop. Untuk sesetengah kerja, lawatan atau ukuran diperlukan sebelum sebut harga boleh disediakan.")
+        (dict "q" "Adakah saya wajib meneruskan selepas bertanya?" "a" "Tidak. Anda boleh minta semakan awal dan menilai cadangan yang diterangkan sebelum membuat keputusan.")
+      }}
+      {{ range $i,$faq := $faqs }}
+      <div class="faq-item">
+        <button class="faq-question" type="button" data-faq-button aria-expanded="false" aria-controls="home-faq-{{ $i }}"><span>{{ $faq.q }}</span><span class="faq-plus" aria-hidden="true">+</span></button>
+        <div class="faq-answer" id="home-faq-{{ $i }}" hidden>{{ $faq.a }}</div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="final-cta" data-lead-section>
+  <div class="container final-inner">
+    <div><h2>Apa masalah utama di rumah atau ofis anda sekarang?</h2><p>Pilih servis atau terus hantar penerangan ringkas melalui WhatsApp.</p></div>
+    <div class="final-actions"><a class="btn btn-secondary" href="#servis">Pilih Servis</a><a class="btn btn-primary" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis. Masalah: ____. Lokasi/poskod: ____." | urlquery }}" target="_blank" rel="noopener">WhatsApp JAYABINA</a></div>
+  </div>
+</section>
+{{ end }}

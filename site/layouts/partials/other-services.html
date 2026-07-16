@@ -1,0 +1,13 @@
+{{ $current := . }}
+<div class="other-services container">
+  <div class="section-head"><span class="section-kicker">SERVIS JAYABINA YANG LAIN</span><h2>Perlu bantuan untuk bahagian rumah yang lain?</h2></div>
+  <div class="service-grid">
+    {{ range hugo.Data.services }}{{ if ne .key $current }}
+    {{ $base := "/images/roof/roof-hero" }}{{ if eq .key "tank" }}{{ $base = "/images/tank/tank-emotional" }}{{ else if eq .key "paint" }}{{ $base = "/images/paint/paint-hero" }}{{ end }}
+    <article class="service-card">
+      <a class="service-image" href="{{ .url }}">{{ partial "responsive-image.html" (dict "base" $base "alt" .alt "sizes" "(max-width: 767px) calc(100vw - 32px), 45vw") }}</a>
+      <div class="service-body"><span class="card-kicker">{{ .kicker }}</span><h3>{{ .name }}</h3><p>{{ .summary }}</p><a class="btn btn-secondary" href="{{ .url }}">Lihat Servis</a></div>
+    </article>
+    {{ end }}{{ end }}
+  </div>
+</div>

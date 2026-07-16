@@ -1,0 +1,9 @@
+{{ define "main" }}
+  {{ if eq .Params.service "roof" }}
+    {{ partial "service-roof.html" . }}
+  {{ else if eq .Params.service "tank" }}
+    {{ partial "service-tank.html" . }}
+  {{ else if eq .Params.service "paint" }}
+    {{ partial "service-paint.html" . }}
+  {{ end }}
+{{ end }}

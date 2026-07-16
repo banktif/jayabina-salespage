@@ -1,0 +1,10 @@
+{{ $base := .base }}
+{{ $alt := .alt }}
+{{ $class := .class | default "" }}
+{{ $loading := .loading | default "lazy" }}
+{{ $hasVariants := fileExists (printf "static%s-480.webp" $base) }}
+{{ if $hasVariants }}
+<img class="{{ $class }}" src="{{ $base }}-800.webp" srcset="{{ $base }}-480.webp 480w, {{ $base }}-800.webp 800w, {{ $base }}-1200.webp 1200w" sizes="{{ .sizes | default "(max-width: 767px) calc(100vw - 40px), 50vw" }}" width="{{ .width | default 1200 }}" height="{{ .height | default 800 }}" loading="{{ $loading }}" decoding="async" alt="{{ $alt }}">
+{{ else }}
+<img class="{{ $class }}" src="{{ $base }}-1200.webp" width="{{ .width | default 1200 }}" height="{{ .height | default 800 }}" loading="{{ $loading }}" decoding="async" alt="{{ $alt }}">
+{{ end }}

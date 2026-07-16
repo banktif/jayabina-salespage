@@ -1,0 +1,4 @@
+{{ define "main" }}
+<header class="page-hero"><div class="container"><span class="section-kicker">{{ .Params.eyebrow | default "JAYABINA" }}</span><h1>{{ .Params.headline | default .Title }}</h1>{{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}</div></header>
+<section class="section"><div class="container">{{ if .Pages }}<div class="service-grid">{{ range .Pages }}<article class="service-card"><div class="service-body"><span class="card-kicker">PANDUAN</span><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3><p>{{ .Description | default .Summary }}</p><a class="btn btn-secondary" href="{{ .RelPermalink }}">Baca Artikel</a></div></article>{{ end }}</div>{{ else }}<div class="empty-state"><h2>Kandungan sedang disusun.</h2><p>Panduan berkaitan penjagaan atap, tangki air dan kemasan rumah akan diterbitkan di sini.</p><a class="btn btn-primary" href="/servis/">Lihat Servis JAYABINA</a></div>{{ end }}</div></section>
+{{ end }}

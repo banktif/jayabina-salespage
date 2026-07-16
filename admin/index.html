@@ -21,7 +21,7 @@
   <link rel="manifest" href="/admin-manifest.json">
   <title>JAYABINA — Operations Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/theme.css?v=20260716-cards1">
+  <link rel="stylesheet" href="/theme.css?v=20260716-website1">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none}
@@ -400,7 +400,7 @@
     .d-sidebar-footer button{color:rgba(255,255,255,.72)}
     .d-sidebar-footer button:hover{background:rgba(255,255,255,.09);color:#fff}
   </style>
-  <link rel="stylesheet" href="/admin-modern.css?v=20260716-cards1">
+  <link rel="stylesheet" href="/admin-modern.css?v=20260716-website1">
 </head>
 <body class="admin-app">
 
@@ -423,6 +423,7 @@
   <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staf</button>
   <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Laporan</button>
   <div class="d-nav-label">Sistem</div>
+  <button class="d-nav-item" id="dsWebsite" onclick="showWebsite()"><span class="dni"><i data-lucide="globe-2"></i></span> Website</button>
   <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Tetapan</button>
   <button class="d-nav-item" id="dsBackup" onclick="showBackup()"><span class="dni"><i data-lucide="database-backup"></i></span> Sandaran</button>
   <div class="d-sidebar-footer">
@@ -476,6 +477,7 @@
     <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staf</button>
     <button class="drawer-item" onclick="showCustomers();toggleDrawer()"><span><i data-lucide="contact"></i></span> Pelanggan</button>
     <button class="drawer-item" onclick="showReports();toggleDrawer()"><span><i data-lucide="bar-chart-3"></i></span> Laporan</button>
+    <button class="drawer-item" onclick="showWebsite();toggleDrawer()"><span><i data-lucide="globe-2"></i></span> Website</button>
     <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span><i data-lucide="settings"></i></span> Tetapan</button>
     <button class="drawer-item" onclick="showBackup();toggleDrawer()"><span><i data-lucide="database-backup"></i></span> Sandaran</button>
   </div>
@@ -658,7 +660,7 @@ function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(
 function setNav(id){var el=document.getElementById(id);if(el){el.classList.add('active');el.setAttribute('aria-current','page')}}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub'),m=document.getElementById('mTitleView');if(t)t.textContent=title;if(s)s.textContent=sub;if(m)m.textContent=title;document.title=title+' — JAYABINA';}
 function showBookings(filter){setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';location.hash='#bookings';if(filter)location.hash='#pending';load(filter);}
-function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else load(cf);}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else if(currentView==='website')showWebsite();else load(cf);}
 
 // ═══════════ CUSTOMER CRM ═══════════
 var custState={q:'',status:'',sort:'last',page:0,per:25,total:0,timer:null,sel:{},req:0};
@@ -1138,6 +1140,72 @@ async function resetStaffPassword(id){
   if(r.ok)alert('Password updated.');else alert('Error: '+(r.body.error||'failed'));
 }
 
+// WEBSITE / HUGO CONTENT MANAGER
+var websiteState={files:[],path:'',sha:'',dirty:false,viewId:0};
+async function websiteRequest(path,opts){
+  opts=opts||{};var token=await authToken();var headers=opts.headers||{};headers.Authorization='Bearer '+token;
+  if(opts.body!==undefined)headers['Content-Type']='application/json';
+  return fetch(API_URL+'/api/website'+path,{method:opts.method||'GET',headers:headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
+}
+async function showWebsite(){
+  var viewId=beginView('website');websiteState.viewId=viewId;setChrome(false);clearNav();setNav('dsWebsite');
+  setHeader('Website','Manage and publish the JAYABINA Hugo website');location.hash='#website';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="site-overview">'+
+    '<div class="kpi green"><div class="kpi-ic"><i data-lucide="globe-2"></i></div><div class="kpi-v" style="font-size:1rem">www.jayabina.com</div><div class="kpi-l">Live website</div></div>'+
+    '<div class="kpi blue"><div class="kpi-ic"><i data-lucide="git-branch"></i></div><div class="kpi-v" id="siteConnect" style="font-size:1rem">Checking...</div><div class="kpi-l">GitHub source</div></div>'+
+    '<div class="kpi amber"><div class="kpi-ic"><i data-lucide="cloud"></i></div><div class="kpi-v" style="font-size:1rem">Cloudflare</div><div class="kpi-l">Hugo publishing</div></div>'+
+    '</div><div class="site-actions"><button class="d-btn acc" onclick="window.open(\'https://www.jayabina.com\',\'_blank\',\'noopener\')"><i data-lucide="external-link"></i> Open live site</button><button class="d-btn" onclick="window.open(\'https://github.com/banktif/jayaclean-salespage/tree/master/site\',\'_blank\',\'noopener\')"><i data-lucide="git-branch"></i> View source</button><button class="d-btn don" onclick="publishWebsite()"><i data-lucide="rocket"></i> Deploy now</button><button class="d-btn" onclick="newWebsiteArticle()"><i data-lucide="file-plus-2"></i> New article</button></div>'+
+    '<div class="site-shell"><aside class="site-browser panel"><div class="site-browser-head"><div><b>Hugo files</b><span>Safe, version-controlled editing</span></div></div><div id="siteFiles"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div></aside>'+
+    '<section class="site-editor panel"><div class="site-editor-empty" id="siteEmpty"><i data-lucide="file-code-2"></i><b>Select a file to edit</b><span>Content is saved to GitHub and deployed through Cloudflare Pages.</span></div><div id="siteEditorForm" style="display:none"><div class="site-editor-head"><div><div class="site-editor-title" id="siteFileLabel">Hugo file</div><code id="siteFilePath"></code></div><span class="site-mode" id="siteFileMode">MD</span></div><textarea id="siteCode" class="site-code" spellcheck="false" aria-label="Hugo file content"></textarea><div class="site-editor-foot"><span id="siteEditorMsg">No unsaved changes.</span><div><button class="d-btn" onclick="reloadWebsiteFile()"><i data-lucide="rotate-ccw"></i> Reload</button><button class="d-btn acc" id="siteSaveBtn" onclick="saveWebsiteFile()"><i data-lucide="save"></i> Save &amp; publish</button></div></div></div></section></div>'+
+    '<div class="site-note"><i data-lucide="shield-check"></i><div><b>Protected publishing flow</b><span>Every save creates a GitHub commit. Hugo builds the website and Cloudflare publishes it; previous versions remain recoverable in Git history.</span></div></div>';
+  try{
+    var res=await websiteRequest('/files'),body=await res.json();if(!res.ok)throw new Error(body.error||'Unable to load website manager');
+    if(!viewActive(viewId,'website'))return;websiteState.files=body.data.files||[];
+    document.getElementById('siteConnect').textContent=body.data.connected?'Connected':'Not connected';
+    renderWebsiteFiles();if(websiteState.files.length)loadWebsiteFile(websiteState.files[0].path,true);
+  }catch(e){if(viewActive(viewId,'website')){document.getElementById('siteConnect').textContent='Unavailable';document.getElementById('siteFiles').innerHTML='<div class="site-file-error">'+esc(errorMessage(e))+'</div>';}}
+}
+function renderWebsiteFiles(){
+  var el=document.getElementById('siteFiles');if(!el)return;var groups=['Content','Business data','Advanced templates'],h='';
+  groups.forEach(function(group){var files=websiteState.files.filter(function(f){return f.group===group});if(!files.length)return;h+='<div class="site-file-group"><div class="site-file-group-label">'+esc(group)+'</div>';files.forEach(function(f){h+='<button class="site-file'+(websiteState.path===f.path?' active':'')+'" data-path="'+esc(f.path)+'" onclick="loadWebsiteFile(this.getAttribute(\'data-path\'))"><span><i data-lucide="'+(f.mode==='html'?'file-code-2':f.mode==='yaml'?'braces':'file-text')+'"></i></span><div><b>'+esc(f.label)+'</b><small>'+esc(f.path.replace('site/',''))+'</small></div></button>'});h+='</div>'});
+  el.innerHTML=h;
+}
+async function loadWebsiteFile(path,force){
+  if(websiteState.dirty&&!force&&!confirm('Discard unsaved changes?'))return;
+  var form=document.getElementById('siteEditorForm'),empty=document.getElementById('siteEmpty'),msg=document.getElementById('siteEditorMsg');if(!form)return;
+  form.style.display='none';empty.style.display='flex';empty.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Loading Hugo file...</span>';
+  try{
+    var res=await websiteRequest('/file?path='+encodeURIComponent(path)),body=await res.json();if(!res.ok)throw new Error(body.error||'Unable to load file');
+    if(!viewActive(websiteState.viewId,'website'))return;var data=body.data,file=websiteState.files.find(function(f){return f.path===path})||{label:path,mode:'markdown'};
+    websiteState.path=path;websiteState.sha=data.sha;websiteState.dirty=false;renderWebsiteFiles();
+    document.getElementById('siteFileLabel').textContent=file.label;document.getElementById('siteFilePath').textContent=path;document.getElementById('siteFileMode').textContent=(file.mode||'markdown').toUpperCase();
+    var code=document.getElementById('siteCode');code.value=data.content;code.oninput=function(){websiteState.dirty=true;msg.textContent='Unsaved changes';msg.className='dirty'};
+    msg.textContent='Loaded from GitHub';msg.className='';empty.style.display='none';form.style.display='block';
+  }catch(e){empty.style.display='flex';empty.innerHTML='<i data-lucide="circle-alert"></i><b>Unable to load file</b><span>'+esc(errorMessage(e))+'</span>';}
+}
+function reloadWebsiteFile(){if(websiteState.path)loadWebsiteFile(websiteState.path,true)}
+async function saveWebsiteFile(){
+  if(!websiteState.path)return;var file=websiteState.files.find(function(f){return f.path===websiteState.path});
+  if(file&&file.group==='Advanced templates'&&!confirm('This is an advanced Hugo template. Save these code changes?'))return;
+  var btn=document.getElementById('siteSaveBtn'),msg=document.getElementById('siteEditorMsg'),content=document.getElementById('siteCode').value;btn.disabled=true;msg.className='';msg.textContent='Saving to GitHub...';
+  try{
+    var res=await websiteRequest('/file',{method:'PUT',body:{path:websiteState.path,content:content,sha:websiteState.sha}}),body=await res.json();if(!res.ok)throw new Error(body.error||'Unable to save file');
+    websiteState.sha=body.data.sha||websiteState.sha;websiteState.dirty=false;msg.className='saved';msg.textContent='Saved. Hugo deployment started automatically.';
+  }catch(e){msg.className='error';msg.textContent='Error: '+errorMessage(e);}btn.disabled=false;
+}
+function newWebsiteArticle(){
+  var title=prompt('Article title:');if(!title)return;var slug=title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);if(!slug){alert('Use a title containing letters or numbers.');return}
+  var path='site/content/blog/'+slug+'.md',date=new Date().toISOString().slice(0,10),content='---\ntitle: "'+title.replace(/"/g,'\\"')+'"\ndate: '+date+'\ndescription: ""\ncategories: ["Panduan"]\ntags: []\ndraft: true\n---\n\nWrite the article here.\n';
+  websiteState.files.push({path:path,label:title,group:'Content',mode:'markdown'});websiteState.path=path;websiteState.sha='';websiteState.dirty=true;renderWebsiteFiles();
+  document.getElementById('siteEmpty').style.display='none';document.getElementById('siteEditorForm').style.display='block';document.getElementById('siteFileLabel').textContent=title;document.getElementById('siteFilePath').textContent=path;document.getElementById('siteFileMode').textContent='MARKDOWN';document.getElementById('siteCode').value=content;document.getElementById('siteEditorMsg').textContent='New draft — save to create it.';
+}
+async function publishWebsite(){
+  if(!confirm('Start a fresh Hugo deployment to www.jayabina.com?'))return;var msg=document.getElementById('siteEditorMsg');if(msg){msg.className='';msg.textContent='Starting deployment...'}
+  try{var res=await websiteRequest('/publish',{method:'POST',body:{}}),body=await res.json();if(!res.ok)throw new Error(body.error||'Unable to deploy');if(msg){msg.className='saved';msg.textContent='Deployment started. The live website normally updates in 1–3 minutes.'}}
+  catch(e){if(msg){msg.className='error';msg.textContent='Error: '+errorMessage(e)}else alert('Error: '+errorMessage(e))}
+}
+
 // ═══════════ SETTINGS ═══════════
 var SETTING_LABELS={business_name:'Business Name',bank_name:'Bank Name',bank_account_no:'Bank Account No',bank_account_holder:'Account Holder',qr_image_url:'Bank QR Image URL',price_total:'Price Total (RM)',price_deposit:'Deposit (RM)',price_balance:'Balance (RM)',wa_business_number:'Business WhatsApp Number',wa_tmpl_baki:'WA Template - Bank Transfer',wa_tmpl_balance_link:'WA Template - Payment Link',wa_tmpl_staff:'WA Template - Staff Assignment',wa_api_enabled:'WhatsApp Cloud API (auto-send)',coverage_area:'Coverage Area',max_slots_per_day:'Max Slots/Day',slots:'Time Slots',service_areas:'Service Areas (comma-separated)',auto_confirm_payment:'Auto-confirm Payment',auto_assign_enabled:'Auto-assign Staff',auto_assign_rule:'Auto-assign Rule',auto_complete_task:'Auto-complete Task',auto_send_wa_balance:'Auto-send WA Balance',cloud_name:'Cloudinary Cloud Name',upload_preset:'Cloudinary Upload Preset',folder:'Cloudinary Folder'};
 async function showSettings(){
@@ -1415,6 +1483,7 @@ async function checkAccess(){
     else if(h==='#schedule')showSchedule();
     else if(h==='#staff')showStaff();
     else if(h==='#reports')showReports();
+    else if(h==='#website')showWebsite();
     else if(h==='#settings')showSettings();
     else if(h==='#customers')showCustomers();
     else if(h==='#backup')showBackup();

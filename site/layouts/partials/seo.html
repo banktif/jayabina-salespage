@@ -1,0 +1,23 @@
+{{ $description := .Description | default site.Params.description }}
+{{ $ogImage := .Params.ogImage | default "/images/og/jayabina-og.png" }}
+<title>{{ .Title }}</title>
+<meta name="description" content="{{ $description }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<meta property="og:locale" content="ms_MY">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:title" content="{{ .Title }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="JAYABINA">
+<meta property="og:image" content="{{ $ogImage | absURL }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Title }}">
+<meta name="twitter:description" content="{{ $description }}">
+<meta name="twitter:image" content="{{ $ogImage | absURL }}">
+{{ $b := hugo.Data.business }}
+{{ $org := dict "@context" "https://schema.org" "@type" "Organization" "name" $b.legal_name "alternateName" $b.brand "identifier" $b.company_number "url" (site.BaseURL) "telephone" $b.phone_tel }}
+<script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>
+{{ with .Params.serviceName }}
+  {{ $service := dict "@context" "https://schema.org" "@type" "Service" "name" . "url" $.Permalink "provider" (dict "@type" "Organization" "name" $b.legal_name "identifier" $b.company_number) }}
+  <script type="application/ld+json">{{ $service | jsonify | safeJS }}</script>
+{{ end }}

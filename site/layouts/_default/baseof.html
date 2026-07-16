@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ms-MY">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d3b2e">
+  {{ partial "seo.html" . }}
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
+</head>
+<body class="{{ if .IsHome }}has-mobile-sticky{{ else }}{{ with .Params.service }}service-page service-{{ . }} has-mobile-sticky{{ end }}{{ end }}">
+  <a class="skip-link" href="#main-content">Terus ke kandungan</a>
+  {{ partial "header.html" . }}
+  <main id="main-content">
+    {{ block "main" . }}{{ end }}
+  </main>
+  {{ partial "footer.html" . }}
+  {{ $b := hugo.Data.business }}
+  {{ $waMessage := "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis. Jenis servis: ____. Lokasi/poskod: ____." }}
+  <a class="floating-wa" href="https://wa.me/{{ $b.whatsapp }}?text={{ $waMessage | urlquery }}" target="_blank" rel="noopener" aria-label="Tanya JAYABINA melalui WhatsApp">WhatsApp</a>
+  {{ if .IsHome }}
+    <div class="mobile-sticky" data-sticky-cta><a class="btn btn-wa" href="#servis">Pilih Servis Anda</a></div>
+  {{ else if .Params.service }}
+    <div class="mobile-sticky" data-sticky-cta><a class="btn btn-wa" href="#hubungi">Minta Semakan</a></div>
+  {{ end }}
+  {{ with resources.Get "js/main.js" | minify | fingerprint }}
+    <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+  {{ end }}
+</body>
+</html>

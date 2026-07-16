@@ -33,6 +33,9 @@ jobs:
       - name: Build admin portal
         run: bash build-admin.sh
 
+      - name: Build JAYABINA Hugo website
+        run: hugo --source site --destination "$GITHUB_WORKSPACE/site-public" --gc --minify
+
       - name: Deploy customer site
         if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
         uses: cloudflare/wrangler-action@v3
@@ -49,4 +52,13 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy admin-public --project-name jayabina-admin --branch master
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy JAYABINA Hugo website
+        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site-public --project-name jayabina --branch master
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}

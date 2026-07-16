@@ -68,6 +68,16 @@ for (const cardRule of [
   assert.ok(files.modern.includes(cardRule), `missing unified card rule ${cardRule}`);
 }
 
-assert.ok(files.html.includes('?v=20260716-cards1'), 'admin must cache-bust the unified card release');
+assert.ok(files.html.includes('?v=20260716-website1'), 'admin must cache-bust the website manager release');
+assert.ok(files.html.includes('id="dsWebsite"'), 'desktop navigation must include the Website module');
+assert.ok(files.html.includes('function showWebsite()'), 'admin must provide the Hugo website manager');
+assert.ok(files.html.includes("API_URL+'/api/website'"), 'website manager must use the authenticated Worker API');
+assert.ok(files.modern.includes('.admin-app .site-shell'), 'website manager must have responsive layout styles');
+
+const inlineScripts = [...files.html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
+assert.ok(inlineScripts.length >= 2, 'admin must retain its inline application scripts');
+for (const [index, source] of inlineScripts.entries()) {
+  assert.doesNotThrow(() => new Function(source), `inline admin script ${index + 1} must parse`);
+}
 
 console.log('Admin theme contract: PASS');
