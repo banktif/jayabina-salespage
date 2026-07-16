@@ -1,6 +1,11 @@
 node_modules/
 .wrangler/
 public/
+admin-public/
+assets/*.png
+!assets/jayaclean-apple-touch-icon.png
+!assets/jayaclean-favicon-64.png
+assets/jayaclean-wudhu-tank-emotional.webp
 .env
 *.log
 connect_test.js

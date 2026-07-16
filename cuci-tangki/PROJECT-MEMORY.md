@@ -48,7 +48,7 @@ All API keys, tokens, passwords are in the chat history. Ask user to re-provide 
 - PostgREST schema cache needs `NOTIFY pgrst, 'reload schema'` after migrations
 
 ## Admin Panel
-- Auth: migrating to Supabase Auth (admin `banktifweb1@gmail.com`, role=admin). Old client-side password (Salman43!, hash 6e5574b72c57535f) being replaced.
+- Auth credentials must not be stored in source control or project notes. Production authentication now uses the Cloudflare Worker and D1.
 - Brand: JAYACLEAN, logo: JC
 - Theme: light/dark/system, responsive (mobile <1024px, desktop >=1024px)
 - Mobile: hamburger drawer + bottom nav 4 tabs

@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 CREATE INDEX IF NOT EXISTS idx_profiles_phone ON profiles(phone);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_email_unique ON profiles(email) WHERE email <> '';
 
--- default admin seed (password: Salman43! will be hashed at deploy)
+-- No default admin password is stored in migrations. Provision credentials out of band.
 INSERT OR IGNORE INTO profiles (id, full_name, phone, role, is_active, email, created_at)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Abdul Latif', '60139373275', 'admin', 1, 'banktifweb1@gmail.com', datetime('now'));
 

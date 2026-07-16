@@ -1,0 +1,17 @@
+{
+  "name": "JAYABINA Operations Portal",
+  "short_name": "JAYABINA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f8f6",
+  "theme_color": "#0d3b2e",
+  "icons": [
+    {
+      "src": "/admin-favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

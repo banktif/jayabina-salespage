@@ -194,7 +194,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 
 ## 12. ACCOUNTS
 - Admin (first): `banktifweb1@gmail.com` (Supabase Auth, role=admin)
-- Old admin login (client-side password `Salman43!` hash) — being replaced by Supabase Auth.
+- Legacy client-side password has been removed; credentials must never be stored in source control.
 
 ---
 

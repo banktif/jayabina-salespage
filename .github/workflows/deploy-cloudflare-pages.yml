@@ -1,0 +1,52 @@
+name: Deploy JAYABINA to Cloudflare Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: {}
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CF_PAGES_TOKEN_READY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT_READY: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: latest
+          extended: true
+
+      - name: Build customer site
+        run: bash build.sh
+
+      - name: Build admin portal
+        run: bash build-admin.sh
+
+      - name: Deploy customer site
+        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name jayaclean --branch master
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy admin portal
+        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy admin-public --project-name jayabina-admin --branch master
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

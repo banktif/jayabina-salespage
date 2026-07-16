@@ -17,7 +17,7 @@ cd ..
 
 # 2. Copy root static files
 echo "-> Copying root static files..."
-for f in index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css .nojekyll CNAME jc-api.js; do
+for f in index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css admin-modern.css admin-favicon.svg admin-manifest.json .nojekyll CNAME jc-api.js; do
   if [ -f "$f" ]; then
     cp "$f" "$OUT_DIR/"
     echo "   $f -> $OUT_DIR/"

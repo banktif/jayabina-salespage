@@ -33,7 +33,8 @@ GitHub Pages serves from **repo root** (`banktif/jayaclean-salespage`).
 | URL | File | Who |
 |-----|------|-----|
 | `/` | `index.html` | Customer sales page (Malay) |
-| `/admin/` | `admin/index.html` | Admin panel (inline login) |
+| `https://admin.jayabina.com/` | `admin/index.html` via Pages project `jayabina-admin` | JAYABINA Operations Portal |
+| `/admin/` | `admin/index.html` | Legacy rollback copy on the cuci sales site |
 | `/worker/` | `worker/index.html` | Staff portal (was "staff") |
 | `/customer/` | `customer/index.html` | Customer self-service |
 | `/editor` | `editor.html` | GrapesJS — **LOCKED to sales page only** |
@@ -41,7 +42,7 @@ GitHub Pages serves from **repo root** (`banktif/jayaclean-salespage`).
 | `/theme.css`, `/favicon.svg`, `/sw.js`, `/manifest.json` | shared assets |
 Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login inline on /admin + /worker).
 
-## Supabase (project ref `thbscwlcyhcnqsppoyfn`)
+## Supabase (legacy migration source only)
 - URL: https://thbscwlcyhcnqsppoyfn.supabase.co
 - Anon/publishable key: `sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR`
 - **Tables:** bookings, slots, profiles, tasks, task_photos, app_settings, **private_settings** (admin-only secrets), + storage bucket `backups` (legacy, unused)
@@ -51,10 +52,10 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 - **Secrets (Supabase):** BAYARCASH_PAT/API_SECRET/PORTAL_KEY/PAYMENT_CHANNEL(5=DuitNow)/SITE_URL, BACKUP_SECRET, GH_PAT
 
 ## Accounts / credentials
-- Admin login: `banktifweb1@gmail.com` / `Salman43!` (Supabase Auth)
+- Admin credentials are never stored in source control or project notes.
 - GitHub repo secrets (Actions): GH_PAT, GL_TOKEN, GL_USER
 - Cloudflare zone id (jayabina.com): `916289c458db6233106080096fe910ed`
-- Cloudinary: cloud `dkibczut`, unsigned preset **`jayaclean_tasks` CREATED** (folder `jayaclean/tasks`) — photo uploads (staff before/after, avatar, QR) working. Admin creds in `cloudinary-onboard.js` (api_key 495611476556691) ⚠️ rotate.
+- Cloudinary uploads use the configured unsigned preset. Administrative credentials must not be stored in source control.
 - ⚠️ Tokens shared in chat (GitHub/GitLab/Cloudflare) should be **rotated**.
 
 ## Payment (Bayarcash)
@@ -88,3 +89,13 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 2. Replace 10 sales-page image placeholders + WhatsApp number already set (60139373275).
 3. Rotate shared tokens (GitHub/GitLab/Cloudflare/Bayarcash).
 4. Concurrent editing caused repeated overwrites — run ONE session at a time; editor now locked so it can't wipe admin.
+
+## Cloudflare production state (authoritative, 2026-07-16)
+- Customer/sales site: Pages project `jayaclean` on `https://cuci.jayabina.com`.
+- Admin portal: Pages project `jayabina-admin`; custom domain `https://admin.jayabina.com`.
+- API: Worker `jayaclean-api` backed by D1 `jayaclean-db` and R2 `jayaclean-backups`.
+- Supabase is no longer the production database or authentication service.
+- Admin branding is **JAYABINA Operations Portal**. Internal API/resource identifiers retain `jayaclean-*` names to avoid breaking production bindings.
+- Dedicated admin output is built with `build-admin.sh` or `build-admin.ps1` and includes noindex/no-store security headers.
+- GitHub Actions workflow `.github/workflows/deploy-cloudflare-pages.yml` builds and deploys the customer and admin Pages projects after repository secrets are configured.
+- Never paste or commit GitHub/Cloudflare tokens. Use OAuth for local login and scoped repository secrets for CI.

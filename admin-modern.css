@@ -1,0 +1,385 @@
+/* JAYABINA Operations Portal — scoped responsive UI layer. */
+:root{
+  --jb-950:#052e22;
+  --jb-900:#0d3b2e;
+  --jb-800:#10513b;
+  --jb-700:#146c43;
+  --jb-600:#158957;
+  --jb-100:#dff5e8;
+  --jb-50:#f1fbf5;
+  --jb-canvas:#f5f8f6;
+  --jb-border:#dfe7e2;
+  --jb-muted:#667085;
+}
+
+body.admin-app{
+  background:
+    radial-gradient(circle at 90% 0,rgba(20,108,67,.07),transparent 30rem),
+    var(--jb-canvas);
+  color:#111827;
+  line-height:1.55;
+}
+
+.admin-app .hdr-logo,
+.admin-app .login-avatar{
+  background:linear-gradient(145deg,var(--jb-700),#0b4b34);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 30px rgba(5,46,34,.22);
+  letter-spacing:-.04em;
+}
+
+.admin-app .d-nav-label{
+  padding:18px 12px 7px;
+  color:rgba(255,255,255,.46);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+
+.admin-app .cloud-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--elevated);
+  color:var(--text2);
+  font-size:12px;
+  font-weight:700;
+  box-shadow:var(--shadow);
+}
+
+.admin-app .cloud-status::before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.13);
+}
+
+.admin-app .d-hdr-actions{display:flex;align-items:center;gap:10px}
+.admin-app .d-icon-btn{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--elevated);
+  color:var(--text2);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
+
+.admin-app .stat,
+.admin-app .kpi,
+.admin-app .panel,
+.admin-app .bk-card,
+.admin-app .sGrp,
+.admin-app .d-card,
+.admin-app .cal-wrap{
+  border-color:var(--jb-border);
+  box-shadow:0 1px 2px rgba(5,46,34,.03),0 8px 28px rgba(5,46,34,.055);
+}
+
+.admin-app .stat:hover,
+.admin-app .kpi:hover,
+.admin-app .panel:hover,
+.admin-app .bk-card:hover{
+  box-shadow:0 14px 34px rgba(5,46,34,.10);
+}
+
+.admin-app .sec-title,
+.admin-app .sGrpH{
+  color:var(--jb-700);
+  font-size:12px;
+  letter-spacing:.08em;
+}
+
+.admin-app .sec-count{font-size:12px;padding:4px 10px}
+.admin-app .bc-badge,
+.admin-app .cbadge{font-size:11px;line-height:1.35;padding:5px 10px}
+
+.admin-app .panel-h h3{font-size:15px}
+.admin-app .panel-h .lnk{font-size:12px;min-height:36px;padding:0 8px}
+.admin-app .mrow .mn{font-size:14px}
+.admin-app .mrow .ma{font-size:12px}
+.admin-app .mrow .mslot{font-size:12px;min-width:60px;padding:6px 9px}
+.admin-app .panel-empty{font-size:13px;min-height:96px;justify-content:center}
+
+.admin-app .kpi{min-height:138px;padding:20px}
+.admin-app .kpi .kpi-ic{width:42px;height:42px;border-radius:13px;margin-bottom:16px}
+.admin-app .kpi .kpi-v{font-size:30px;letter-spacing:-.045em}
+.admin-app .kpi .kpi-l{font-size:11px;line-height:1.4;letter-spacing:.06em;margin-top:8px}
+
+.admin-app .bk-card{padding:20px;border-radius:18px}
+.admin-app .bk-name{font-size:15px}
+.admin-app .bk-sub{font-size:12px}
+.admin-app .bk-mrow{font-size:13px}
+.admin-app .bk-act{min-height:42px;font-size:12px}
+
+.admin-app .sLbl{font-size:13px;color:var(--text2)}
+.admin-app .sInp,
+.admin-app .mv-sel,
+.admin-app .crm-search,
+.admin-app .crm-sel{
+  min-height:46px;
+  font-size:14px;
+  background:var(--elevated);
+}
+
+.admin-app .cust-name{font-size:14px}
+.admin-app .cust-sub,
+.admin-app .cust-stat{font-size:12px}
+.admin-app .cust-row{min-height:66px;padding:12px 14px}
+
+.admin-app thead th{font-size:11px;padding:14px 16px;background:#f8faf9}
+.admin-app tbody td{font-size:13px;padding:16px}
+.admin-app tbody tr:hover{background:var(--jb-50)}
+.admin-app .d-btn{min-height:40px;font-size:12px}
+
+.admin-app .m-sheet h3{font-size:17px}
+.admin-app .m-row{font-size:14px}
+.admin-app .m-btn{min-height:44px;font-size:13px}
+
+.admin-app .login{
+  overflow:auto;
+  background:
+    radial-gradient(circle at 18% 18%,rgba(34,197,94,.20),transparent 22rem),
+    linear-gradient(135deg,var(--jb-950),#07130f 62%);
+}
+
+.admin-app .login::before{
+  content:"JAYABINA";
+  position:fixed;
+  left:5vw;
+  bottom:3vh;
+  color:rgba(255,255,255,.035);
+  font-size:clamp(5rem,15vw,14rem);
+  font-weight:800;
+  letter-spacing:-.08em;
+  pointer-events:none;
+}
+
+.admin-app .login-box{
+  position:relative;
+  width:420px;
+  max-width:calc(100vw - 32px);
+  padding:40px;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:28px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 28px 80px rgba(0,0,0,.35);
+  text-align:left;
+}
+
+.admin-app .login-avatar{margin:0 0 24px;width:64px;height:64px;border-radius:18px;font-size:20px}
+.admin-app .login-box h2{font-size:26px;color:#111827;letter-spacing:-.04em;margin-bottom:6px}
+.admin-app .login-box .sub{font-size:14px;color:#667085;margin-bottom:26px}
+.admin-app .login-box input{
+  min-height:52px;
+  padding:0 16px;
+  border-color:#d8e2dc;
+  border-radius:13px;
+  background:#fff;
+  color:#111827;
+  font-size:16px;
+  text-align:left;
+  box-shadow:none;
+}
+.admin-app .login-box button{min-height:52px;font-size:14px;border-radius:13px;background:var(--jb-700)}
+.admin-app .login-note{margin-top:16px!important;font-size:12px!important;color:#667085!important;text-align:left!important;line-height:1.55}
+
+html.dark .admin-app .login-box{background:rgba(19,31,24,.97);border-color:rgba(255,255,255,.10)}
+html.dark .admin-app .login-box h2{color:var(--text)}
+html.dark .admin-app .login-box input{background:var(--elevated);border-color:var(--border-strong);color:var(--text)}
+
+@media(min-width:1024px){
+  .admin-app .d-sidebar{
+    width:272px;
+    min-width:272px;
+    padding:20px 16px;
+    background:linear-gradient(180deg,var(--jb-900),var(--jb-950));
+    border:0;
+    box-shadow:12px 0 34px rgba(5,46,34,.08);
+  }
+  .admin-app .d-brand{
+    position:static;
+    padding:4px 8px 22px;
+    margin-bottom:4px;
+    background:transparent;
+  }
+  .admin-app .d-brand .hdr-logo{width:46px;height:46px;border-radius:14px}
+  .admin-app .d-brand-text h1{font-size:17px;letter-spacing:-.04em}
+  .admin-app .d-brand-text span{font-size:10px;letter-spacing:.12em}
+  .admin-app .d-nav-item{
+    min-height:44px;
+    padding:0 12px;
+    border-radius:11px;
+    font-size:13px;
+    margin-bottom:3px;
+  }
+  .admin-app .d-nav-item .dni{width:24px;font-size:17px}
+  .admin-app .d-sidebar-footer button{min-height:40px;font-size:12px}
+  .admin-app .d-main{
+    width:calc(100% - 272px);
+    max-width:none;
+    margin-left:272px;
+    padding:0 40px 48px;
+  }
+  .admin-app .d-hdr{
+    position:sticky;
+    top:0;
+    z-index:35;
+    min-height:92px;
+    margin:0 0 24px;
+    background:linear-gradient(180deg,var(--jb-canvas) 76%,rgba(245,248,246,0));
+  }
+  html.dark .admin-app .d-hdr{background:linear-gradient(180deg,var(--bg) 76%,rgba(10,15,10,0))}
+  .admin-app .d-hdr h1{font-size:28px;letter-spacing:-.04em}
+  .admin-app .d-hdr p{font-size:13px;margin-top:3px}
+  .admin-app .stats-grid{gap:18px;margin-bottom:28px}
+  .admin-app .stat{min-height:142px;padding:24px;text-align:left}
+  .admin-app .stat-icon{font-size:22px;margin-bottom:18px}
+  .admin-app .stat-val{font-size:36px}
+  .admin-app .stat-lbl{font-size:11px;margin-top:8px}
+  .admin-app .dash-grid{gap:16px;margin-bottom:18px}
+  .admin-app .panels{grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);gap:18px;margin-bottom:18px}
+  .admin-app .panel{padding:22px}
+  .admin-app .modal{left:272px}
+  .admin-app .m-sheet{width:540px;padding:30px;border-radius:20px}
+}
+
+@media(max-width:1023px){
+  body.admin-app{
+    padding-top:calc(64px + env(safe-area-inset-top));
+    padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  }
+  .admin-app .hdr{
+    height:calc(64px + env(safe-area-inset-top));
+    padding:env(safe-area-inset-top) 16px 0;
+    background:rgba(247,250,248,.92)!important;
+    border-color:var(--jb-border);
+    backdrop-filter:blur(18px)!important;
+    -webkit-backdrop-filter:blur(18px)!important;
+  }
+  html.dark .admin-app .hdr{background:rgba(10,15,10,.90)!important}
+  .admin-app .hdr-logo{width:40px;height:40px;border-radius:12px}
+  .admin-app .hdr-title h1{font-size:17px;line-height:1.15;letter-spacing:-.03em}
+  .admin-app .hdr-title span{display:block;margin-top:3px;font-size:10px;color:var(--text3);letter-spacing:.08em}
+  .admin-app .hdr-btn{width:44px;height:44px;border-radius:13px}
+  .admin-app .drawer{width:min(340px,90vw);background:var(--elevated);padding-top:env(safe-area-inset-top)}
+  .admin-app .drawer-head{padding:18px 20px!important;background:var(--jb-900);border:0!important;color:#fff}
+  .admin-app .drawer-head .hdr-logo{border-color:rgba(255,255,255,.22)}
+  .admin-app .drawer-head .drawer-sub{color:rgba(255,255,255,.60)!important}
+  .admin-app .drawer-item{min-height:48px;font-size:14px;padding:0 14px}
+  .admin-app .bnav{
+    min-height:70px;
+    padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.94)!important;
+    border-color:var(--jb-border);
+    box-shadow:0 -8px 28px rgba(5,46,34,.08);
+    backdrop-filter:blur(18px)!important;
+    -webkit-backdrop-filter:blur(18px)!important;
+  }
+  html.dark .admin-app .bnav{background:rgba(14,33,24,.94)!important}
+  .admin-app .bnav-item{min-width:64px;min-height:52px;padding:6px 10px;border-radius:12px}
+  .admin-app .bnav-item.active{background:var(--accent-light)}
+  .admin-app .bnav-item.active::after{display:none}
+  .admin-app .bnav-item .bni{font-size:19px}
+  .admin-app .bnav-item .bnl{font-size:10px;letter-spacing:.04em;text-transform:none}
+  .admin-app .d-main{padding:0}
+  .admin-app .stats-grid{padding:18px 14px 0;gap:8px}
+  .admin-app .stat{min-height:110px;padding:15px 12px;text-align:left;border-radius:15px}
+  .admin-app .stat-icon{font-size:18px;margin-bottom:12px}
+  .admin-app .stat-val{font-size:28px}
+  .admin-app .stat-lbl{font-size:10px;letter-spacing:.04em;line-height:1.3}
+  .admin-app .sec{padding:20px 16px 9px}
+  .admin-app .list{padding:10px 14px 24px}
+  .admin-app .dash-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .admin-app .kpi{min-height:118px;padding:14px}
+  .admin-app .kpi .kpi-ic{width:36px;height:36px;margin-bottom:11px}
+  .admin-app .kpi .kpi-v{font-size:clamp(22px,7vw,28px)}
+  .admin-app .kpi .kpi-l{font-size:11px;letter-spacing:.035em}
+  .admin-app .panel{padding:17px}
+  .admin-app .bk-act,
+  .admin-app .qact-btn,
+  .admin-app .cal-nav button,
+  .admin-app .pager button{min-height:44px;font-size:12px}
+  .admin-app .card-name{font-size:15px}
+  .admin-app .card-addr,
+  .admin-app .card-phone{font-size:12px}
+  .admin-app .crm-search,
+  .admin-app .crm-sel,
+  .admin-app .sInp,
+  .admin-app .mv-sel{min-height:48px;font-size:16px}
+  .admin-app .sGrp{padding:17px}
+  .admin-app .m-sheet{
+    max-width:none;
+    max-height:calc(100dvh - env(safe-area-inset-top) - 10px);
+    padding:24px 18px calc(20px + env(safe-area-inset-bottom));
+    border-radius:24px 24px 0 0;
+  }
+  .admin-app .m-acts{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom));padding:12px 0 calc(8px + env(safe-area-inset-bottom));background:var(--elevated)}
+}
+
+@media(max-width:480px){
+  .admin-app .login{align-items:flex-end;padding:16px}
+  .admin-app .login-box{padding:28px 22px 24px;border-radius:24px}
+  .admin-app .login-avatar{width:56px;height:56px;margin-bottom:20px}
+  .admin-app .login-box h2{font-size:23px}
+  .admin-app .bk-card{padding:16px}
+  .admin-app .bk-foot,
+  .admin-app .qact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .admin-app .crm-bar{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .admin-app .crm-search{grid-column:1/-1;min-width:0}
+  .admin-app .cal-wrap{overflow-x:auto;overscroll-behavior-inline:contain}
+  .admin-app .cal-grid{min-width:344px}
+  .admin-app .m-row{display:grid;gap:4px}
+  .admin-app .m-row .mv{max-width:none;text-align:left}
+}
+
+@media(max-width:359px){
+  .admin-app .crm-bar{grid-template-columns:1fr}
+  .admin-app .crm-search{grid-column:auto}
+  .admin-app .stats-grid{grid-template-columns:1fr 1fr}
+  .admin-app .stats-grid .stat:last-child{grid-column:1/-1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .admin-app *,
+  .admin-app *::before,
+  .admin-app *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* Restore visible overflow affordance inside operational surfaces. */
+.admin-app .d-main,
+.admin-app .drawer,
+.admin-app .m-sheet,
+.admin-app .cal-wrap,
+.admin-app [style*="overflow-x:auto"]{
+  scrollbar-width:thin!important;
+  scrollbar-color:var(--border-strong) transparent!important;
+}
+.admin-app .d-main::-webkit-scrollbar,
+.admin-app .drawer::-webkit-scrollbar,
+.admin-app .m-sheet::-webkit-scrollbar,
+.admin-app .cal-wrap::-webkit-scrollbar,
+.admin-app [style*="overflow-x:auto"]::-webkit-scrollbar{
+  display:block!important;
+  width:6px;
+  height:6px;
+}
+.admin-app .d-main::-webkit-scrollbar-thumb,
+.admin-app .drawer::-webkit-scrollbar-thumb,
+.admin-app .m-sheet::-webkit-scrollbar-thumb,
+.admin-app .cal-wrap::-webkit-scrollbar-thumb,
+.admin-app [style*="overflow-x:auto"]::-webkit-scrollbar-thumb{
+  display:block!important;
+  background:var(--border-strong);
+  border-radius:999px;
+}
