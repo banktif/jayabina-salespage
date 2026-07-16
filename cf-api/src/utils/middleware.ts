@@ -49,16 +49,6 @@ export function handleCors(req: Request): Response | null {
   return null;
 }
 
-export async function getSetting(db: D1Database, key: string): Promise<string> {
-  const row = await db.prepare('SELECT value FROM app_settings WHERE key = ?').bind(key).first<{value: string}>();
-  return row?.value || '';
-}
-
-export async function getPrivateSetting(db: D1Database, key: string): Promise<string> {
-  const row = await db.prepare('SELECT value FROM private_settings WHERE key = ?').bind(key).first<{value: string}>();
-  return row?.value || '';
-}
-
 export function detectArea(address: string, areas: string): string | null {
   if (!areas) return null;
   const addrLower = address.toLowerCase();

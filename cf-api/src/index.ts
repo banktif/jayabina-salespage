@@ -23,7 +23,7 @@ app.onError((error) => {
 });
 
 app.all('/api/health', async (c) => {
-  if (c.req.raw.method !== 'GET') return handleLegacyRequest(c.req.raw, c.env);
+  if (c.req.raw.method !== 'GET') return err('Not found', 404);
   await createDb(c.env).get(sql`SELECT 1`);
   return ok({ service: 'jayaclean-api', database: 'ok' });
 });
@@ -101,28 +101,7 @@ const handleBackupRoute = (req: Request, env: Env) => {
 app.all('/api/backup', (c) => handleBackupRoute(c.req.raw, c.env));
 app.all('/api/backup/*', (c) => handleBackupRoute(c.req.raw, c.env));
 
-app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
-
-async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
-  const cors = handleCors(req);
-  if (cors) return cors;
-
-  const url = new URL(req.url);
-  const path = url.pathname.replace(/\/+$/, '') || '/';
-
-  // Routes
-  try {
-    if (path === '/api/health' && req.method === 'GET') {
-      await env.DB.prepare('SELECT 1').first();
-      return ok({ service: 'jayaclean-api', database: 'ok' });
-    }
-
-    return err('Not found', 404);
-  } catch (e: any) {
-    console.error('Unhandled error:', e);
-    return err(e.message || 'Internal server error', 500);
-  }
-}
+app.notFound(() => err('Not found', 404));
 
 const worker = {
   async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
