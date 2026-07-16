@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { Env } from './types';
 import { json, err, ok } from './utils/helpers';
 import { handleCors, requireAuth, requireAdmin } from './utils/middleware';
@@ -13,6 +13,7 @@ import { handleSlots } from './routes/slots';
 import { handleWhatsapp } from './routes/whatsapp';
 import { handleBackup } from './routes/backup';
 import { createDb } from './db/client';
+import { bookings as bookingsTable } from './db/schema';
 
 const app = new Hono<{ Bindings: Env }>({ strict: false });
 
@@ -83,6 +84,16 @@ const handleTaskPhotosRoute = (req: Request, env: Env) => {
 app.all('/api/task-photos', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
 app.all('/api/task-photos/*', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
 
+const handleBookingsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleBookings(req, env, path);
+};
+app.all('/api/bookings', (c) => handleBookingsRoute(c.req.raw, c.env));
+app.all('/api/bookings/*', (c) => handleBookingsRoute(c.req.raw, c.env));
+app.all('/api/payments/create-intent', (c) => handleCreateIntent(c.req.raw, c.env));
+app.all('/api/payments/create-balance-intent', (c) => handleCreateBalanceIntent(c.req.raw, c.env));
+app.all('/api/payments/bayarcash-callback', (c) => handleBayarcashCallback(c.req.raw, c.env));
+
 app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
 
 async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
@@ -98,17 +109,6 @@ async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
       await env.DB.prepare('SELECT 1').first();
       return ok({ service: 'jayaclean-api', database: 'ok' });
     }
-
-      // Public endpoints
-      if (path === '/api/bookings/public') return await handleBookings(req, env, path);
-
-      // Bookings
-      if (path.startsWith('/api/bookings')) return await handleBookings(req, env, path);
-
-      // Payment
-      if (path === '/api/payments/create-intent') return await handleCreateIntent(req, env);
-      if (path === '/api/payments/create-balance-intent') return await handleCreateBalanceIntent(req, env);
-      if (path === '/api/payments/bayarcash-callback') return await handleBayarcashCallback(req, env);
 
       // Backup
       if (path.startsWith('/api/backup')) return await handleBackup(req, env, path);
@@ -164,9 +164,13 @@ async function handleCreateBalanceIntent(req: Request, env: Env): Promise<Respon
 
   if (!env.BAYARCASH_PAT || !env.BAYARCASH_PORTAL_KEY) return err('Payment gateway not configured', 500);
 
-  const booking = await env.DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(booking_id).first<{
-    id: string; customer_name: string; customer_phone: string; deposit_amount: number; amount: number;
-  }>();
+  const booking = await createDb(env).select({
+    id: bookingsTable.id,
+    customer_name: bookingsTable.customerName,
+    customer_phone: bookingsTable.customerPhone,
+    deposit_amount: bookingsTable.depositAmount,
+    amount: bookingsTable.amount
+  }).from(bookingsTable).where(eq(bookingsTable.id, booking_id)).get();
   if (!booking) return err('Booking not found', 404);
 
   const balanceAmount = booking.amount - booking.deposit_amount;

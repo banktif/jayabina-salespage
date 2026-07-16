@@ -75,6 +75,8 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 
 - **Step 5 Hono entrypoint attempt A — SKIPPED:** routing the legacy dispatcher through one Hono catch-all failed the required gates. TypeScript reported that `app.fetch()` may return either `Response` or `Promise<Response>`, and the contract snapshot showed Hono's default error boundary replacing the legacy JSON/security-header error response with plain-text `Internal Server Error`. The source change was fully reverted. This catch-all approach is skipped; later Hono routes must retain the legacy outer error boundary explicitly.
 
+- **Step 5 Bayarcash callback Drizzle lookup — SKIPPED:** the typed Drizzle lookup preserved the underlying D1 failure but wrapped its message in `DrizzleQueryError`, changing the frozen HTTP 500 JSON body. That query conversion was reverted immediately. The callback's initial pending-booking lookup remains on the legacy D1 prepared statement; its later valid-path mutations may use Drizzle. No production request or data was involved.
+
 ## Baseline contract suite
 
 - Runtime: official Cloudflare Vitest integration using the project Wrangler configuration.
@@ -93,6 +95,7 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 - **Customers — PASS:** CRM list/search/filter/pagination, detail, patch and delete now use Hono + Drizzle. The window total, controlled sorting with `NULLS LAST`, serialized tags and explicit `snake_case` projections preserve the previous API contract. Verification: TypeScript PASS, 3/3 tests PASS against the committed baseline snapshot, Worker dry-run PASS, diff check PASS.
 - **WhatsApp — PASS:** Hono now owns the WhatsApp endpoint and optional booking-phone lookup uses Drizzle. Cloud API payloads and the `wa.me` fallback are unchanged. Verification: TypeScript PASS, 3/3 tests PASS against the committed baseline snapshot, Worker dry-run PASS, diff check PASS.
 - **Tasks + task photos — PASS:** Hono now routes task and evidence-photo contracts. Drizzle handles joined job lists, assignment validation, photo counts, status timestamps, booking/slot synchronization and customer aggregates with explicit legacy field aliases. The distribute endpoint remains on its legacy handler until the bookings/payment group is migrated. Verification: TypeScript PASS, 3/3 tests PASS against the committed baseline snapshot, Worker dry-run PASS, diff check PASS.
+- **Bookings + payments + distribution — PASS with one documented skip:** Hono now routes bookings, Bayarcash intents/callbacks and unassigned-task distribution. Drizzle handles booking filters, public/detail reads, customer/slot creation, updates, payment-state mutations, aggregates and auto-assignment. The initial callback lookup is the single retained raw D1 statement documented under failures because changing it altered the frozen error body. Verification after that narrow revert: TypeScript PASS, 3/3 tests PASS against the committed baseline snapshot, Worker dry-run PASS, diff check PASS.
 
 ## Backup evidence
 
