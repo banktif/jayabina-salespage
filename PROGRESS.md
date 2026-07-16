@@ -25,7 +25,7 @@ Object storage: Cloudflare R2 `jayaclean-backups`
 | 3. Install Hono + Drizzle and introspect schema | PASS | Typecheck + 2 schema parity tests + Drizzle SQL export + Worker dry-run | `8db513e` | Runtime bindings remain `DB` and `BACKUP_R2`. |
 | 4. Baseline snapshot tests | PASS | 41-route-group contract snapshot stable across two consecutive Worker-runtime runs | `329600a` | Dynamic timestamps, backup names and gzip bytes are normalized; status, headers, structure and business values remain exact. |
 | 5. Refactor route groups | PASS | Snapshot equality after every route-group commit | `2de29f1`–`ddc7e9a` | All route groups now run through Hono; Drizzle owns data access except one documented compatibility skip. |
-| 6. Full regression and final summary | IN PROGRESS | All tests + dry-run + production smoke checks | pending | Local full regression is green; production deploy and read-only smoke checks remain. |
+| 6. Full regression and final summary | PASS | All tests twice + dependency audit + dry-run + production read-only smoke checks | final documentation commit | Deployed only after every local gate passed. |
 
 ## Route audit
 
@@ -112,4 +112,15 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 
 ## Final summary
 
-Pending.
+Completed on 2026-07-16.
+
+- The Worker entrypoint and every HTTP route group now run through Hono.
+- D1 access is implemented with the introspected Drizzle schema across health, authentication, settings, slots, profiles, customers, WhatsApp, tasks/photos, bookings/payments/distribution and backup/status operations.
+- One raw D1 prepared statement remains intentionally in the Bayarcash callback lookup. Its Drizzle conversion was reverted and documented because Drizzle changed the frozen legacy error body; this is the only compatibility skip found by the final source audit.
+- Hono 4.12.30 and Drizzle ORM 0.45.2 are runtime dependencies. The production dependency audit reports 0 vulnerabilities.
+- Final local verification: TypeScript PASS; schema parity PASS; complete Worker-runtime contract snapshot PASS twice consecutively; Worker dry-run PASS; diff check PASS.
+- GitHub `master` was pushed through checkpoint commit `0e70eca` before production deployment.
+- Cloudflare Worker `jayaclean-api` deployed successfully at `https://jayaclean-api.banktifweb.workers.dev` with Version ID `499d2f1a-def8-467d-bb04-3bcda20d0d47`; D1 `jayaclean-db`, R2 `jayaclean-backups` and hourly cron bindings remained attached.
+- Production smoke verification was read-only: health `200`, public settings `200`, missing-date validation `400`, protected settings without a token `401`, unknown route JSON `404`, and CORS preflight `204`.
+- No production business records were created, updated or deleted by the refactor tests or production smoke checks. Local contract tests used isolated D1/R2 storage.
+- Pre-refactor recovery assets remain verified at `C:\Users\USER\Downloads\Jayaclean-private-backups\jayaclean-db-pre-hono-20260716-152304.sql` and R2 object `db-backup-2026-07-16T07-27-03-456Z.json.gz`.
