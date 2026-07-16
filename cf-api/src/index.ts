@@ -1,3 +1,5 @@
+import { Hono } from 'hono';
+import { sql } from 'drizzle-orm';
 import type { Env } from './types';
 import { json, err, ok } from './utils/helpers';
 import { handleCors, requireAuth, requireAdmin } from './utils/middleware';
@@ -10,21 +12,36 @@ import { handleCustomers } from './routes/customers';
 import { handleSlots } from './routes/slots';
 import { handleWhatsapp } from './routes/whatsapp';
 import { handleBackup } from './routes/backup';
+import { createDb } from './db/client';
 
-export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
-    const cors = handleCors(req);
-    if (cors) return cors;
+const app = new Hono<{ Bindings: Env }>({ strict: false });
 
-    const url = new URL(req.url);
-    const path = url.pathname.replace(/\/+$/, '') || '/';
+app.onError((error) => {
+  console.error('Unhandled error:', error);
+  return err(error.message || 'Internal server error', 500);
+});
 
-    // Routes
-    try {
-      if (path === '/api/health' && req.method === 'GET') {
-        await env.DB.prepare('SELECT 1').first();
-        return ok({ service: 'jayaclean-api', database: 'ok' });
-      }
+app.all('/api/health', async (c) => {
+  if (c.req.raw.method !== 'GET') return handleLegacyRequest(c.req.raw, c.env);
+  await createDb(c.env).get(sql`SELECT 1`);
+  return ok({ service: 'jayaclean-api', database: 'ok' });
+});
+
+app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
+
+async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
+  const cors = handleCors(req);
+  if (cors) return cors;
+
+  const url = new URL(req.url);
+  const path = url.pathname.replace(/\/+$/, '') || '/';
+
+  // Routes
+  try {
+    if (path === '/api/health' && req.method === 'GET') {
+      await env.DB.prepare('SELECT 1').first();
+      return ok({ service: 'jayaclean-api', database: 'ok' });
+    }
 
       // Auth
       if (path.startsWith('/api/auth')) return await handleAuth(req, env, path);
@@ -60,7 +77,20 @@ export default {
       // Backup
       if (path.startsWith('/api/backup')) return await handleBackup(req, env, path);
 
-      return err('Not found', 404);
+    return err('Not found', 404);
+  } catch (e: any) {
+    console.error('Unhandled error:', e);
+    return err(e.message || 'Internal server error', 500);
+  }
+}
+
+const worker = {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const cors = handleCors(req);
+    if (cors) return cors;
+
+    try {
+      return await app.fetch(req, env, ctx);
     } catch (e: any) {
       console.error('Unhandled error:', e);
       return err(e.message || 'Internal server error', 500);
@@ -82,6 +112,9 @@ export default {
 
   }
 };
+
+export { app };
+export default worker;
 
 async function handleCreateBalanceIntent(req: Request, env: Env): Promise<Response> {
   try {

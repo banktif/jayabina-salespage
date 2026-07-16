@@ -24,7 +24,7 @@ Object storage: Cloudflare R2 `jayaclean-backups`
 | 2. Backup production D1 | PASS | Full export restored into isolated local D1; sanitized R2 archive downloaded and parsed | pending | No production business rows were changed. |
 | 3. Install Hono + Drizzle and introspect schema | PASS | Typecheck + 2 schema parity tests + Drizzle SQL export + Worker dry-run | `8db513e` | Runtime bindings remain `DB` and `BACKUP_R2`. |
 | 4. Baseline snapshot tests | PASS | 41-route-group contract snapshot stable across two consecutive Worker-runtime runs | pending | Dynamic timestamps, backup names and gzip bytes are normalized; status, headers, structure and business values remain exact. |
-| 5. Refactor route groups | PENDING | Snapshot equality after every route-group commit | pending | One route group per commit where practical. |
+| 5. Refactor route groups | IN PROGRESS | Snapshot equality after every route-group commit | pending | Health now runs through Hono + Drizzle; remaining groups retain the verified legacy fallback until migrated. |
 | 6. Full regression and final summary | PENDING | All tests + dry-run + production smoke checks | pending | Deploy only after all checks pass. |
 
 ## Route audit
@@ -83,6 +83,10 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 - Snapshot captures HTTP status, security/CORS headers and JSON bodies.
 - Runtime-generated JWTs, UUIDs, timestamps, R2 object names and compressed byte counts are normalized. All other values are compared exactly.
 - The existing invalid Bayarcash callback case intentionally snapshots the current HTTP 500 behavior, including its legacy D1 bind failure, so the refactor cannot silently alter it.
+
+## Route refactor verification
+
+- **Health — PASS:** `GET /api/health` is now handled by Hono and executes the D1 connectivity probe through Drizzle. CORS, response envelope, headers, fallback behavior and the scheduled handler remain unchanged. Verification: TypeScript PASS, 3/3 tests PASS against the committed baseline snapshot, Worker dry-run PASS, diff check PASS.
 
 ## Backup evidence
 
