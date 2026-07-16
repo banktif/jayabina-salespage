@@ -60,5 +60,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site-public --project-name jayabina --branch master
+          command: pages deploy site-public --project-name jayabina --branch main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
