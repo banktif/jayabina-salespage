@@ -31,15 +31,13 @@ jobs:
         run: hugo --source site --destination site-public --minify
 
       - name: Deploy JAYABINA to www.jayabina.com
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         run: npx --yes wrangler@4 pages deploy site-public --project-name jayabina --branch master
 
       - name: Deploy Admin to admin.jayabina.com
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         run: |
           mkdir -p admin-public
-          cp admin/index.html admin-public/index.html 2>/dev/null || true
-          test -f admin/editor.html && cp admin/editor.html admin-public/
-          test -d admin/vendor && cp -r admin/vendor admin-public/
-          for f in theme.css admin-modern.css jc-api.js admin-favicon.svg admin-manifest.json; do test -f "$f" && cp "$f" admin-public/; done
+          cp admin/index.html admin-public/index.html
+          test -f admin/editor.html && cp admin/editor.html admin-public/ || true
+          test -d admin/vendor && cp -r admin/vendor admin-public/ || true
+          for f in theme.css admin-modern.css jc-api.js admin-favicon.svg admin-manifest.json; do test -f "$f" && cp "$f" admin-public/ || true; done
           npx --yes wrangler@4 pages deploy admin-public --project-name jayabina-admin --branch master
