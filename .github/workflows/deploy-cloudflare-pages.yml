@@ -12,9 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      CF_PAGES_TOKEN_READY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CF_ACCOUNT_READY: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
     permissions:
       contents: read
       deployments: write
@@ -27,36 +25,29 @@ jobs:
           hugo-version: latest
           extended: true
 
-      - name: Build customer site
-        run: bash build.sh
+      - name: Build JAYABINA Hugo website (site/)
+        run: hugo --source site --destination site-public --minify
 
-      - name: Build admin portal
-        run: bash build-admin.sh
+      - name: Build customer blog (blog/)
+        run: |
+          hugo --source blog --destination blog-public --minify
+          cp -r blog-public/* public/ 2>/dev/null || true
+        continue-on-error: true
 
-      - name: Build JAYABINA Hugo website
-        run: hugo --source site --destination "$GITHUB_WORKSPACE/site-public" --gc --minify
-
-      - name: Install Wrangler
-        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
-        run: npm install -g wrangler
-
-      - name: Deploy customer site
-        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
+      - name: Deploy JAYABINA to www.jayabina.com
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler pages deploy public --project-name jayaclean --branch master
+        run: npx --yes wrangler@4 pages deploy site-public --project-name jayabina --branch master
 
-      - name: Deploy admin portal
-        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
+      - name: Deploy Admin to admin.jayabina.com
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler pages deploy admin-public --project-name jayabina-admin --branch master
-
-      - name: Deploy JAYABINA Hugo website
-        if: ${{ env.CF_PAGES_TOKEN_READY != '' && env.CF_ACCOUNT_READY != '' }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler pages deploy site-public --project-name jayabina --branch master
+        run: |
+          mkdir -p admin-public
+          cp admin/index.html admin-public/index.html 2>/dev/null || true
+          test -f admin/editor.html && cp admin/editor.html admin-public/
+          test -d admin/vendor && cp -r admin/vendor admin-public/
+          for f in theme.css admin-modern.css jc-api.js admin-favicon.svg admin-manifest.json; do test -f "$f" && cp "$f" admin-public/; done
+          npx --yes wrangler@4 pages deploy admin-public --project-name jayabina-admin --branch master
