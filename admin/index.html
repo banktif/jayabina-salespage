@@ -73,7 +73,11 @@
     /* ════════ STATS (shared) ════════ */
     .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px}
     @media(min-width:1024px){.stats-grid{padding:0;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}}
-    .stat{background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:all .25s;cursor:default}
+    .stat{background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+    .stat:active{transform:scale(.97)}
+    .stat.today.active{border-color:var(--accent2);box-shadow:var(--shadow-lg)}
+    .stat.total.active{border-color:var(--accent);box-shadow:var(--shadow-lg)}
+    .stat.wait.active{border-color:var(--warning);box-shadow:var(--shadow-lg)}
     @media(min-width:1024px){.stat{padding:28px 24px;border-radius:18px}}
     .stat:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
     .stat-icon{font-size:1.4rem;margin-bottom:8px;opacity:.8}@media(min-width:1024px){.stat-icon{font-size:1.8rem;margin-bottom:12px}}
@@ -441,9 +445,9 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat today"><div class="stat-icon"><i data-lucide="calendar"></i></div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Today</div></div>
-    <div class="stat total"><div class="stat-icon"><i data-lucide="bar-chart-3"></i></div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Total</div></div>
-    <div class="stat wait"><div class="stat-icon"><i data-lucide="hourglass"></i></div><div class="stat-val" id="sWait">0</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat today" onclick="showBookings('today')" onkeydown="if(event.key==='Enter')this.click()" role="button" tabindex="0" title="Show today's bookings"><div class="stat-icon"><i data-lucide="calendar"></i></div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Today</div></div>
+    <div class="stat total" onclick="showBookings()" onkeydown="if(event.key==='Enter')this.click()" role="button" tabindex="0" title="Show all bookings"><div class="stat-icon"><i data-lucide="bar-chart-3"></i></div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat wait" onclick="showBookings('pending_payment')" onkeydown="if(event.key==='Enter')this.click()" role="button" tabindex="0" title="Show pending payment bookings"><div class="stat-icon"><i data-lucide="hourglass"></i></div><div class="stat-val" id="sWait">0</div><div class="stat-lbl">Pending</div></div>
   </div>
 
   <div class="sec"><span class="sec-title" id="secTitle">Bookings</span><span class="sec-count" id="secCount">0</span></div>
@@ -564,17 +568,20 @@ async function load(filter){
   cf=filter||null;
   var isDesktop=matchMedia('(min-width:1024px)').matches;
   clearNav();
-  var nm={'':['dsAll','navAll'],'pending_payment':['dsWait','navWait'],'confirmed':['dsOK','navOK'],'completed':['dsDone','navDone']};
+  var nm={'':['dsAll','navAll'],'today':['dsAll','navAll'],'pending_payment':['dsWait','navWait'],'confirmed':['dsOK','navOK'],'completed':['dsDone','navDone']};
   var ids=nm[filter||'']||nm[''];setNav(ids[0]);setNav(ids[1]);
+  var sc={'today':'.stat.today','':'.stat.total','pending_payment':'.stat.wait'};
+  document.querySelectorAll('.stats-grid .stat').forEach(function(s){s.classList.remove('active')});
+  if(sc[filter||'']){var se=document.querySelector(sc[filter||'']);if(se)se.classList.add('active')}
   var l=document.getElementById('list');l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{
     var{data,error}=await SB.from('bookings').select('*').order('booking_date',{ascending:true}).order('booking_time',{ascending:true});
     if(error)throw error;if(!viewActive(viewId,'bookings'))return;all=data||[];
-    var f=filter?all.filter(function(b){return b.status===filter}):all;
+    var f=filter==='today'?all.filter(function(b){return b.booking_date===localDateKey(new Date())}):(filter?all.filter(function(b){return b.status===filter}):all);
     updateStats(all);document.getElementById('secCount').textContent=f.length;
     document.getElementById('dsBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
     document.getElementById('drBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
-    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="inbox"></i></div><h2>No Bookings</h2><p>New bookings will appear here.</p></div>';return}
+    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="inbox"></i></div><h2>No Bookings</h2><p>'+(filter==='today'?'No bookings scheduled for today.':'New bookings will appear here.')+'</p></div>';return}
 
     renderBookings(f);
   }catch(e){if(viewActive(viewId,'bookings'))l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(errorMessage(e))+'</p></div>'}
@@ -659,7 +666,7 @@ function setChrome(show){var g=document.querySelector('.stats-grid'),s=document.
 function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(function(n){n.classList.remove('active');n.removeAttribute('aria-current')});}
 function setNav(id){var el=document.getElementById(id);if(el){el.classList.add('active');el.setAttribute('aria-current','page')}}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub'),m=document.getElementById('mTitleView');if(t)t.textContent=title;if(s)s.textContent=sub;if(m)m.textContent=title;document.title=title+' — JAYABINA';}
-function showBookings(filter){setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';location.hash='#bookings';if(filter)location.hash='#pending';load(filter);}
+function showBookings(filter){setChrome(true);setHeader('Bookings','All customer bookings');var tm={'today':"Today's Bookings",'pending_payment':'Pending Payment','confirmed':'Confirmed','completed':'Completed'};document.getElementById('secTitle').textContent=tm[filter]||'Bookings';location.hash=filter==='pending_payment'?'#pending':'#bookings';load(filter);}
 function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else if(currentView==='website')showWebsite();else load(cf);}
 
 // ═══════════ CUSTOMER CRM ═══════════
