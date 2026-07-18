@@ -106,6 +106,7 @@
     .nav-links a:hover,.nav-links a.active{color:var(--green-700)}
     .nav-actions{display:flex;align-items:center;gap:12px}
     .nav-actions .btn{min-height:44px;padding:10px 18px;font-size:.93rem}
+    .nav-right{display:flex;align-items:center;gap:10px}
     .menu-toggle{display:block;width:46px;height:46px;padding:0;border:1px solid var(--grey-200);border-radius:12px;background:var(--white);cursor:pointer}
     .menu-toggle span{display:block;width:21px;height:2px;margin:4px auto;background:var(--green-950);border-radius:99px;transition:transform .2s ease,opacity .2s ease}
     .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
@@ -117,11 +118,12 @@
     .mobile-menu a:hover{background:var(--green-50);color:var(--green-800)}
     .mobile-menu .btn{margin-top:10px;color:var(--white);padding-inline:18px}
     .mm-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--grey-500);text-transform:uppercase;margin:10px 8px 2px}
-    @media(min-width:1024px){.mobile-menu{top:80px}}
+    .mm-sections{display:grid;gap:6px}
+    @media(min-width:1024px){.mobile-menu{top:80px}.mm-sections{display:none}}
 
     .hero{min-height:760px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
-    .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr);gap:72px;align-items:center}
+    .hero-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
     .hero h1{color:var(--white)}
     .hero h1 span{color:#9de3ba}
     .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px}
@@ -241,13 +243,16 @@
     .booking-card .btn{width:100%;margin-top:22px}
     .form-note{margin:12px auto 0;color:var(--grey-600);font-size:.875rem;text-align:center;line-height:1.5}
 
-    .faq-layout{display:grid;grid-template-columns:.65fr 1.35fr;gap:70px;align-items:start}
-    .faq-list{border-top:1px solid var(--grey-200)}
-    .faq-item{border-bottom:1px solid var(--grey-200)}
-    .faq-question{width:100%;min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border:0;background:transparent;color:var(--grey-900);font-family:'Bricolage Grotesque',sans-serif;font-size:1.08rem;font-weight:700;text-align:left;cursor:pointer}
+    .faq-head{text-align:center;max-width:660px;margin:0 auto 42px}
+    .faq-head h2{margin-left:auto;margin-right:auto}
+    .faq-head p{margin:0 auto;color:var(--grey-600)}
+    .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+    .faq-card{background:var(--white);border:1px solid var(--grey-200);border-radius:var(--radius);padding:4px 20px;box-shadow:var(--shadow-sm);transition:border-color .2s ease,box-shadow .2s ease}
+    .faq-card:hover{border-color:#8dc9a7;box-shadow:var(--shadow)}
+    .faq-question{width:100%;min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;border:0;background:transparent;color:var(--grey-900);font-family:'Bricolage Grotesque',sans-serif;font-size:1.02rem;font-weight:700;text-align:left;cursor:pointer}
     .faq-plus{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--green-100);color:var(--green-800);font-family:'Figtree',sans-serif;font-size:1.2rem;transition:transform .2s ease,background .2s ease}
     .faq-question[aria-expanded="true"] .faq-plus{transform:rotate(45deg);background:var(--green-700);color:var(--white)}
-    .faq-answer{padding:0 52px 20px 0;color:var(--grey-600);font-size:var(--font-small)}
+    .faq-answer{padding:0 0 18px;color:var(--grey-600);font-size:var(--font-small)}
     .faq-answer p{margin-bottom:0}
 
     .final-cta{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white)}
@@ -257,11 +262,12 @@
     .final-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
 
     .site-footer{padding:42px 0 30px;background:var(--green-950);color:#c7d8d1;font-size:.9rem}
-    .footer-brand{margin-bottom:22px}
-    .footer-brand strong{display:block;color:var(--white);font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem}
-    .footer-brand span{display:block}
-    .footer-acc{display:grid;gap:10px}
-    @media(min-width:768px){.footer-acc{grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}}
+    .footer-grid{display:grid;gap:18px}
+    @media(min-width:768px){.footer-grid{grid-template-columns:1.25fr 1fr 1fr 1fr;gap:26px;align-items:start}}
+    .footer-col1 strong{display:block;color:var(--white);font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;margin-bottom:8px}
+    .footer-col1 p{margin:0;color:#c7d8d1;font-size:.88rem;line-height:1.6;max-width:32ch}
+    .f-wa{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:9px 15px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:var(--white);font-size:.85rem;font-weight:700;transition:background .2s ease}
+    .f-wa:hover{background:rgba(255,255,255,.08)}
     .f-acc{border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04)}
     .f-acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:var(--white);font-weight:700;font-size:.95rem}
     .f-acc summary::-webkit-details-marker{display:none}
@@ -345,7 +351,7 @@
       .scope-list{grid-template-columns:1fr}
       .payment-split{grid-template-columns:1fr}
       .booking-card{padding:24px 18px;border-radius:20px}
-      .faq-answer{padding-right:0}
+      .faq-grid{grid-template-columns:1fr}
       .footer-bottom{flex-direction:column;gap:6px}
     }
 
@@ -375,17 +381,21 @@
         <li><a href="#harga">Harga</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
-      <div class="nav-actions"><a class="btn btn-primary" href="#hubungi">Semakan Percuma</a></div>
-      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-right">
+        <div class="nav-actions"><a class="btn btn-primary" href="#hubungi">Semakan Percuma</a></div>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mm-label">Seksyen page ini</div>
-    <a href="#tanda">Tanda dah sampai masa tukar</a>
-    <a href="#bukti">Bukti &amp; rekod kerja</a>
-    <a href="#proses">Cara kami bekerja</a>
-    <a href="#harga">Harga &amp; skop</a>
-    <a href="#faq">Soalan lazim</a>
+    <div class="mm-sections">
+      <div class="mm-label">Seksyen page ini</div>
+      <a href="#tanda">Tanda dah sampai masa tukar</a>
+      <a href="#bukti">Bukti &amp; rekod kerja</a>
+      <a href="#proses">Cara kami bekerja</a>
+      <a href="#harga">Harga &amp; skop</a>
+      <a href="#faq">Soalan lazim</a>
+    </div>
     <div class="mm-label">Halaman utama</div>
     <a href="/">Utama</a>
     <a href="/servis/">Semua Servis</a>
@@ -403,8 +413,8 @@
           <h1>Lagi sekali bocor, lagi sekali repair — sampai bila? <span>Berhenti tampal. Kali ni tukar terus.</span></h1>
           <p class="lead">Atap anda bukan lagi pelindung. Ia punca resah setiap kali hujan. Kami ganti atap baharu — dengan rekod foto penuh dan harga yang anda setuju dulu.</p>
           <div class="hero-actions">
-            <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semakan percuma untuk tukar atap. Poskod saya: ____. Jenis rumah: ____. Masalah utama: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar Siling di WhatsApp</a>
-            <a class="btn btn-hero-ghost" href="tel:+60139373275">Call 013-937 3275</a>
+            <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu dapatkan sebutan harga untuk tukar atap. Poskod saya: ____. Jenis rumah: ____. Masalah utama: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Dapatkan Sebutan Harga</a>
+            <a class="btn btn-hero-ghost" href="#kisah">Info Lanjut</a>
           </div>
           <p class="hero-note">Semakan awal melalui WhatsApp adalah percuma — hantar gambar siling &amp; poskod sekarang.</p>
         </div>
@@ -562,16 +572,16 @@
       </div>
     </section>
 
-    <section class="section" id="faq">
-      <div class="container faq-layout">
-        <div class="reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan jujur sebelum anda hubungi kami.</h2><p class="muted">Ini soalan yang selalu ditanya — kami jawab terus terang, tak berselindung.</p></div>
-        <div class="faq-list reveal">
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Atap lama yang dibuang — siapa urus?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kami uruskan semua pembuangan atap lama. Ia termasuk dalam skop kerja yang dipersetujui — anda tak perlu fikir langsung.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Kalau hujan masa kerja?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Cuaca faktor utama kerja atap. Jika hujan lebat, kerja ditunda — bahagian terbuka dilindungi dan kerja disambung sebaik cuaca elok. Jadual dimaklumkan semula.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Berapa lama nak siap?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Bergantung pada keluasan dan kerumitan atap. Anggaran tempoh diberikan bersama sebut harga selepas semakan tapak — bukan sebelum ukur.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Perlu kosongkan rumah ke?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Tak perlu. Kerja kami di atas bumbung — penghuni boleh tinggal seperti biasa. Kami cuma perlukan akses ke laluan bumbung.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq5"><span>Macam mana nak tahu harga? Atap rumah saya tak standard.</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq5" hidden><p>Betul — setiap atap berbeza. Sebab itu kami semak dulu. Hantar gambar dan poskod untuk anggaran awal percuma; harga muktamad selepas ukuran di tapak.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq6"><span>Kenapa tak repair je? Tampal lagi murah, kan?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq6" hidden><p>Repair nampak murah sekarang — tapi bila dah 4-5 kali tampal, jumlah duit tu sebenarnya dah boleh tukar terus. Kalau dah lebih tiga kali bocor di tempat berbeza, repair cuma tangguh masalah.</p></div></div>
+    <section class="section section-mint" id="faq">
+      <div class="container">
+        <div class="faq-head reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan jujur sebelum anda hubungi kami.</h2><p class="muted">Ini soalan yang selalu ditanya — kami jawab terus terang, tak berselindung.</p></div>
+        <div class="faq-grid reveal">
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Atap lama yang dibuang — siapa urus?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kami uruskan semua pembuangan atap lama. Ia termasuk dalam skop kerja yang dipersetujui — anda tak perlu fikir langsung.</p></div></div>
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Kalau hujan masa kerja?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Cuaca faktor utama kerja atap. Jika hujan lebat, kerja ditunda — bahagian terbuka dilindungi dan kerja disambung sebaik cuaca elok. Jadual dimaklumkan semula.</p></div></div>
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Berapa lama nak siap?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Bergantung pada keluasan dan kerumitan atap. Anggaran tempoh diberikan bersama sebut harga selepas semakan tapak — bukan sebelum ukur.</p></div></div>
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Perlu kosongkan rumah ke?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Tak perlu. Kerja kami di atas bumbung — penghuni boleh tinggal seperti biasa. Kami cuma perlukan akses ke laluan bumbung.</p></div></div>
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq5"><span>Macam mana nak tahu harga? Atap rumah saya tak standard.</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq5" hidden><p>Betul — setiap atap berbeza. Sebab itu kami semak dulu. Hantar gambar dan poskod untuk anggaran awal percuma; harga muktamad selepas ukuran di tapak.</p></div></div>
+          <div class="faq-card"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq6"><span>Kenapa tak repair je? Tampal lagi murah, kan?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq6" hidden><p>Repair nampak murah sekarang — tapi bila dah 4-5 kali tampal, jumlah duit tu sebenarnya dah boleh tukar terus. Kalau dah lebih tiga kali bocor di tempat berbeza, repair cuma tangguh masalah.</p></div></div>
         </div>
       </div>
     </section>
@@ -579,15 +589,19 @@
     <section class="final-cta">
       <div class="container final-inner reveal">
         <div><h2>Anda dah penat. Dah cukup. Masa untuk ganti — bukan tampal lagi.</h2><p>Esok hujan lebat lagi, anda duduk minum kopi — bukan angkat baldi. Hantar gambar atap anda sekarang.</p></div>
-        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semakan percuma untuk tukar atap. Poskod saya: ____. Jenis rumah: ____. Masalah utama: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Hantar Gambar Siling</a><a class="btn btn-light" href="tel:+60139373275">Call 013-937 3275</a></div>
+        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu dapatkan sebutan harga untuk tukar atap. Poskod saya: ____. Jenis rumah: ____. Masalah utama: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Dapatkan Sebutan Harga</a></div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <div class="footer-brand"><strong>JAYABINA</strong><span>Servis tukar atap, cuci tangki air &amp; mengecat · KL &amp; Selangor</span></div>
-      <div class="footer-acc">
+      <div class="footer-grid">
+        <div class="footer-col1">
+          <strong>JAYABINA</strong>
+          <p>Servis tukar atap, cuci tangki air &amp; mengecat rumah dan ofis. Kuala Lumpur &amp; Selangor.</p>
+          <a class="f-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu dapatkan sebutan harga untuk tukar atap. Poskod saya: ____. Jenis rumah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp Kami</a>
+        </div>
         <details class="f-acc">
           <summary>Servis</summary>
           <div class="f-links">
