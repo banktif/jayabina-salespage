@@ -591,3 +591,9 @@ body.admin-app{
   background:var(--border-strong);
   border-radius:999px;
 }
+/* Design Spec swatches */
+.ds-swatch{
+  width:44px;height:44px;border-radius:8px;border:1px solid var(--border);
+  font-size:.6rem;display:flex;align-items:flex-end;justify-content:center;
+  padding:2px;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5);
+}
