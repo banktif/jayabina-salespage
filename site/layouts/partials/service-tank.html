@@ -124,10 +124,10 @@
     .hero{min-height:760px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
     .hero-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
-    .hero h1{color:var(--white);text-align:center;margin-left:auto;margin-right:auto}
+    .hero h1{color:var(--white)}
     .hero h1 span{color:#9de3ba}
-    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px;text-align:center;margin-left:auto;margin-right:auto}
-    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em;margin-left:auto;margin-right:auto;width:fit-content}
+    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px}
+    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em}
     .pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 5px rgba(74,222,128,.13)}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
     .hero-note{display:flex;align-items:center;gap:9px;margin:0;color:#c7d8d1;font-size:.92rem}
@@ -334,8 +334,9 @@
       .hero-grid{grid-template-columns:1fr;gap:0}
       .hero-copy{display:contents}
       .hero-badge{order:1;justify-self:start}
-      .hero-copy h1{order:2}
-      .hero-copy .lead{order:3;margin-bottom:26px}
+      .hero h1{order:2;text-align:center;margin-left:auto;margin-right:auto}
+      .hero-copy .lead{order:3;margin-bottom:26px;text-align:center;margin-left:auto;margin-right:auto}
+      .hero-badge{margin-left:auto;margin-right:auto;width:fit-content}
       .hero-visual{order:4;margin:0 0 28px;max-width:680px}
       .hero-actions{order:5}
       .hero-note{order:6}
@@ -677,7 +678,7 @@
           <p>Servis cuci tangki air, tukar atap &amp; mengecat rumah dan ofis. Kuala Lumpur &amp; Selangor.</p>
           <div class="footer-info">
             <span>Primex Jaya Bina Solutions</span>
-            <span>JR0188646-T</span><span>013-937 3275</span>
+            <span>JR0188646-T</span>
           </div>
         </div>
         <details class="f-acc">
