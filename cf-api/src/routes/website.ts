@@ -33,6 +33,22 @@ export const DEFAULT_EDITOR_SITES: WebsiteEditorSite[] = [{
   file: 'index.html',
   live_url: 'https://cuci.jayabina.com/',
   asset_dir: 'assets/editor'
+}, {
+  id: 'jayabina-header',
+  name: 'JAYABINA Header Template',
+  repo: REPO,
+  branch: BRANCH,
+  file: 'site/layouts/partials/header-edit.html',
+  live_url: 'https://www.jayabina.com/',
+  asset_dir: 'assets/editor'
+}, {
+  id: 'jayabina-footer',
+  name: 'JAYABINA Footer Template',
+  repo: REPO,
+  branch: BRANCH,
+  file: 'site/layouts/partials/footer-edit.html',
+  live_url: 'https://www.jayabina.com/',
+  asset_dir: 'assets/editor'
 }];
 
 export type WebsiteFile = {
@@ -292,10 +308,22 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const projectJson = JSON.stringify(body.project_data, null, 2) + '\n';
     if (new TextEncoder().encode(projectJson).byteLength > MAX_EDITOR_PROJECT_BYTES) return err('Visual editor project data is too large', 413);
 
-    const result = await atomicGithubTextCommit(site, env.GH_PAT, baseCommit, {
+    const files: Record<string, string> = {
       [site.file]: html,
       [editorProjectPath(site)]: projectJson
-    }, `Update ${site.name} via JAYABINA Visual Editor`);
+    };
+
+    // Extract body HTML back to real partial for header/footer templates
+    if (site.file === 'site/layouts/partials/header-edit.html') {
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      if (bodyMatch) files['site/layouts/partials/header.html'] = bodyMatch[1].trim();
+    }
+    if (site.file === 'site/layouts/partials/footer-edit.html') {
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      if (bodyMatch) files['site/layouts/partials/footer.html'] = bodyMatch[1].trim();
+    }
+
+    const result = await atomicGithubTextCommit(site, env.GH_PAT, baseCommit, files, `Update ${site.name} via JAYABINA Visual Editor`);
     if (result instanceof Response) return result;
     return ok({
       site_id: site.id,
