@@ -323,10 +323,6 @@
     .f-acc.static .f-links{padding:0}
     .footer-bottom{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:center;text-align:center;gap:16px;flex-wrap:wrap;font-size:.82rem;color:#9fb8ae}
 
-    .desktop-wa{position:fixed;right:22px;bottom:22px;z-index:50;min-height:50px;padding:13px 18px;border-radius:999px;background:var(--wa);color:var(--white);box-shadow:0 14px 32px rgba(0,0,0,.2);font-size:.92rem;font-weight:700;transition:opacity .2s ease,transform .2s ease}
-    .desktop-wa.is-hidden{opacity:0;transform:translateY(14px);pointer-events:none}
-    .mobile-sticky{display:none}
-
     .js .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
     .js .reveal.visible,.js.js-fallback .reveal{opacity:1;transform:none}
 
@@ -358,11 +354,6 @@
       .booking-card{max-width:760px}
       .final-inner{align-items:flex-start;flex-direction:column;gap:28px}
       .final-actions{justify-content:flex-start}
-      .desktop-wa{display:none}
-      body{padding-bottom:78px}
-      .mobile-sticky{position:fixed;left:0;right:0;bottom:0;z-index:90;display:block;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--grey-200);box-shadow:0 -8px 24px rgba(17,24,39,.08)}
-      .mobile-sticky .btn{width:100%;min-height:52px}
-      .mobile-sticky.is-hidden{display:none}
     }
 
     @media(max-width:767px){
@@ -743,19 +734,6 @@
         var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target)}})},{threshold:.08});
         document.querySelectorAll('.reveal').forEach(function(element){revealObserver.observe(element)});
       }else{document.querySelectorAll('.reveal').forEach(function(element){element.classList.add('visible')})}
-
-      var sticky=document.getElementById('mobileSticky');
-      var desktopWhatsApp=document.querySelector('.desktop-wa');
-      var bookingSection=document.getElementById('tempah');
-      var heroSection=document.getElementById('hero');
-      if(sticky&&bookingSection&&heroSection&&'IntersectionObserver' in window){
-        var heroVisible=true;
-        var bookingVisible=false;
-        function updateSticky(){sticky.classList.toggle('is-hidden',heroVisible||bookingVisible);if(desktopWhatsApp)desktopWhatsApp.classList.toggle('is-hidden',bookingVisible)}
-        new IntersectionObserver(function(entries){entries.forEach(function(entry){heroVisible=entry.isIntersecting;updateSticky()})},{threshold:.05}).observe(heroSection);
-        new IntersectionObserver(function(entries){entries.forEach(function(entry){bookingVisible=entry.isIntersecting;updateSticky()})},{threshold:.01}).observe(bookingSection);
-        updateSticky();
-      }
 
       document.querySelectorAll('.faq-question').forEach(function(button){button.addEventListener('click',function(){
         var open=this.getAttribute('aria-expanded')==='true';
