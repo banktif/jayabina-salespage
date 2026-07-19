@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== JAYACLEAN Build ==="
+echo "=== JAYABINA Build ==="
 
 SRC_DIR="blog"
 OUT_DIR="public"

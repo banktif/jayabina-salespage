@@ -26,7 +26,7 @@ app.onError((error) => {
 app.all('/api/health', async (c) => {
   if (c.req.raw.method !== 'GET') return err('Not found', 404);
   await createDb(c.env).get(sql`SELECT 1`);
-  return ok({ service: 'jayaclean-api', database: 'ok' });
+  return ok({ service: 'jayabina-api', database: 'ok' });
 });
 
 const handleSettingsRoute = (req: Request, env: Env) => {

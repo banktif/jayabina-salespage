@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
-  "name": "jayaclean-api",
+  "name": "jayabina-api",
   "account_id": "9b9af0328258f9bd59c1c3b955ddb616",
   "main": "src/index.ts",
   "workers_dev": true,
@@ -11,14 +11,14 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "jayaclean-db",
-      "database_id": "3ceabfef-4c60-47cb-b853-3658d3fa69a7"
+      "database_name": "jayabina-db",
+      "database_id": "5dffa038-ee6a-4876-aa78-8ca1baaafd39"
     }
   ],
   "r2_buckets": [
     {
       "binding": "BACKUP_R2",
-      "bucket_name": "jayaclean-backups"
+      "bucket_name": "jayabina-backups"
     }
   ],
   "vars": {

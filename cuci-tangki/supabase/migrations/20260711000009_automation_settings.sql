@@ -1,5 +1,5 @@
 -- =============================================
--- JAYACLEAN - Automation Settings
+-- JAYABINA - Automation Settings
 -- Toggle switches for auto/manual workflows
 -- =============================================
 

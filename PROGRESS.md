@@ -1,7 +1,7 @@
 # Cloudflare Worker Hono + Drizzle Refactor Progress
 
 Date started: 2026-07-16  
-Production API: `jayaclean-api`  
+Production API: `jayabina-api`  
 Database: Cloudflare D1 `jayaclean-db`  
 Object storage: Cloudflare R2 `jayaclean-backups`
 
@@ -120,7 +120,7 @@ Completed on 2026-07-16.
 - Hono 4.12.30 and Drizzle ORM 0.45.2 are runtime dependencies. The production dependency audit reports 0 vulnerabilities.
 - Final local verification: TypeScript PASS; schema parity PASS; complete Worker-runtime contract snapshot PASS twice consecutively; Worker dry-run PASS; diff check PASS.
 - GitHub `master` was pushed through checkpoint commit `0e70eca` before production deployment.
-- Cloudflare Worker `jayaclean-api` deployed successfully at `https://jayaclean-api.banktifweb.workers.dev` with Version ID `499d2f1a-def8-467d-bb04-3bcda20d0d47`; D1 `jayaclean-db`, R2 `jayaclean-backups` and hourly cron bindings remained attached.
+- Cloudflare Worker `jayabina-api` deployed successfully at `https://jayabina-api.banktifweb.workers.dev` with Version ID `499d2f1a-def8-467d-bb04-3bcda20d0d47`; D1 `jayaclean-db`, R2 `jayaclean-backups` and hourly cron bindings remained attached.
 - Production smoke verification was read-only: health `200`, public settings `200`, missing-date validation `400`, protected settings without a token `401`, unknown route JSON `404`, and CORS preflight `204`.
 - No production business records were created, updated or deleted by the refactor tests or production smoke checks. Local contract tests used isolated D1/R2 storage.
 - Pre-refactor recovery assets remain verified at `C:\Users\USER\Downloads\Jayaclean-private-backups\jayaclean-db-pre-hono-20260716-152304.sql` and R2 object `db-backup-2026-07-16T07-27-03-456Z.json.gz`.

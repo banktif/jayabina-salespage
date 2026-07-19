@@ -1,5 +1,5 @@
-// JAYACLEAN — Service Worker (Offline Cache)
-var CACHE='jayaclean-v1';
+// JAYABINA — Service Worker (Offline Cache)
+var CACHE='jayabina-v1';
 var FILES=[
   '/','/index.html','/success.html','/test-pay.html',
   '/admin/','/worker/','/customer/','/login/',

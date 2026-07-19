@@ -1,5 +1,5 @@
 -- =============================================
--- JAYACLEAN - WhatsApp Business API Settings
+-- JAYABINA - WhatsApp Business API Settings
 -- =============================================
 
 INSERT INTO app_settings (key, value) VALUES

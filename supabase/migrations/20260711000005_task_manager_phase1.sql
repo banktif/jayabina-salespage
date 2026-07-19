@@ -1,5 +1,5 @@
 -- =============================================
--- JAYACLEAN - Task Manager Phase 1
+-- JAYABINA - Task Manager Phase 1
 -- Auth foundation: profiles, app_settings, RLS, role helper
 -- =============================================
 
@@ -123,8 +123,8 @@ INSERT INTO app_settings (key, value) VALUES
   ('auto_assign_enabled', 'false'),
   ('auto_assign_rule', 'round_robin'),
   ('cloud_name', 'dkibczut'),
-  ('upload_preset', 'jayaclean_tasks'),
-  ('folder', 'jayaclean/tasks')
+  ('upload_preset', 'jayabina_tasks'),
+  ('folder', 'jayabina/tasks')
 ON CONFLICT (key) DO NOTHING;
 
 -- 9. Reload PostgREST schema cache

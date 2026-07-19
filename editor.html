@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <title>JAYACLEAN — Multi-Site Sales Page Editor</title>
+  <title>JAYABINA — Multi-Site Sales Page Editor</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -73,7 +73,7 @@
 <div id="siteModal" onclick="if(event.target===this)closeSiteModal()">
   <div class="box">
     <h3>Manage Sales Pages <button class="sm-btn gray" onclick="closeSiteModal()" style="font-size:.7rem;padding:4px 10px">Close</button></h3>
-    <div class="warnbox">&#128737; Safe editing: only <b>sales pages</b> (HTML) can be added. System/app pages (admin, worker, customer, dashboard, login, sw.js, theme.css) are <b>blocked automatically</b>. In the <b>jayaclean-salespage</b> repo, only <code>index.html</code> is allowed.</div>
+    <div class="warnbox">&#128737; Safe editing: only <b>sales pages</b> (HTML) can be added. System/app pages (admin, worker, customer, dashboard, login, sw.js, theme.css) are <b>blocked automatically</b>. In the <b>JAYABINA-WEBSITE</b> repo, only <code>index.html</code> is allowed.</div>
     <div style="margin-bottom:12px;display:flex;gap:6px">
       <button class="sm-btn green" onclick="fetchRepos()" id="fetchReposBtn">&#128193; Fetch My GitHub Repos</button>
       <select id="repoSelect" style="display:none;flex:1;font-size:.75rem" onchange="onRepoSelect()"><option value="">Select a repo to add...</option></select>
@@ -89,7 +89,7 @@
 
 <!-- TOP BAR -->
 <div id="topbar">
-  <span class="brand">JAYACLEAN</span>
+  <span class="brand">JAYABINA</span>
   <select id="siteSelect" onchange="onSiteChange()"><option value="">-- Select Sales Page --</option></select>
   <span class="sep"></span>
   <button onclick="loadSite()" class="prim">Load</button>
@@ -121,7 +121,7 @@ function protectReason(repo,file){
   if(/(^|\/)(admin|worker|customer|dashboard|login|staff|app|api)(\/|$)/.test(file))return 'App/system pages are protected.';
   var base=file.split('/').pop();
   if(['admin.html','worker.html','customer.html','login.html','staff.html','dashboard.html','manifest.json','sw.js','theme.css'].indexOf(base)>-1)return 'System file is protected.';
-  if(/jayaclean-salespage$/i.test(repo)&&!(file==='index.html'||/^home\/[a-z0-9_.-]+\.html?$/.test(file)))return 'In the JAYACLEAN repo, only the sales page (index.html) or home/*.html variants are editable.';
+  if(/JAYABINA-WEBSITE$/i.test(repo)&&!(file==='index.html'||/^home\/[a-z0-9_.-]+\.html?$/.test(file)))return 'In the JAYABINA repo, only the sales page (index.html) or home/*.html variants are editable.';
   return null;
 }
 
