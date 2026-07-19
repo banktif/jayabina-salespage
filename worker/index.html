@@ -14,7 +14,7 @@
   <script>
     (function(){
       var saved=localStorage.getItem('theme');
-      var mode=saved==='dark'||saved==='light'?saved:(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      var mode=saved==='dark'||saved==='light'?saved:'light';
       document.documentElement.className=mode;
       document.querySelector('meta[name=theme-color]').content=mode==='dark'?'#0a0f0a':'#f5f7f5';
     })();
@@ -441,9 +441,13 @@ function renderJobs(){
       h+='<td><span class="d-date">'+fd(b.booking_date)+'</span><span class="d-dot"></span><span class="d-date">'+ft(b.booking_time)+'</span></td>';
       h+='<td>'+badge(t2.status)+'</td>';
       h+='<td><div class="d-acts" onclick="event.stopPropagation()">';
+      if(t2.status==='assigned'){
+        h+='<button class="d-btn acc" onclick="acceptJob(\''+t2.id+'\')"><i data-lucide="check"></i> Accept</button>';
+        h+='<button class="d-btn del" onclick="rejectJob(\''+t2.id+'\')"><i data-lucide="x"></i> Reject</button>';
+      }
       h+='<button class="d-btn" style="color:#25D366;border-color:#25D366" onclick="window.open(\'https://wa.me/'+waNum(b.customer_phone)+'\',\'_blank\')"><i data-lucide="message-circle"></i> WA</button>';
       h+='<button class="d-btn" style="color:var(--accent2);border-color:var(--accent2)" onclick="window.open(\''+mapsUrl(b.customer_address)+'\',\'_blank\')"><i data-lucide="map-pin"></i> Maps</button>';
-      if(t2.status==='assigned')h+='<button class="d-btn acc" onclick="openJob(\''+t2.id+'\')"><i data-lucide="play"></i> Start</button>';
+      if(t2.status==='assigned')h+='<button class="d-btn don" onclick="openJob(\''+t2.id+'\')"><i data-lucide="camera"></i> Start</button>';
       if(t2.status==='in_progress')h+='<button class="d-btn don" onclick="openJob(\''+t2.id+'\')"><i data-lucide="check"></i> Finish</button>';
       h+='</div></td></tr>';
     });
@@ -457,8 +461,12 @@ function renderJobs(){
       h+='<div class="card-name">'+esc(b.customer_name)+'</div>';
       h+='<div class="card-addr">'+esc(b.customer_address)+'</div>';
       h+='<div class="qact">';
+      if(t2.status==='assigned'){
+        h+='<button class="qact-btn accept" onclick="event.stopPropagation();acceptJob(\''+t2.id+'\')">Accept</button>';
+        h+='<button class="qact-btn decline" onclick="event.stopPropagation();rejectJob(\''+t2.id+'\')">Reject</button>';
+      }
       h+='<button class="qact-btn" style="color:#25D366;border-color:#25D366" onclick="event.stopPropagation();window.open(\'https://wa.me/'+waNum(b.customer_phone)+'\',\'_blank\')">WA</button>';
-      if(t2.status==='assigned')h+='<button class="qact-btn accept" onclick="event.stopPropagation();openJob(\''+t2.id+'\')">Start</button>';
+      if(t2.status==='assigned')h+='<button class="qact-btn done" onclick="event.stopPropagation();openJob(\''+t2.id+'\')" style="background:var(--accent-light);color:var(--accent2)">Photo</button>';
       if(t2.status==='in_progress')h+='<button class="qact-btn done" onclick="event.stopPropagation();openJob(\''+t2.id+'\')">Finish</button>';
       h+='</div></div></div>';
     });
@@ -493,7 +501,11 @@ function openJob(id){
 
   document.getElementById('mBody').innerHTML=h;
   var a='';
-  if(t2.status==='assigned')a+='<button class="m-btn accept" id="modalStartBtn" onclick="startJob(\''+id+'\')"'+(beforeP.length?'':' disabled')+'><i data-lucide="play"></i> Start'+(beforeP.length?'':' (need photo)')+'</button>';
+  if(t2.status==='assigned'){
+    a+='<button class="m-btn accept" onclick="acceptJob(\''+id+'\')"><i data-lucide="check"></i> Accept Job</button>';
+    a+='<button class="m-btn" style="background:var(--danger);color:#fff" onclick="rejectJob(\''+id+'\')"><i data-lucide="x"></i> Reject Job</button>';
+    a+='<button class="m-btn done" id="modalStartBtn" onclick="startJob(\''+id+'\')"'+(beforeP.length?'':' disabled')+'><i data-lucide="camera"></i> Start (photo required)</button>';
+  }
   if(t2.status==='in_progress')a+='<button class="m-btn done" id="modalFinishBtn" onclick="finishJob(\''+id+'\')"'+(afterP.length?'':' disabled')+'><i data-lucide="check"></i> Finish'+(afterP.length?'':' (need photo)')+'</button>';
   a+='<button class="m-btn wa" onclick="window.open(\'https://wa.me/'+waNum(b.customer_phone)+'\',\'_blank\')"><i data-lucide="message-circle"></i> WhatsApp</button>';
   a+='<button class="m-btn close" onclick="closeModal()">Close</button>';
@@ -527,6 +539,27 @@ async function startJob(id){
   if(!photosFor(id,'before').length){alert('Add at least 1 before photo');return}
   try{var {error}=await SB.from('tasks').update({status:'in_progress',started_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;
     var x=jobs.find(function(y){return y.t.id===id});if(x)x.t.status='in_progress';openJob(id)}catch(e){alert('Error: '+e.message)}
+}
+async function acceptJob(id){
+  try{
+    var token=await SB.auth.getToken();
+    var res=await fetch(API_URL+'/api/tasks/'+id+'/accept',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Failed');
+    alert('Job accepted! You can now add photos and start.');
+    closeModal();loadJobs();
+  }catch(e){alert('Error: '+e.message)}
+}
+async function rejectJob(id){
+  if(!confirm('Reject this job? It will be reassigned to another staff.'))return;
+  try{
+    var token=await SB.auth.getToken();
+    var res=await fetch(API_URL+'/api/tasks/'+id+'/reject',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Failed');
+    alert('Job rejected and reassigned.');
+    closeModal();loadJobs();
+  }catch(e){alert('Error: '+e.message)}
 }
 async function finishJob(id){
   if(!photosFor(id,'after').length){alert('Add at least 1 after photo');return}

@@ -5,6 +5,28 @@ import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings, bookings, customers, profiles, slots, tasks } from '../db/schema';
 
+// WhatsApp notification helper (mirrors tasks.ts logic for fire-and-forget)
+async function sendWa(env: Env, phone: string, message: string): Promise<void> {
+  let digits = String(phone).replace(/\D/g, '');
+  if (digits.startsWith('0')) digits = '6' + digits;
+  if (!digits.startsWith('60')) digits = '60' + digits;
+  try {
+    if (env.WA_PHONE_NUMBER_ID && env.WA_ACCESS_TOKEN) {
+      await fetch(`https://graph.facebook.com/v22.0/${env.WA_PHONE_NUMBER_ID}/messages`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to: digits, type: 'text', text: { body: message } })
+      });
+    }
+  } catch {}
+}
+async function notifyAdmins(env: Env, db: AppDb, message: string): Promise<void> {
+  try {
+    const admins = await db.select({ phone: profiles.phone }).from(profiles).where(eq(profiles.role, 'admin'));
+    for (const a of admins) { if (a.phone) await sendWa(env, a.phone, message); }
+  } catch {}
+}
+
 const bookingFields = {
   id: bookings.id,
   created_at: bookings.createdAt,
@@ -214,8 +236,28 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
 
             // Auto-assign if enabled
             const autoEnabled = await getSetting(db, 'auto_assign_enabled');
-            if (autoEnabled === 'true') {
-              await autoAssignTask(db, taskId);
+            if (autoEnabled !== 'false') {
+              const r = await autoAssignTask(db, taskId);
+              if (r.assigned && r.staffId) {
+                const b = await db.select({
+                  customer_name: bookings.customerName, customer_address: bookings.customerAddress,
+                  booking_date: bookings.bookingDate, booking_time: bookings.bookingTime
+                }).from(bookings).where(eq(bookings.id, bookingId)).get();
+                const s = await db.select({ full_name: profiles.fullName, phone: profiles.phone })
+                  .from(profiles).where(eq(profiles.id, r.staffId)).get();
+                if (s?.phone) {
+                  sendWa(env, s.phone,
+                    `🔔 NEW JOB: ${b?.customer_name || 'Customer'}\n`
+                    + `${b?.booking_date} ${b?.booking_time} — ${b?.customer_address || ''}\n`
+                    + `Please check dashboard to accept.`
+                  ).catch(() => {});
+                }
+                notifyAdmins(env, db,
+                  `📋 New booking ASSIGNED\n`
+                  + `${b?.customer_name || 'Customer'} → ${s?.full_name || r.staffId}\n`
+                  + `${b?.booking_date} ${b?.booking_time}`
+                ).catch(() => {});
+              }
             }
           } else if (existingTask.status === 'cancelled') {
             await db.update(tasks).set({
@@ -385,8 +427,28 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
         await db.insert(tasks).values({ id: taskId, bookingId: booking.id, status: 'unassigned' });
 
         const autoEnabled = await getSetting(db, 'auto_assign_enabled');
-        if (autoEnabled === 'true') {
-          await autoAssignTask(db, taskId);
+        if (autoEnabled !== 'false') {
+          const r = await autoAssignTask(db, taskId);
+          if (r.assigned && r.staffId) {
+            const b = await db.select({
+              customer_name: bookings.customerName, customer_address: bookings.customerAddress,
+              booking_date: bookings.bookingDate, booking_time: bookings.bookingTime
+            }).from(bookings).where(eq(bookings.id, booking.id)).get();
+            const s = await db.select({ full_name: profiles.fullName, phone: profiles.phone })
+              .from(profiles).where(eq(profiles.id, r.staffId)).get();
+            if (s?.phone) {
+              sendWa(env, s.phone,
+                `🔔 NEW JOB: ${b?.customer_name || 'Customer'}\n`
+                + `${b?.booking_date} ${b?.booking_time} — ${b?.customer_address || ''}\n`
+                + `Please check dashboard to accept.`
+              ).catch(() => {});
+            }
+            notifyAdmins(env, db,
+              `📋 New booking ASSIGNED\n`
+              + `${b?.customer_name || 'Customer'} → ${s?.full_name || r.staffId}\n`
+              + `${b?.booking_date} ${b?.booking_time}`
+            ).catch(() => {});
+          }
         }
       }
     }
@@ -464,13 +526,15 @@ async function getSetting(db: AppDb, key: string): Promise<string> {
   return row?.value || '';
 }
 
-async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
+export async function autoAssignTask(db: AppDb, taskId: string, excludeStaffId?: string): Promise<{ assigned: boolean; staffId?: string }> {
   const rule = await getSetting(db, 'auto_assign_rule') || 'round_robin';
   const task = await db.select({ id: tasks.id }).from(tasks)
     .where(and(eq(tasks.id, taskId), sql`${tasks.assignedTo} IS NULL`)).get();
   if (!task) return false;
 
   let staff: { id: string } | null = null;
+
+  const excludeClause = excludeStaffId ? sql`AND p.id <> ${excludeStaffId}` : sql``;
 
   if (rule === 'area_based') {
     const job = await db.select({ customer_address: bookings.customerAddress }).from(tasks)
@@ -480,6 +544,7 @@ async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
         SELECT p.id FROM profiles p
         WHERE p.role = 'staff' AND p.is_active = 1 AND p.service_area <> ''
           AND lower(${job.customer_address}) LIKE '%' || lower(p.service_area) || '%'
+          ${excludeClause}
         ORDER BY (SELECT COUNT(*) FROM tasks t WHERE t.assigned_to = p.id AND t.status IN ('assigned','in_progress','awaiting_review')) ASC
         LIMIT 1
       `) || null;
@@ -489,7 +554,7 @@ async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
   if (!staff && rule === 'least_loaded') {
     staff = await db.get<{ id: string }>(sql`
       SELECT p.id FROM profiles p
-      WHERE p.role = 'staff' AND p.is_active = 1
+      WHERE p.role = 'staff' AND p.is_active = 1 ${excludeClause}
       ORDER BY (SELECT COUNT(*) FROM tasks t WHERE t.assigned_to = p.id AND t.status IN ('assigned','in_progress','awaiting_review')) ASC
       LIMIT 1
     `) || null;
@@ -497,7 +562,7 @@ async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
     // round_robin: staff assigned least recently (or never)
     staff = await db.get<{ id: string }>(sql`
       SELECT p.id FROM profiles p
-      WHERE p.role = 'staff' AND p.is_active = 1
+      WHERE p.role = 'staff' AND p.is_active = 1 ${excludeClause}
       ORDER BY COALESCE((SELECT MAX(t.created_at) FROM tasks t WHERE t.assigned_to = p.id), '1970-01-01') ASC
       LIMIT 1
     `) || null;
@@ -506,9 +571,9 @@ async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
   if (staff) {
     await db.update(tasks).set({ assignedTo: staff.id, status: 'assigned', updatedAt: nowISO() })
       .where(eq(tasks.id, taskId));
-    return true;
+    return { assigned: true, staffId: staff.id };
   }
-  return false;
+  return { assigned: false };
 }
 
 export async function handleDistributeUnassigned(req: Request, env: Env): Promise<Response> {
@@ -521,7 +586,7 @@ export async function handleDistributeUnassigned(req: Request, env: Env): Promis
       .where(and(sql`${tasks.assignedTo} IS NULL`, eq(tasks.status, 'unassigned')));
     let count = 0;
     for (const task of unassignedTasks) {
-      if (await autoAssignTask(db, task.id)) count++;
+      if ((await autoAssignTask(db, task.id)).assigned) count++;
     }
     return ok({ assigned: count });
   } catch (e: any) {
