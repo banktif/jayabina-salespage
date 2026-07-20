@@ -1,10 +1,11 @@
 /* ============================================================
    JAYABINA — Shared Booking + Bayarcash Module (booking.js)
-   Drop this into any homepage version. Replaces placeholder
-   booking forms with the real Supabase/Bayarcash flow.
+   LEGACY — requires Supabase SDK loaded before this script.
+   Current production booking uses jc-api.js → api.jayabina.com.
    ============================================================ */
 
 (function () {
+  if (typeof supabase === 'undefined') { console.warn('booking.js: Supabase SDK not loaded'); return; }
   var SB = supabase.createClient(
     "https://thbscwlcyhcnqsppoyfn.supabase.co",
     "sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR"

@@ -702,7 +702,7 @@
   <a class="desktop-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60000000000" target="_blank" rel="noopener">Tanya di WhatsApp</a>
   <div class="mobile-sticky" id="mobileSticky"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60000000000" target="_blank" rel="noopener">Semak Slot & Harga</a></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <!-- Supabase SDK removed — legacy -->
   <script>
     window.addEventListener('DOMContentLoaded',function(){
       var WHATSAPP_NUMBER='60000000000'; // WAJIB GANTI dengan nombor WhatsApp Business sebenar, format 601xxxxxxxx.
@@ -752,7 +752,7 @@
       })});
 
       var SB=null;
-      if(window.supabase){SB=window.supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR')}
+      // Legacy Supabase client removed
       async function fetchBookedSlots(date){if(!SB)throw new Error('BOOKING_UNAVAILABLE');var result=await SB.from('slots').select('time_slot').eq('date',date).eq('is_booked',true);if(result.error)throw result.error;if(!result.data)throw new Error('AVAILABILITY_UNAVAILABLE');return result.data.map(function(item){return item.time_slot})}
 
       var today=new Date();today.setHours(0,0,0,0);

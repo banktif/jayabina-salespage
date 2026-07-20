@@ -26,7 +26,7 @@ export type WebsiteEditorSite = {
 };
 
 export const DEFAULT_EDITOR_SITES: WebsiteEditorSite[] = [{
-  id: 'jayaclean-sales',
+  id: 'jayabina-sales',
   name: 'JAYABINA Sales Page',
   repo: REPO,
   branch: BRANCH,

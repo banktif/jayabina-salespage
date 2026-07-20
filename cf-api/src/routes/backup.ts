@@ -45,7 +45,7 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
         dump[table] = rows;
       }
 
-      const json = JSON.stringify({ _meta: { project: 'jayaclean', timestamp: now }, ...dump });
+      const json = JSON.stringify({ _meta: { project: 'jayabina', timestamp: now }, ...dump });
       const compressed = await gzip(json);
       const filename = `db-backup-${now.replace(/[:.]/g, '-')}.json.gz`;
 

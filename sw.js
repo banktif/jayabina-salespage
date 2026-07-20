@@ -4,7 +4,7 @@ var FILES=[
   '/','/index.html','/success.html','/test-pay.html',
   '/admin/','/worker/','/customer/','/login/',
   '/theme.css','/manifest.json',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+  // Legacy Supabase SDK removed — frontend uses jc-api.js
   'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
 ];

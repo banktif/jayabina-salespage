@@ -13,4 +13,3 @@ assets/jayaclean-wudhu-tank-emotional.webp
 *.log
 connect_test.js
 cloudinary-onboard.js
-supabase_test.js

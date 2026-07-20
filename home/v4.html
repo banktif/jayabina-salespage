@@ -568,7 +568,7 @@ footer p{margin-top:4px}
   <a href="#tempah" class="btn btn-teal">🗓️ Tempah — RM150</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- Supabase SDK removed — legacy -->
 <script>
 // MOBILE MENU
 document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('mobileMenu').classList.toggle('open')});
@@ -584,7 +584,7 @@ var secs=document.querySelectorAll('section[id]'),nlinks=document.querySelectorA
 window.addEventListener('scroll',function(){var sy=window.pageYOffset,cur='';secs.forEach(function(s){if(sy>=s.offsetTop-80)cur=s.getAttribute('id')});nlinks.forEach(function(l){l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active')})},{passive:true});
 
 // SUPABASE
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var SB=/* Supabase client removed — legacy */
 async function fetchBookedSlots(date){var {data,error}=await SB.from('slots').select('time_slot').eq('date',date).eq('is_booked',true);if(error||!data)return[];return data.map(function(s){return s.time_slot})}
 
 // CALENDAR
