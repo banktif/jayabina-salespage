@@ -94,10 +94,10 @@ var editor=null,dirty=false,previewMode=false,outlineMode=false;
 var currentEnvelope=null,currentFileName='';
 var G=window.JayaGrapesFull||{};
 
-function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1');initEditor()}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
-(function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none';initEditor()}else{document.getElementById('pwInput').focus()}})();
+function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1');setTimeout(initEditor,100)}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
+(function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none';setTimeout(initEditor,100)}else{document.getElementById('pwInput').focus()}})();
 
-function initEditor(){setTimeout(function(){if(!G.grapesjs||G.version!=='0.23.2'){toast('Editor bundle loading... please wait.',true);setTimeout(initEditor,1000);return}setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()},300)}
+function initEditor(){if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs||window.JayaGrapesFull.version!=='0.23.2'){document.getElementById('fileInfo').innerHTML='<b>Loading editor...</b><small>GrapesJS 0.23.2</small>';setTimeout(initEditor,600);return}G=window.JayaGrapesFull;setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()}
 
 function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(message,ok){var el=document.getElementById('toast');el.textContent=message;el.className='toast '+(ok?'ok':'error')+' show';clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.className='toast'},3500)}
