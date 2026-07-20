@@ -12,7 +12,23 @@ This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **WWW SITE LOCKED (owner order, 2026-07-20):** `www.jayabina.com` (Pages project `jayabina`, `site/` Hugo source) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session. GrapesJS editor `protectReason()` guards `site/content/` — do NOT disable it.
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- ⛔ **BOOKING FORM DESIGN LOCKED (owner order, 2026-07-20):** The `index.html` booking form (section `#tempah`, CSS `.fg-row`, JS booking handler) MUST NEVER be modified, deleted, or reformatted without an explicit owner instruction. The modern design includes: email field (`cem`) with validation, 2-column `.fg-row` grid on desktop, `autocomplete` attributes, and `customer_email` in the Cloudflare API payload. The `service-tank.html` Hugo partial's booking form is also locked — it already contains the email field and is protected by the GrapesJS `protectReason()` guard (blocks `site/` path). GrapesJS `cuci-tangki/editor.html` is additionally locked to block `index.html` from being loaded or saved for the `banktif/jayabina-salespage` repo. To unlock: remove the check at `editor.html:268` (line after `protectReason` in `loadSite()`) and `editor.html:365` (line after `protectReason` in `saveToGitHub()`). This design was rolled back from commit `23d3797` (Jul 19) — if overwritten, restore: `git checkout 23d3797 -- index.html` (then rebrand JC→JB + cuci→www URL changes from later commits).
+- ⛔ **BOOKING FORM DESIGN LOCKED (owner order, 2026-07-20):** The `/servis-cuci-tangki-air/` booking form (Hugo partial `site/layouts/partials/service-tank.html`) is the PRIMARY booking funnel and MUST NEVER be modified, deleted, or reformatted without an explicit owner instruction. **TEMPLATE SAVED** at git tag `booking-form-template` (commit `85ddf78`). Features: email field with validation, 2-column `.fg-row` grid on desktop, `autocomplete` attributes, `customer_email` in API payload, 100 slots/day capacity, multi-booking per time slot (no per-slot uniqueness). The root `index.html` dark-theme standalone page is a LEGACY backup — the live page is Hugo-generated. GrapesJS `protectReason()` blocks `site/` path (protects `service-tank.html`). The `cuci-tangki/editor.html` additionally blocks `index.html` load/save for `banktif/jayabina-salespage`.
+
+  **🔁 ONE-CLICK ROLLBACK:**
+  ```bash
+  # Restore booking form HTML/CSS/JS to template:
+  cp site/layouts/partials/service-tank.html.template site/layouts/partials/service-tank.html
+
+  # Restore API capacity code:
+  git checkout booking-form-template -- cf-api/src/routes/bookings.ts cf-api/src/routes/slots.ts cf-api/src/db/schema.ts
+
+  # Apply D1 migration if needed:
+  npx wrangler d1 execute jayabina-db --file=cf-api/migrations/0003_drop_slot_unique_index.sql --remote
+
+  # Deploy:
+  npx wrangler deploy
+  git add -A && git commit -m "rollback: restore booking form template" && git push origin master
+  ```
 - ⛔ **FULLWIDTH LAYOUT LOCKED (owner order, 2026-07-20):** Both portals must remain fullwidth on desktop — `.d-main` has NO `max-width` constraint. Content stretches to fill available space.
 - ⛔ **PERSISTENT LOGIN LOCKED (owner order, 2026-07-20):** Login session must survive page refresh indefinitely. Worker: token in localStorage + `jc_user_cache` fallback. Customer: `jc_login_phone` in localStorage with `autoLogin()`. Only explicit logout clears the session. Do NOT change this behavior.
 - Frontend: www.jayabina.com (Hugo build from `site/`). Booking funnel PRIMARY di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`. The old cuci.jayabina.com Pages project (`jayabina`) has been decommissioned — all content migrated to www.
