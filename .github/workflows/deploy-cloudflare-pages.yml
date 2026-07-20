@@ -39,7 +39,3 @@ jobs:
           for f in theme.css admin-modern.css jc-api.js admin-favicon.svg admin-manifest.json; do test -f "$f" && cp "$f" admin-public/ || true; done
           wrangler pages deploy admin-public --project-name jayabina-admin --branch master
 
-      - name: Deploy booking site (cuci.jayabina.com)
-        run: |
-          bash build.sh
-          wrangler pages deploy public --project-name jayabina-pages --branch master

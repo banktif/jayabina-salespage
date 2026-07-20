@@ -1171,7 +1171,7 @@ async function showWebsite(){
       '<div><label class="sLbl">Select version</label><select id="hpSel" class="mv-sel"><option value="v1"'+((settings['active_homepage']||'v1')==='v1'?' selected':'')+'>Version 1 — DeepSeek</option><option value="v2"'+(settings['active_homepage']==='v2'?' selected':'')+'>Version 2 — Claude</option><option value="v3"'+(settings['active_homepage']==='v3'?' selected':'')+'>Version 3 — Codex</option><option value="v4"'+(settings['active_homepage']==='v4'?' selected':'')+'>Version 4 KILLER — Expert Team</option></select></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="d-btn" onclick="previewHome()"><i data-lucide="eye"></i> Preview</button><button class="btn-primary" style="width:auto" onclick="publishHome()"><i data-lucide="rocket"></i> Publish to Live</button></div>'+
       '<div id="hpMsg" style="font-size:.75rem;color:var(--text3)"></div>'+
-      '<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Preview and publish the selected water-tank sales page version at <b>cuci.jayabina.com</b>. This does not change the JAYABINA corporate homepage.</div>'+
+      '<div style="font-size:.72rem;color:var(--text3);line-height:1.7">Preview and publish the selected water-tank sales page version. This overwrites <b>www.jayabina.com/index.html</b>.</div>'+
     '</div></div>'+
     '<div id="siteSettings"><div class="panel site-settings-loading"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Loading website configuration...</span></div></div></div>'+
     '<div id="siteVisualView" style="display:none"><div class="site-visual-head panel"><div><span class="site-settings-eyebrow">GRAPESJS 0.23.2 · FULL OSS BUNDLE</span><h2>Multi-website visual editor</h2><p>Choose a static website, load it from GitHub and publish changes without exposing a GitHub token in your browser.</p></div><button class="d-btn acc" onclick="window.open(\'/editor.html\',\'_blank\',\'noopener\')"><i data-lucide="maximize-2"></i> Open full screen</button></div><div class="site-visual-frame-wrap"><iframe id="siteVisualFrame" title="JAYABINA multi-website visual editor" loading="lazy"></iframe></div></div>'+
@@ -1405,16 +1405,16 @@ async function saveSettings(){
   var rows=[];document.querySelectorAll('[data-key]').forEach(function(el){rows.push({key:el.getAttribute('data-key'),value:el.value,updated_at:new Date().toISOString()});});
   try{var {error}=await SB.from('app_settings').upsert(rows);if(error)throw error;msg.style.color='var(--accent)';msg.textContent='Saved.';await loadSettings()}catch(e){msg.style.color='var(--danger)';msg.textContent='Error: '+e.message}
 }
-function previewHome(){var v=document.getElementById('hpSel').value;window.open('https://cuci.jayabina.com/home/'+v,'_blank','noopener');}
+function previewHome(){var v=document.getElementById('hpSel').value;window.open('https://www.jayabina.com/home/'+v,'_blank','noopener');}
 async function publishHome(){
   var v=document.getElementById('hpSel').value,m=document.getElementById('hpMsg');
-  if(!confirm('Publish '+v+' as the LIVE water-tank sales page at cuci.jayabina.com?'))return;
+  if(!confirm('Publish '+v+' as the LIVE water-tank sales page at www.jayabina.com?'))return;
   m.style.color='var(--text3)';m.textContent='Publishing...';
   try{
     var token=await authToken();
     var res=await fetch(API_URL+'/api/website/publish-home',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({version:v})});
     var r=await res.json();
-    if(res.ok){m.style.color='var(--accent)';m.textContent='Published '+v+'! cuci.jayabina.com is deploying (~1 min).';var hl=document.getElementById('hpLive');if(hl)hl.textContent=v;}
+    if(res.ok){m.style.color='var(--accent)';m.textContent='Published '+v+'! www.jayabina.com is deploying (~1 min).';var hl=document.getElementById('hpLive');if(hl)hl.textContent=v;}
     else{m.style.color='var(--danger)';m.textContent='Error: '+(r.error||'failed');}
   }catch(e){m.style.color='var(--danger)';m.textContent='Error: '+e.message;}
 }

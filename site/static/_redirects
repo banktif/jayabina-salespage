@@ -1,0 +1,4 @@
+/admin https://admin.jayabina.com/ 302
+/admin/ https://admin.jayabina.com/ 302
+/admin/* https://admin.jayabina.com/:splat 302
+/admin.html https://admin.jayabina.com/ 302

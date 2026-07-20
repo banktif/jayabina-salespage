@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Test Bayaran — Jaya Bina Services</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#E8F5E9,#fff);min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+    .card{background:#fff;border-radius:24px;padding:40px 32px;max-width:420px;width:100%;box-shadow:0 4px 40px rgba(0,0,0,.06)}
+    .tag{display:inline-block;background:#FFF3CD;color:#946200;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:50px;margin-bottom:16px}
+    h1{font-size:1.35rem;color:#1B5E20;margin-bottom:8px}
+    p{color:#666;font-size:.85rem;line-height:1.6;margin-bottom:20px}
+    label{display:block;text-align:left;font-size:.78rem;color:#888;margin-bottom:6px;font-weight:600}
+    .amt{display:flex;align-items:center;gap:8px;background:#f6f8f6;border:1px solid #e2e8e2;border-radius:12px;padding:12px 16px;margin-bottom:20px}
+    .amt span{font-weight:700;color:#1B5E20;font-size:1.1rem}
+    .amt input{border:none;background:transparent;font-family:inherit;font-size:1.1rem;font-weight:700;color:#1B5E20;width:100%;outline:none}
+    .btn{width:100%;padding:15px;background:#2E7D32;color:#fff;border:none;border-radius:50px;font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s}
+    .btn:hover{background:#1B5E20}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .status{margin-top:16px;font-size:.8rem;min-height:20px}
+    .status.err{color:#c0392b}
+    .status.ok{color:#1B5E20}
+    .ref{margin-top:14px;font-size:.72rem;color:#aaa;word-break:break-all}
+    a.back{display:inline-block;margin-top:18px;font-size:.8rem;color:#2E7D32;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="tag">&#9888; MOD UJIAN — BUKAN BOOKING SEBENAR</div>
+  <h1>Test Bayaran Bayarcash</h1>
+  <p>Halaman ini cipta booking ujian &amp; hantar ke Bayarcash dengan amount kecil untuk uji aliran bayaran. Booking ditanda TEST.</p>
+  <label for="amt">Amount ujian (RM)</label>
+  <div class="amt"><span>RM</span><input type="number" id="amt" value="2" min="1" step="1"></div>
+  <button class="btn" id="btnPay">Bayar &amp; Uji Sekarang &rarr;</button>
+  <div class="status" id="status"></div>
+  <div class="ref" id="ref"></div>
+  <a class="back" href="/">&larr; Kembali ke Laman Utama</a>
+</div>
+
+<script src="/jc-api.js"></script>
+<script>
+var API_URL=localStorage.getItem('jc_api_url')||'https://api.jayabina.com';
+var SB=JCApi.create(API_URL);
+var BC_FN=API_URL+'/api/payments/create-intent';
+
+document.getElementById('btnPay').addEventListener('click',async function(){
+  var btn=this,st=document.getElementById('status'),refEl=document.getElementById('ref');
+  st.className='status';st.textContent='';refEl.textContent='';
+  var amt=parseInt(document.getElementById('amt').value,10);
+  if(!amt||amt<1){st.className='status err';st.textContent='Amount tak sah.';return}
+  btn.disabled=true;btn.textContent='Menyediakan bayaran...';
+  try{
+    var result=await SB.from('bookings').insert({
+      customer_name:'TEST PAYMENT',
+      customer_phone:'0139373275',
+      customer_address:'TEST PAYMENT - halaman ujian, bukan booking sebenar',
+      booking_date:'2099-12-31',
+      booking_time:'9am',
+      amount:amt,
+      deposit_amount:amt,
+      status:'pending_payment',
+      payment_status:'pending',
+      notes:'TEST PAYMENT RM'+amt+' - dari test-pay.html'
+    });
+    if(result.error)throw new Error(result.error);
+    var bk=Array.isArray(result.data)?result.data[0]:result.data;
+    if(!bk||!bk.id)throw new Error('Booking failed');
+    var bookingId=bk.id;
+    refEl.textContent='Booking test: '+bookingId;
+    btn.textContent='Ke halaman bayaran...';
+    var res=await fetch(BC_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:bookingId})});
+    var pay=await res.json();
+    if(res.ok&&pay.url){location.href=pay.url;return;}
+    throw new Error((pay&&pay.error?pay.error:'Gateway gagal')+(pay&&pay.detail?' — '+JSON.stringify(pay.detail):''));
+  }catch(e){
+    st.className='status err';st.textContent='Ralat: '+(e.message||'tidak diketahui');
+    btn.disabled=false;btn.textContent='Bayar & Uji Sekarang \u2192';
+  }
+});
+</script>
+</body>
+</html>

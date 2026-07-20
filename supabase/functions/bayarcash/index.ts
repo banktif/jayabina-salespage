@@ -91,7 +91,7 @@ async function handleCreateIntent(req: Request): Promise<Response> {
     .update({ bayarcash_ref: orderNo, updated_at: new Date().toISOString() })
     .eq("id", booking.id);
 
-  const siteOrigin = (payload.origin || Deno.env.get("SITE_URL") || "https://cuci.jayabina.com").replace(/\/$/, "");
+  const siteOrigin = (payload.origin || Deno.env.get("SITE_URL") || "https://www.jayabina.com").replace(/\/$/, "");
   const returnUrl = `${siteOrigin}/success.html?order=${booking.id}`;
   const callbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/bayarcash/callback`;
 
@@ -178,7 +178,7 @@ async function handleCreateBalanceIntent(req: Request): Promise<Response> {
 
   const orderNo = ("BB" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)).toUpperCase();
 
-  const siteOrigin = (payload.origin || Deno.env.get("SITE_URL") || "https://cuci.jayabina.com").replace(/\/$/, "");
+  const siteOrigin = (payload.origin || Deno.env.get("SITE_URL") || "https://www.jayabina.com").replace(/\/$/, "");
   const returnUrl = `${siteOrigin}/success.html?order=${booking.id}`;
   const callbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/bayarcash/callback`;
 

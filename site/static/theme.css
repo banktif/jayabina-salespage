@@ -1,0 +1,179 @@
+/* ============================================================
+   JAYACLEAN — Shared Theme (admin / staff / login)
+   Modern design tokens + Lucide icon defaults + global polish.
+   Single source of truth for colors. Customer pages NOT affected.
+   Palette: JAYASEO forest-green design system.
+   ============================================================ */
+
+/* ---------- LIGHT (default) ---------- */
+:root{
+  --bg:#f5f7f5;
+  --surface:#ffffff;
+  --elevated:#ffffff;
+  --overlay:rgba(255,255,255,.82);
+  --border:#e5e7eb;
+  --border-strong:#d5dbd5;
+  --text:#0b1220;
+  --text2:#48546a;
+  --text3:#8b95a7;
+  --accent:#166534;
+  --accent-hover:#14532d;
+  --accent-light:#f0fdf4;
+  --accent-glow:rgba(22,101,52,.18);
+  --accent2:#3b82f6;
+  --accent2-light:#eaf1ff;
+  --warning:#d99a0b;
+  --warning-light:#fbf4e3;
+  --danger:#e5484d;
+  --danger-light:#fdecec;
+  --font:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+  --radius-lg:16px;
+  --shadow:0 1px 2px rgba(22,101,52,.04),0 2px 6px rgba(22,101,52,.06);
+  --shadow-lg:0 12px 34px rgba(22,101,52,.10);
+  --menu-bg:#e7f3ea;
+  --menu-overlay:rgba(231,243,234,.86);
+  --surface-hover:#edf7f0;
+  --canvas-glow:rgba(22,101,52,.07);
+  --nav-glass:rgba(255,255,255,.94);
+  --header-fade:rgba(245,247,245,0);
+  --login-card:rgba(255,255,255,.97);
+  --login-card-border:rgba(255,255,255,.58);
+  --card-bg:#ffffff;
+  --card-muted:#f6faf7;
+  --card-border:#dfe8e2;
+  --card-border-hover:rgba(22,101,52,.34);
+  --card-shadow:0 1px 2px rgba(5,46,34,.035),0 10px 28px rgba(5,46,34,.065);
+  --card-shadow-hover:0 18px 44px rgba(5,46,34,.13);
+  --card-radius:18px;
+}
+
+html.light{color-scheme:light}
+
+/* ---------- DARK (forced via html.dark) ---------- */
+html.dark{
+  --bg:#0a0f0a;
+  --surface:#162016;
+  --elevated:#1c2b1c;
+  --overlay:rgba(10,15,10,.85);
+  --border:rgba(255,255,255,.06);
+  --border-strong:rgba(255,255,255,.11);
+  --text:#e9eef5;
+  --text2:#9aa7b8;
+  --text3:#8997a8;
+  --accent:#22c55e;
+  --accent-hover:#16a34a;
+  --accent-light:rgba(34,197,94,.14);
+  --accent-glow:rgba(34,197,94,.26);
+  --accent2:#5b9dff;
+  --accent2-light:rgba(91,157,255,.12);
+  --warning:#f0b429;
+  --warning-light:rgba(240,180,41,.12);
+  --danger:#f0595e;
+  --danger-light:rgba(240,89,94,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);
+  --shadow-lg:0 14px 40px rgba(0,0,0,.5);
+  --menu-bg:#0e2118;
+  --menu-overlay:rgba(14,33,24,.9);
+  --surface-hover:#203626;
+  --canvas-glow:rgba(34,197,94,.09);
+  --nav-glass:rgba(14,33,24,.94);
+  --header-fade:rgba(10,15,10,0);
+  --login-card:rgba(19,31,24,.97);
+  --login-card-border:rgba(255,255,255,.11);
+  --card-bg:#152219;
+  --card-muted:#1b2c21;
+  --card-border:rgba(255,255,255,.085);
+  --card-border-hover:rgba(34,197,94,.38);
+  --card-shadow:0 1px 2px rgba(0,0,0,.28),0 12px 32px rgba(0,0,0,.30);
+  --card-shadow-hover:0 20px 48px rgba(0,0,0,.46);
+}
+
+html.dark{color-scheme:dark}
+
+/* ---------- DARK (system pref, unless page forces light/dark) ---------- */
+@media (prefers-color-scheme: dark){
+  html:not(.light):not(.dark){
+    --bg:#0a0f0a;
+    --surface:#162016;
+    --elevated:#1c2b1c;
+    --overlay:rgba(10,15,10,.85);
+    --border:rgba(255,255,255,.06);
+    --border-strong:rgba(255,255,255,.11);
+    --text:#e9eef5;
+    --text2:#9aa7b8;
+    --text3:#8997a8;
+    --accent:#22c55e;
+    --accent-hover:#16a34a;
+    --accent-light:rgba(34,197,94,.14);
+    --accent-glow:rgba(34,197,94,.26);
+    --accent2:#5b9dff;
+    --accent2-light:rgba(91,157,255,.12);
+    --warning:#f0b429;
+    --warning-light:rgba(240,180,41,.12);
+    --danger:#f0595e;
+    --danger-light:rgba(240,89,94,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);
+    --shadow-lg:0 14px 40px rgba(0,0,0,.5);
+    --menu-bg:#0e2118;
+    --menu-overlay:rgba(14,33,24,.9);
+    --surface-hover:#203626;
+    --canvas-glow:rgba(34,197,94,.09);
+    --nav-glass:rgba(14,33,24,.94);
+    --header-fade:rgba(10,15,10,0);
+    --login-card:rgba(19,31,24,.97);
+    --login-card-border:rgba(255,255,255,.11);
+    --card-bg:#152219;
+    --card-muted:#1b2c21;
+    --card-border:rgba(255,255,255,.085);
+    --card-border-hover:rgba(34,197,94,.38);
+    --card-shadow:0 1px 2px rgba(0,0,0,.28),0 12px 32px rgba(0,0,0,.30);
+    --card-shadow-hover:0 20px 48px rgba(0,0,0,.46);
+    color-scheme:dark;
+  }
+}
+
+/* ---------- Lucide icon defaults ---------- */
+[data-lucide],svg.lucide{
+  width:1.15em;height:1.15em;
+  stroke-width:2;
+  vertical-align:-.15em;
+  flex-shrink:0;
+}
+
+/* ---------- Global polish ---------- */
+*{ -webkit-tap-highlight-color:transparent; }
+input,select,textarea{accent-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3);opacity:1}
+button{ transition:transform .12s ease, background .18s ease, color .18s ease, border-color .18s ease; }
+button:active{ transform:scale(.97); }
+a,button,input,select,textarea{ outline:none; }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+
+/* Nuke ALL scrollbars */
+::-webkit-scrollbar{display:none !important}
+::-webkit-scrollbar-track{display:none !important}
+::-webkit-scrollbar-thumb{display:none !important}
+::-webkit-scrollbar-corner{display:none !important}
+*{scrollbar-width:none !important;-ms-overflow-style:none !important}
+html,body,.d-sidebar,.drawer,.m-sheet,.d-main,.list,.d-card{scrollbar-width:none !important}
+html::-webkit-scrollbar,body::-webkit-scrollbar,.d-sidebar::-webkit-scrollbar,.drawer::-webkit-scrollbar,.m-sheet::-webkit-scrollbar,.d-main::-webkit-scrollbar{display:none !important}
+
+/* Sidebar/drawer/modal — show scrollbar on hover */
+.d-sidebar:hover,.drawer:hover,.m-sheet:hover{
+  scrollbar-width:thin !important;scrollbar-color:var(--border-strong) transparent !important
+}
+.d-sidebar:hover::-webkit-scrollbar,.drawer:hover::-webkit-scrollbar,.m-sheet:hover::-webkit-scrollbar{
+  display:block !important;width:5px;height:5px
+}
+.d-sidebar:hover::-webkit-scrollbar-track,.drawer:hover::-webkit-scrollbar-track,.m-sheet:hover::-webkit-scrollbar-track{
+  display:block !important;background:transparent
+}
+.d-sidebar:hover::-webkit-scrollbar-thumb,.drawer:hover::-webkit-scrollbar-thumb,.m-sheet:hover::-webkit-scrollbar-thumb{
+  display:block !important;background:var(--border-strong);border-radius:20px
+}
+.d-sidebar:hover::-webkit-scrollbar-thumb:hover,.drawer:hover::-webkit-scrollbar-thumb:hover,.m-sheet:hover::-webkit-scrollbar-thumb:hover{
+  background:var(--text3) !important
+}
+
+::selection{ background:var(--accent); color:#fff; }
