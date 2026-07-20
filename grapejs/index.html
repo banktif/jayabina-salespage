@@ -123,11 +123,11 @@ var B=false,O=false,R=window.JayaGrapesFull||{};var G=R;
 function initEditor(){
   var r=window.JayaGrapesFull;
   if(!r||!r.grapesjs||r.version!=='0.23.2'){T++;if(T>=X){ct();tt('Bundle failed. Refresh.',false);return}
-    L('Loading... '+T+'/'+X);setTimeout(IE,500);return}
+    L('Loading... '+T+'/'+X);setTimeout(initEditor,500);return}
   R=r;ct();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()
 }
-window._initEditor=IE;
-if(sessionStorage.getItem('gjs_u'))IE();
+window._initEditor=initEditor;
+if(sessionStorage.getItem('gjs_u'))initEditor();
 
 function setupDragDrop(){var b=document.body,o=document.getElementById('dragOverlay');b.addEventListener('dragover',function(ev){ev.preventDefault();ev.dataTransfer.dropEffect='copy';o.classList.add('active')});b.addEventListener('dragleave',function(ev){if(!ev.relatedTarget||ev.relatedTarget===document.documentElement)o.classList.remove('active')});b.addEventListener('drop',function(ev){ev.preventDefault();o.classList.remove('active');var f=ev.dataTransfer.files[0];if(f&&/\\.html?$/i.test(f.name))handleFileOpen(f);else tt('Drop .html file',false)})}
 
@@ -172,7 +172,7 @@ function buildEditor(){
     plugins:pl,pluginsOpts:{[R.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[R.customCode]:{},[R.touch]:{},[R.tabs]:{},[R.tooltip]:{},[R.styleBg]:{},[R.parserPostcss]:{},[R.blocksFlexbox]:{},[R.styleFilter]:{},[R.styleGradient]:{},[R.typed]:{}},
     showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:E.bodyHtml,style:E.css};
   e=R.grapesjs.init(cf);L('Editor: '+(e?'OK':'NULL'));if(!e){tt('Init returned null',false);ct();return}
-  window.editor=e;AB();
+  window.editor=e;addMarketingBlocks();
   e.on('load',function(){e.clearDirtyCount()});
   e.on('update',function(){if(!e.getDirtyCount())return;d=true;document.getElementById('downloadBtn').disabled=false;ct('dirty','Unsaved')});
   d=false;document.getElementById('downloadBtn').disabled=false;document.getElementById('emptyState').classList.add('hidden');document.getElementById('canvasStatus').classList.remove('hidden');document.getElementById('canvasSite').textContent=N;ct('loaded','Ready');tt(N+' loaded',true)
@@ -201,7 +201,7 @@ window.addEventListener('beforeunload',function(ev){if(d){ev.preventDefault();ev
 document.addEventListener('keydown',function(ev){
   if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='s'){ev.preventDefault();handleDownload()}
   if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='o'){ev.preventDefault();document.getElementById('fileInput').click()}
-  if(ev.key==='Escape'){CS();document.querySelectorAll('.modal.open').forEach(function(el){el.classList.remove('open')})}
+  if(ev.key==='Escape'){closeSides();document.querySelectorAll('.modal.open').forEach(function(el){el.classList.remove('open')})}
 });
 </script>
 </body>
