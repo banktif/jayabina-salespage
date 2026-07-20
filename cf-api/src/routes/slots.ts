@@ -14,7 +14,7 @@ export async function handleSlots(req: Request, env: Env, path: string): Promise
     if (!date) return err('Missing date parameter');
 
     const slotsStr = await getSetting(db, 'slots') || '9am,11am,2pm,4pm';
-    const maxSlotsPerDay = parseInt(await getSetting(db, 'max_slots_per_day') || '4');
+    const maxSlotsPerDay = parseInt(await getSetting(db, 'max_slots_per_day') || '100');
     const slotList = slotsStr.split(',').map(s => s.trim());
 
     const booked = await db.select({ time_slot: slots.timeSlot }).from(slots)
@@ -34,7 +34,7 @@ export async function handleSlots(req: Request, env: Env, path: string): Promise
     const date = url.searchParams.get('date');
     if (!date) return err('Missing date parameter');
 
-    const maxSlotsPerDay = parseInt(await getSetting(db, 'max_slots_per_day') || '4');
+    const maxSlotsPerDay = parseInt(await getSetting(db, 'max_slots_per_day') || '100');
     const [bookedCount] = await db.select({ cnt: count() }).from(slots)
       .where(and(eq(slots.date, date), eq(slots.isBooked, 1)));
     const available = (bookedCount?.cnt || 0) < maxSlotsPerDay;

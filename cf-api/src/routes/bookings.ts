@@ -106,7 +106,7 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
       return err('Booking date must be today or later');
     }
 
-    const maxSlots = parseInt(await getSetting(db, 'max_slots_per_day') || '4');
+    const maxSlots = parseInt(await getSetting(db, 'max_slots_per_day') || '100');
     const allowedSlots = (await getSetting(db, 'slots') || '9am,11am,2pm,4pm')
       .split(',').map(s => s.trim()).filter(Boolean);
     if (!allowedSlots.includes(booking_time)) return err('Invalid booking time');
