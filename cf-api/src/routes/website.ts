@@ -274,11 +274,15 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     if (!refResponse.ok || !refData.object?.sha) return githubError(refData, refResponse.status, 'Unable to load website version');
     const file = await readGithubRepoFile(site.repo, site.file, site.branch, env.GH_PAT);
     if (new TextEncoder().encode(file.content).byteLength > MAX_EDITOR_HTML_BYTES) return err('This HTML file is too large for the visual editor', 413);
+    const htmlHash = await sha256(file.content);
 
     let projectData: unknown = null;
     try {
       const project = await readGithubRepoFile(site.repo, editorProjectPath(site), site.branch, env.GH_PAT);
-      if (new TextEncoder().encode(project.content).byteLength <= MAX_EDITOR_PROJECT_BYTES) projectData = JSON.parse(project.content);
+      if (new TextEncoder().encode(project.content).byteLength <= MAX_EDITOR_PROJECT_BYTES) {
+        const parsed = JSON.parse(project.content);
+        if (parsed._source === htmlHash) projectData = parsed;
+      }
     } catch (e: any) {
       if (e?.status !== 404) return err(e?.message || 'Unable to load visual editor project data', e?.status || 502);
     }
@@ -305,6 +309,7 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     if (new TextEncoder().encode(html).byteLength > MAX_EDITOR_HTML_BYTES) return err('This HTML file is too large for the visual editor', 413);
     if (!/^[a-f0-9]{40}$/i.test(baseCommit)) return err('Website version is missing or invalid. Reload the page and try again.', 400);
     if (!body.project_data || typeof body.project_data !== 'object') return err('GrapesJS project data is required', 400);
+    (body.project_data as Record<string, unknown>)._source = await sha256(html);
     const projectJson = JSON.stringify(body.project_data, null, 2) + '\n';
     if (new TextEncoder().encode(projectJson).byteLength > MAX_EDITOR_PROJECT_BYTES) return err('Visual editor project data is too large', 413);
 
@@ -881,6 +886,13 @@ function uniqueAssetName(value: string): string {
 
 function publicAssetUrl(site: WebsiteEditorSite, name: string): string {
   return new URL(`/${site.asset_dir}/${name}`.replace(/\/+/g, '/'), site.live_url).toString();
+}
+
+async function sha256(content: string): Promise<string> {
+  const data = new TextEncoder().encode(content);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function readGithubRepoFile(repo: string, filePath: string, branch: string, token: string): Promise<{ content: string; sha: string }> {
