@@ -143,11 +143,11 @@ function _openWithRetry(){if(!window.JayaGrapesFull||!window.JayaGrapesFull.grap
 function splitDocument(html){
   var s=String(html||''),dt=(s.match(/<!doctype[^>]*>/i)||['<!doctype html>'])[0];
   var hm=s.match(/<html([^>]*)>/i);
-  var hdm=s.match(/<head[^>]*>([\\s\\S]*?)<\\/head>/i);
-  var bm=s.match(/<body([^>]*)>([\\s\\S]*?)<\\/body>/i);
+  var hdm=s.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  var bm=s.match(/<body([^>]*)>([\s\S]*?)<\/body>/i);
   var hd=hdm?hdm[1]:'',bd=bm?bm[2]:s;
-  var sTag=/<script\\b[\\s\\S]*?<\\/script>/gi;
-  var stTag=/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi;
+  var sTag=/<script\b[\s\S]*?<\/script>/gi;
+  var stTag=/<style\b[^>]*>[\s\S]*?<\/style>/gi;
   var sh=(hd.match(sTag)||[]).join('\n');
   var sb=(bd.match(sTag)||[]).join('\n');
   var cs='';
@@ -156,7 +156,7 @@ function splitDocument(html){
   var sH=hd.replace(sTag,'').replace(stTag,'').trim();
   var cB=bd.replace(sTag,'').replace(stTag,'').trim();
   var lk=[];
-  hd.replace(/<link\\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,function(t){var m=t.match(/href=["']([^"']+)["']/i);if(m)lk.push(m[1]);return t});
+  hd.replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,function(t){var m=t.match(/href=["']([^"']+)["']/i);if(m)lk.push(m[1]);return t});
   E={doctype:dt,htmlAttrs:hm?hm[1]:' lang="en"',bodyAttrs:bm?bm[1]:'',staticHead:sH,headScripts:sh,bodyScripts:sb,bodyHtml:cB,css:cs,stylesheets:lk}
 }
 
