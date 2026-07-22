@@ -430,45 +430,13 @@
       .js .reveal{opacity:1;transform:none}
     }
   </style>
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
-  <nav class="site-nav" aria-label="Navigasi utama">
-    <div class="container nav-inner">
-      <a class="brand" href="#hero" aria-label="JAYABINA - kembali ke utama"><img class="brand-mark" src="/favicon.png" width="38" height="38" alt=""><span>JAYABINA</span></a>
-      <ul class="nav-links">
-        <li><a href="#tanda">Tanda</a></li>
-        <li><a href="#bukti">Visual</a></li>
-        <li><a href="#proses">Proses</a></li>
-        <li><a href="#harga">Harga</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-right">
-        <div class="nav-actions"><a class="btn btn-primary" href="#tempah">Semak Slot &amp; Harga</a></div>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mm-sections">
-      <div class="mm-label">Seksyen page ini</div>
-      <a href="#tanda">Tanda tangki perlu diperiksa</a>
-      <a href="#bukti">Visual perbandingan</a>
-      <a href="#proses">Cara kami bekerja</a>
-      <a href="#harga">Harga &amp; skop</a>
-      <a href="#faq">Soalan lazim</a>
-    </div>
-    <div class="mm-label">Halaman utama</div>
-    <a href="/">Utama</a>
-    <a href="/servis/">Semua Servis</a>
-    <a href="/tentang-kami/">Tentang Kami</a>
-    <a href="/blog/">Blog</a>
-    <a href="/hubungi-kami/">Hubungi</a>
-    <div class="mm-label">Portal</div>
-    <a href="https://akaun.jayabina.com/">Akaun Pelanggan</a>
-    <a href="https://staff.jayabina.com/">Portal Staff</a>
-    <a class="btn btn-primary" href="#tempah">Semak Slot &amp; Harga</a>
-  </div>
+  {{ partial "header.html" . }}
 
   <main>
     <section class="hero" id="hero">
@@ -682,42 +650,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-col1">
-          <strong>JAYABINA</strong>
-          <p>Servis cuci tangki air, tukar atap &amp; mengecat rumah dan ofis. Kuala Lumpur &amp; Selangor.</p>
-          <a class="f-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp Kami</a>
-        </div>
-        <details class="f-acc">
-          <summary>Servis</summary>
-          <div class="f-links">
-            <a href="/servis-tukar-atap/">Tukar Atap Baharu</a>
-            <a href="/servis-cuci-tangki-air/">Cuci Tangki Air</a>
-            <a href="/servis-mengecat/">Mengecat Rumah &amp; Ofis</a>
-          </div>
-        </details>
-        <details class="f-acc">
-          <summary>Tentang</summary>
-          <div class="f-links">
-            <a href="/">Utama</a>
-            <a href="/tentang-kami/">Tentang Kami</a>
-            <a href="/hubungi-kami/">Hubungi Kami</a>
-          </div>
-        </details>
-        <details class="f-acc">
-          <summary>Informasi</summary>
-          <div class="f-links">
-            <a href="/terma-perkhidmatan/">Terma Perkhidmatan</a>
-            <a href="/dasar-privasi/">Dasar Privasi</a>
-            <a href="/blog/">Blog</a>
-          </div>
-        </details>
-      </div>
-      <div class="footer-bottom"><span>© 2026 Primex Jaya Bina Solutions. Hak cipta terpelihara.</span><span>www.jayabina.com</span></div>
-    </div>
-  </footer>
+  {{ partial "footer.html" . }}
 
   <a class="desktop-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Tanya di WhatsApp</a>
   <div class="mobile-sticky" id="mobileSticky"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Semak Slot &amp; Harga</a></div>
