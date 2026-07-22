@@ -204,12 +204,6 @@
     .faq-answer{padding:0 52px 20px 0;color:var(--grey-600);font-size:var(--font-small)}
     .faq-answer p{margin-bottom:0}
 
-    .final-cta{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white)}
-    .final-inner{display:flex;align-items:center;justify-content:space-between;gap:50px}
-    .final-cta h2{color:var(--white);margin-bottom:14px}
-    .final-cta p{margin-bottom:0;color:#d7e8e1}
-    .final-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
-
     .site-footer{padding:42px 0 30px;background:linear-gradient(135deg,#f1fbf5 0%,#e8f5ee 50%,#f4faf6 100%);color:var(--grey-700);font-size:.98rem}
     .footer-grid{display:grid;gap:18px}
     @media(min-width:768px){.footer-grid{grid-template-columns:1.25fr 1fr 1fr 1fr;gap:26px;align-items:start}}
@@ -252,8 +246,6 @@
       .step-grid{grid-template-columns:1fr}
       .step-card::after{display:none}
       .faq-layout{grid-template-columns:1fr;gap:44px}
-      .final-inner{align-items:flex-start;flex-direction:column;gap:28px}
-      .final-actions{justify-content:flex-start}
     }
 
     @media(max-width:767px){
@@ -413,12 +405,6 @@
       </div>
     </section>
 
-    <section class="final-cta">
-      <div class="container final-inner reveal">
-        <div><h2>Hantar gambar sekarang. Kami beri sebut harga percuma.</h2><p>Satu WhatsApp, ceritakan masalah anda. Atap bocor, tangki kotor, atau dinding kusam — kami uruskan. Hantar gambar dan poskod ke 60139373275. Semakan percuma, tanpa komitmen.</p></div>
-        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Dapatkan Sebut Harga Percuma</a><a class="btn btn-light" href="#servis">Lihat Semua Servis</a></div>
-      </div>
-    </section>
   </main>
 
   {{ partial "footer.html" . }}
