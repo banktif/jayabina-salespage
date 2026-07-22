@@ -1451,8 +1451,8 @@ function renderTemplates(){
   // Color theme section — color pickers with hex inputs
   h+='<div class="panel" style="display:grid;gap:14px;border-left:3px solid var(--accent2);background:var(--accent-light)"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="palette" style="color:var(--accent2);width:20px;height:20px"></i><b style="font-size:1rem;color:var(--text)">Color Theme</b></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
-    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Header Gradient</span><div style="display:flex;gap:8px;align-items:center"><input type="color" id="tplH1" value="#0d3b2e" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH1Hex" value="#0d3b2e" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"><span style="font-size:.78rem;color:var(--text3)">→</span><input type="color" id="tplH2" value="#146c43" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH2Hex" value="#146c43" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"></div><div id="tplPreviewH" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
-    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Footer Gradient</span><div style="display:flex;gap:8px;align-items:center"><input type="color" id="tplF1" value="#0d3b2e" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF1Hex" value="#0d3b2e" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"><span style="font-size:.78rem;color:var(--text3)">→</span><input type="color" id="tplF2" value="#146c43" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF2Hex" value="#146c43" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"></div><div id="tplPreviewF" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
+    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Header</span><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><input type="color" id="tplH1" value="#0d3b2e" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH1Hex" value="#0d3b2e" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"><span style="font-size:.72rem;color:var(--text3)">→</span><input type="color" id="tplH2" value="#146c43" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH2Hex" value="#146c43" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"><span style="font-size:.68rem;color:var(--text3)">text</span><input type="color" id="tplHText" value="#ffffff" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplHTextHex" value="#ffffff" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"></div><div id="tplPreviewH" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
+    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Footer</span><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><input type="color" id="tplF1" value="#0d3b2e" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF1Hex" value="#0d3b2e" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"><span style="font-size:.72rem;color:var(--text3)">→</span><input type="color" id="tplF2" value="#146c43" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF2Hex" value="#146c43" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"><span style="font-size:.68rem;color:var(--text3)">text</span><input type="color" id="tplFText" value="#ffffff" style="width:32px;height:30px;border:0;border-radius:6px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplFTextHex" value="#ffffff" maxlength="7" style="width:72px;font-size:.76rem;padding:4px 6px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"></div><div id="tplPreviewF" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
     '</div>'+
     '<div style="display:flex;gap:8px"><button class="d-btn acc" onclick="applyColorTheme()"><i data-lucide="check"></i> Apply Colors &amp; Deploy</button></div>'+
     '<div id="tplThemeMsg" style="font-size:.75rem;color:var(--text3)"></div></div>';
@@ -1516,39 +1516,43 @@ function tplSyncGradient(side){
   var pfx=side==='header'?'H':'F';
   var c1=document.getElementById('tpl'+pfx+'1'),c2=document.getElementById('tpl'+pfx+'2');
   var h1=document.getElementById('tpl'+pfx+'1Hex'),h2=document.getElementById('tpl'+pfx+'2Hex');
+  var tEl=document.getElementById('tpl'+pfx+'Text'),tHex=document.getElementById('tpl'+pfx+'TextHex');
   var preview=document.getElementById('tplPreview'+pfx);
   if(c1&&h1)h1.value=c1.value;if(c2&&h2)h2.value=c2.value;
+  if(tEl&&tHex)tHex.value=tEl.value;
   if(c1&&c2&&preview)preview.style.background='linear-gradient(135deg,'+c1.value+','+c2.value+')';
-  // Also sync hex → color
-  var t1=document.getElementById('tpl'+pfx+'1'),t2=document.getElementById('tpl'+pfx+'2');
-  var x1=document.getElementById('tpl'+pfx+'1Hex'),x2=document.getElementById('tpl'+pfx+'2Hex');
-  if(t1&&x1&&/^#[0-9a-fA-F]{6}$/.test(x1.value))t1.value=x1.value;
-  if(t2&&x2&&/^#[0-9a-fA-F]{6}$/.test(x2.value))t2.value=x2.value;
+  // Sync hex → color (for text inputs)
+  for(var i of ['1','2','Text']){
+    var cp=document.getElementById('tpl'+pfx+i),hx=document.getElementById('tpl'+pfx+i+'Hex');
+    if(cp&&hx&&/^#[0-9a-fA-F]{6}$/.test(hx.value))cp.value=hx.value;
+  }
 }
 async function loadColorTheme(){
   try{
     var res=await websiteRequest('/templates/theme'),body=await res.json();
     if(!res.ok)return;
     var h=body.data.header.split(':'),f=body.data.footer.split(':');
-    setColor('H',h[0],h[1]);setColor('F',f[0],f[1]);
+    setColor('H',h[0],h[1],h[2]||'#ffffff');setColor('F',f[0],f[1],f[2]||'#ffffff');
   }catch(e){}
 }
-function setColor(pfx,c1,c2){
+function setColor(pfx,c1,c2,ct){
   var e1=document.getElementById('tpl'+pfx+'1'),e2=document.getElementById('tpl'+pfx+'2');
   var x1=document.getElementById('tpl'+pfx+'1Hex'),x2=document.getElementById('tpl'+pfx+'2Hex');
+  var tEl=document.getElementById('tpl'+pfx+'Text'),tHex=document.getElementById('tpl'+pfx+'TextHex');
   var pv=document.getElementById('tplPreview'+pfx);
   if(e1&&e2){e1.value=c1;e2.value=c2}if(x1&&x2){x1.value=c1;x2.value=c2}
+  if(tEl&&tHex){tEl.value=ct;tHex.value=ct}
   if(pv)pv.style.background='linear-gradient(135deg,'+c1+','+c2+')';
 }
 async function applyColorTheme(){
   var msg=document.getElementById('tplThemeMsg');if(!msg)return;
-  var h1=document.getElementById('tplH1Hex').value,h2=document.getElementById('tplH2Hex').value;
-  var f1=document.getElementById('tplF1Hex').value,f2=document.getElementById('tplF2Hex').value;
-  if(!h1||!h2||!f1||!f2)return;
-  if(!confirm('Apply header '+h1+'→'+h2+' and footer '+f1+'→'+f2+'?'))return;
+  var h1=document.getElementById('tplH1Hex').value,h2=document.getElementById('tplH2Hex').value,ht=document.getElementById('tplHTextHex').value;
+  var f1=document.getElementById('tplF1Hex').value,f2=document.getElementById('tplF2Hex').value,ft=document.getElementById('tplFTextHex').value;
+  if(!h1||!h2||!ht||!f1||!f2||!ft)return;
+  if(!confirm('Apply header '+h1+'→'+h2+' text '+ht+' / footer '+f1+'→'+f2+' text '+ft+'?'))return;
   msg.style.color='var(--text3)';msg.textContent='Applying...';
   try{
-    var res=await websiteRequest('/templates/theme',{method:'PUT',body:{header:h1+':'+h2,footer:f1+':'+f2}}),body=await res.json();
+    var res=await websiteRequest('/templates/theme',{method:'PUT',body:{header:h1+':'+h2+':'+ht,footer:f1+':'+f2+':'+ft}}),body=await res.json();
     if(!res.ok)throw new Error(body.error||'Unable to apply theme');
     msg.style.color='var(--accent)';msg.textContent='Colors applied! Deploying (~1-2 min).';
   }catch(e){msg.style.color='var(--danger)';msg.textContent='Error: '+errorMessage(e);}

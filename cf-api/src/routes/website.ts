@@ -682,8 +682,8 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const map: Record<string, string> = {};
     rows.forEach(r => { map[r.key] = r.value || ''; });
     return ok({
-      header: map['template_color_header'] || '#0d3b2e:#146c43',
-      footer: map['template_color_footer'] || '#0d3b2e:#146c43'
+      header: map['template_color_header'] || '#0d3b2e:#146c43:#ffffff',
+      footer: map['template_color_footer'] || '#0d3b2e:#146c43:#ffffff'
     });
   }
 
@@ -692,9 +692,9 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const body = await safeJson(req);
     const headerVal = typeof body.header === 'string' ? body.header : '';
     const footerVal = typeof body.footer === 'string' ? body.footer : '';
-    const re = /^#[0-9a-fA-F]{6}:#[0-9a-fA-F]{6}$/;
-    if (headerVal && !re.test(headerVal)) return err('Header must be format: #RRGGBB:#RRGGBB', 400);
-    if (footerVal && !re.test(footerVal)) return err('Footer must be format: #RRGGBB:#RRGGBB', 400);
+    const re = /^#[0-9a-fA-F]{6}:#[0-9a-fA-F]{6}:#[0-9a-fA-F]{6}$/;
+    if (headerVal && !re.test(headerVal)) return err('Header must be format: #RRGGBB:#RRGGBB:#RRGGBB', 400);
+    if (footerVal && !re.test(footerVal)) return err('Footer must be format: #RRGGBB:#RRGGBB:#RRGGBB', 400);
 
     const db = createDb(env);
     const now = nowISO();
@@ -705,18 +705,18 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const map: Record<string, string> = {};
     existing.forEach(r => { map[r.key] = r.value || ''; });
 
-    const finalHeader = headerVal || map['template_color_header'] || '#0d3b2e:#146c43';
-    const finalFooter = footerVal || map['template_color_footer'] || '#0d3b2e:#146c43';
+    const finalHeader = headerVal || map['template_color_header'] || '#0d3b2e:#146c43:#ffffff';
+    const finalFooter = footerVal || map['template_color_footer'] || '#0d3b2e:#146c43:#ffffff';
 
-    const [h1, h2] = finalHeader.split(':');
-    const [f1, f2] = finalFooter.split(':');
+    const [h1, h2, hText] = finalHeader.split(':');
+    const [f1, f2, fText] = finalFooter.split(':');
 
     await db.insert(appSettings).values({ key: 'template_color_header', value: finalHeader, updatedAt: now })
       .onConflictDoUpdate({ target: appSettings.key, set: { value: finalHeader, updatedAt: now } });
     await db.insert(appSettings).values({ key: 'template_color_footer', value: finalFooter, updatedAt: now })
       .onConflictDoUpdate({ target: appSettings.key, set: { value: finalFooter, updatedAt: now } });
 
-    const css = generateThemeCSS(h1, h2, f1, f2);
+    const css = generateThemeCSS(h1, h2, hText, f1, f2, fText);
     try {
       const result = await multiFileGithubCommit(env.GH_PAT,
         { [THEME_PATH]: css },
@@ -749,29 +749,31 @@ const TEMPLATE_PATHS: Record<string, string> = {
 
 const THEME_PATH = 'site/layouts/partials/theme-colors.html';
 
-function generateThemeCSS(h1: string, h2: string, f1: string, f2: string): string {
+function generateThemeCSS(h1: string, h2: string, hText: string, f1: string, f2: string, fText: string): string {
   const headerGradient = `linear-gradient(135deg,${h1},${h2})`;
   const footerGradient = `linear-gradient(135deg,${f1},${f2})`;
+  // derive muted text: lighten the text color slightly
+  const fmuted = fText + 'cc'; // 80% opacity for muted text
   return [
     '<style>',
     `.site-nav{background:${headerGradient} !important}`,
-    `.site-nav .brand{color:#fff}`,
-    `.site-nav .nav-links a{color:#fff}`,
-    `.site-nav .nav-links a:hover,.site-nav .nav-links a.active{color:#9de3ba}`,
-    `.site-nav .menu-toggle{border-color:rgba(255,255,255,.25)}`,
-    `.site-nav .menu-toggle span{background:#fff}`,
-    `.site-footer{background:${footerGradient} !important;color:#fff}`,
-    `.site-footer a{color:#c7d8d1}`,
-    `.site-footer a:hover{color:#fff}`,
-    `.footer-col1 strong{color:#fff}`,
-    `.footer-col1 p{color:#c7d8d1}`,
-    `.footer-bottom{color:#9fb8ae;border-top-color:rgba(255,255,255,.12)}`,
-    `.f-acc{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04)}`,
-    `.f-acc summary{color:#fff}`,
-    `.f-acc summary::after{color:#9de3ba}`,
-    `.f-links a{color:#c7d8d1}`,
-    `.f-links a:hover{color:#fff}`,
-    `.f-acc.static summary{color:#9de3ba}`,
+    `.site-nav .brand{color:${hText}}`,
+    `.site-nav .nav-links a{color:${hText}}`,
+    `.site-nav .nav-links a:hover,.site-nav .nav-links a.active{color:${hText};opacity:.8}`,
+    `.site-nav .menu-toggle{border-color:${hText}55}`,
+    `.site-nav .menu-toggle span{background:${hText}}`,
+    `.site-footer{background:${footerGradient} !important;color:${fText}}`,
+    `.site-footer a{color:${fmuted}}`,
+    `.site-footer a:hover{color:${fText}}`,
+    `.footer-col1 strong{color:${fText}}`,
+    `.footer-col1 p{color:${fmuted}}`,
+    `.footer-bottom{color:${fmuted};border-top-color:${fText}22}`,
+    `.f-acc{border-color:${fText}22;background:${fText}11}`,
+    `.f-acc summary{color:${fText}}`,
+    `.f-acc summary::after{color:${fText}99}`,
+    `.f-links a{color:${fmuted}}`,
+    `.f-links a:hover{color:${fText}}`,
+    `.f-acc.static summary{color:${fText}99}`,
     '</style>',
   ].join('\n');
 }
