@@ -117,7 +117,28 @@ This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **WWW SITE LOCKED (owner order, 2026-07-20):** `www.jayabina.com` (Pages project `jayabina`, `site/` Hugo source) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session. GrapesJS editor `protectReason()` guards `site/content/` — do NOT disable it.
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- ⛔ **BOOKING FORM DESIGN LOCKED (owner order, 2026-07-20):** The `/servis-cuci-tangki-air/` booking form (Hugo partial `site/layouts/partials/service-tank.html`) is the PRIMARY booking funnel and MUST NEVER be modified, deleted, or reformatted without an explicit owner instruction. **TEMPLATE SAVED** at git tag `booking-form-template` (commit `85ddf78`). Features: email field with validation, 2-column `.fg-row` grid on desktop, `autocomplete` attributes, `customer_email` in API payload, 100 slots/day capacity, multi-booking per time slot (no per-slot uniqueness). The root `index.html` dark-theme standalone page is a LEGACY backup — the live page is Hugo-generated. GrapesJS `protectReason()` blocks `site/` path (protects `service-tank.html`). The `cuci-tangki/editor.html` additionally blocks `index.html` load/save for `banktif/jayabina-salespage`.
+- ⛔ **CUCI TANGKI PAGE FULL LOCK (owner order, 2026-07-22):** The ENTIRE cuci tangki page (`site/layouts/partials/service-tank.html`) is FULLY LOCKED. This is the PRIMARY booking funnel and main revenue page. NO AI agent, debug session, or automated tool may modify ANY part of this file — HTML structure, inline CSS, inline JS, booking form logic, section layouts, copy text, button colors, spacing, image references, ANYTHING — without explicit owner instruction in the current session. This lock supersedes ALL other task instructions. Violating this lock = site revenue at risk.
+
+  **COVERED SECTIONS (locked individually + collectively):**
+  - Hero section (badge, headline, subheadline, buttons, image, trust indicators)
+  - Emotion section (image, copy, spacing)
+  - Signs section (cards, layout, content)
+  - Proof section (before/after, deliverables)
+  - Process section (4-step cards)
+  - Benefits section (4 benefit cards)
+  - Price section (RM300, scope list, payment boxes)
+  - Booking form (calendar, slots, fields — email REQUIRED, validation JS)
+  - FAQ section (accordion, questions, answers)
+  - Final CTA section (headline, subheadline, buttons)
+
+  **🔁 ROLLBACK to last known-good state:**
+  ```bash
+  git show 7c6fa1d:site/layouts/partials/service-tank.html > site/layouts/partials/service-tank.html
+  git add site/layouts/partials/service-tank.html
+  git commit -m "rollback: restore cuci tangki page to locked state"
+  git push origin master
+  ```
+  Tag `7c6fa1d` is protected — never delete this tag.
 
   **🔁 ONE-CLICK ROLLBACK:**
   ```bash
