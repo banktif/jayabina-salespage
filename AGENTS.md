@@ -204,6 +204,33 @@ This section supersedes older Supabase architecture and deploy notes below.
   4. 🚫 NEVER remove `{{ partial \"header.html\" . }}` or `{{ partial \"footer.html\" . }}` from any page template.
   5. 🔒 To edit header/footer design: use Admin → Website → Templates → edit & sync. This is the ONLY supported path.
   6. 🔒 Template HTML stored in D1 `website_templates` table. GitHub partials are write-only (sync output). The sync commits must preserve the lock comments.
+- ⛔ **COLOR THEME SYSTEM LOCKED (owner order, 2026-07-22):** The template color theme system (`admin → Website → Templates → Color Theme`) must NEVER be removed, restructured, or have its functionality altered. This includes:
+  - D1 keys: `template_color_header`, `template_color_footer`
+  - API route: `/api/website/templates/theme` (GET/PUT)
+  - Partial: `site/layouts/partials/theme-colors.html` — loaded AFTER main.css on ALL pages
+  - Admin UI: color pickers + hex inputs in Templates tab
+  - Color format: `#RRGGBB:#RRGGBB:#RRGGBB` (bg-start:bg-end:text-color)
+  - Theme CSS generates: `.site-nav`, `.site-footer`, `.f-acc`, `.f-links` overrides with `!important`
+- ⛔ **BLOG SYSTEM LOCKED (owner order, 2026-07-22):** The Hugo blog templates must NEVER have their structure, layout, or core sections removed. Locked files:
+  - `site/layouts/blog/list.html` — listing page (hero, featured card, article grid, pagination, categories, subscribe CTA)
+  - `site/layouts/_default/single.html` — single article (hero, meta, prose, sidebar, related articles)
+  - `site/content/blog/_index.md` — section metadata
+  - Blog content articles (`site/content/blog/*.md`) — articles are Hugo-generated content, only edit via Admin → Content tab
+- ⛔ **TEMPLATE API & D1 SYSTEM LOCKED (owner order, 2026-07-22):** The template infrastructure must NEVER be deleted or have its core routes removed:
+  - D1 table: `website_templates` (type, slot, html_content, is_active)
+  - API routes: `GET/PUT /api/website/templates`, `GET/PUT /api/website/templates/theme`, `POST /api/website/templates/:type/activate/:slot`, `POST /api/website/templates/sync`, `POST /api/website/templates/seed`
+  - Worker: `cf-api/src/routes/website.ts` — template and theme route handlers
+  - Worker: `cf-api/src/db/schema.ts` — `websiteTemplates` table definition
+  - Admin UI: `admin/index.html` — Templates tab, template CRUD functions, color theme UI
+- ⛔ **MASTER ROLLBACK SNAPSHOT (2026-07-22):** This tag is the canonical known-good state of the entire website:
+  ```bash
+  git tag lock-master-20260722 af2bcb0
+  # To roll back entire site to this state:
+  git reset --hard lock-master-20260722
+  git push origin master --force
+  # Then redeploy Worker:
+  cd cf-api && npx wrangler deploy
+  ```
 - Frontend: www.jayabina.com (Hugo build from `site/`). Booking funnel PRIMARY di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`. The old cuci.jayabina.com Pages project (`jayabina`) has been decommissioned — all content migrated to www.
 - Portals: staff → `staff.jayabina.com` (Worker `jayabina-staff-router`, `cf-staff-router/`, serves `/worker/` from www); pelanggan → `akaun.jayabina.com` (Worker `jayabina-akaun-router`, `cf-akaun-router/`, serves `/customer/` from www).
 - CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys TWO projects on push to master: `jayabina` (www, Hugo build from `site/`, `--branch main`) and `jayabina-admin` (admin panel, `--branch master`).
