@@ -285,7 +285,7 @@ This section supersedes older Supabase architecture and deploy notes below.
   - All 4 page templates (tentang-kami, hubungi-kami, blog, servis)
 - ⛔ **MASTER ROLLBACK SNAPSHOT (2026-07-22):** This tag is the canonical known-good state of the entire website:
   ```bash
-  git tag lock-master-20260722 af2bcb0
+  git tag lock-master-20260722 bd5ab75
   # To roll back entire site to this state:
   git reset --hard lock-master-20260722
   git push origin master --force
