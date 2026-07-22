@@ -54,4 +54,5 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function footerAcc(){var isDesktop=window.matchMedia('(min-width:768px)').matches;document.querySelectorAll('.f-acc').forEach(function(acc){acc.open=isDesktop;acc.classList.toggle('static',isDesktop)})}
   footerAcc();window.addEventListener('resize',footerAcc);
+  document.querySelectorAll('.f-acc').forEach(function(d){d.addEventListener('toggle',function(){if(this.open){document.querySelectorAll('.f-acc').forEach(function(o){if(o!==this)o.open=false},this)}})})
 });

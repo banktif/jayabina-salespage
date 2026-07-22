@@ -37,5 +37,5 @@
     </div>
     <div class="footer-bottom"><span>&copy; {{ now.Year }} {{ $b.legal_name }}.</span></div>
   </div>
-  <script>function footerAcc(){var d=window.matchMedia('(min-width:768px)').matches;document.querySelectorAll('.f-acc').forEach(function(a){a.open=d;a.classList.toggle('static',d)})}footerAcc();window.addEventListener('resize',footerAcc);</script>
+  <script>function footerAcc(){var d=window.matchMedia('(min-width:768px)').matches;document.querySelectorAll('.f-acc').forEach(function(a){a.open=d;a.classList.toggle('static',d)})}footerAcc();window.addEventListener('resize',footerAcc);document.querySelectorAll('.f-acc').forEach(function(d){d.addEventListener('toggle',function(){if(this.open){document.querySelectorAll('.f-acc').forEach(function(o){if(o!==this)o.open=false},this)}})})</script>
 </footer>
