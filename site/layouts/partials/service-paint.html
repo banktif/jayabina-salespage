@@ -19,6 +19,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Servis Mengecat Rumah &amp; Ofis KL &amp; Selangor | JAYABINA</title>
   <script>document.documentElement.className='js';window.setTimeout(function(){document.documentElement.classList.add('js-fallback')},2500);</script>
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
   <style>
     :root{
       --green-950:#052e22;
@@ -369,9 +372,6 @@
       .js .reveal{opacity:1;transform:none}
     }
   </style>
-  {{ with resources.Get "css/main.css" | minify | fingerprint }}
-    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
-  {{ end }}
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
