@@ -179,7 +179,7 @@ ul{margin:0;padding-left:1.2rem}
 .f-links a{padding:8px 0;color:var(--grey-600);font-size:.94rem}
 .f-links a:hover{color:var(--green-800)}
 .f-acc.static{border:0;background:transparent}
-.f-acc.static summary{pointer-events:none;cursor:default;padding:0 0 8px;color:var(--green-800);font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+.f-acc.static summary{pointer-events:none;cursor:default;padding:0 0 8px;color:var(--green-800);font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
 .f-acc.static summary::after{display:none}
 .f-acc.static .f-links{padding:0}
 .footer-bottom{margin-top:22px;padding-top:18px;border-top:1px solid var(--grey-200);display:flex;justify-content:center;text-align:center;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--grey-500)}
