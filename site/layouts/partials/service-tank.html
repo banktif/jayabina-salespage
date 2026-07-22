@@ -130,7 +130,7 @@
     .emotion-section{position:relative;overflow:hidden;background:linear-gradient(180deg,#f8faf9 0%,#f1fbf5 40%,#fff 100%)}
     .emotion-section::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(20,108,67,.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
     .emotion-section::after{content:'';position:absolute;width:500px;height:500px;right:-220px;bottom:-280px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.1),transparent 72%);pointer-events:none}
-    .emotion-grid{position:relative;display:grid;grid-template-columns:.78fr 1.22fr;gap:64px;align-items:center}
+    .emotion-grid{position:relative;display:grid;grid-template-columns:1.22fr .78fr;gap:64px;align-items:center}
     .emotion-copy h2{max-width:14ch}
     .emotion-copy .lead{color:#1a4031}
     .emotion-copy p:not(.lead){color:var(--grey-600)}
@@ -411,6 +411,10 @@
 
     <section class="section emotion-section" id="kenapa-perlu-periksa">
       <div class="container emotion-grid">
+        <figure class="emotion-visual reveal">
+          <img class="emotion-ph-img" src="/images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp" srcset="/images/tank/tank-air-jernih-vs-dalam-kotor-480.webp 480w, /images/tank/tank-air-jernih-vs-dalam-kotor-800.webp 800w, /images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp 1200w" sizes="(max-width:767px) calc(100vw - 48px), 50vw" width="1200" height="800" loading="lazy" decoding="async" alt="Perbandingan air jernih di paip dan mendapan tersembunyi di dasar tangki air rumah">
+          <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Apa yang kita nampak: air jernih di paip</span><span class="emotion-label">Apa yang mungkin tersembunyi: mendapan di dasar tangki</span></div>
+        </figure>
         <div class="emotion-copy reveal">
           <span class="section-kicker">Yang penting ialah keadaan sebenar</span>
           <h2>Air boleh nampak jernih walaupun dasar tangki belum diperiksa.</h2>
@@ -418,10 +422,6 @@
           <p>Mendapan boleh terkumpul selepas lama digunakan. Cara paling jujur untuk tahu ialah buka, lihat dan nilai keadaan sebenar—tanpa menakut-nakutkan.</p>
           <a class="btn btn-primary" href="#tanda">Lihat Tanda Yang Perlu Diperiksa</a>
         </div>
-        <figure class="emotion-visual reveal">
-          <img class="emotion-ph-img" src="/images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp" srcset="/images/tank/tank-air-jernih-vs-dalam-kotor-480.webp 480w, /images/tank/tank-air-jernih-vs-dalam-kotor-800.webp 800w, /images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp 1200w" sizes="(max-width:767px) calc(100vw - 48px), 50vw" width="1200" height="800" loading="lazy" decoding="async" alt="Perbandingan air jernih di paip dan mendapan tersembunyi di dasar tangki air rumah">
-          <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Apa yang kita nampak: air jernih di paip</span><span class="emotion-label">Apa yang mungkin tersembunyi: mendapan di dasar tangki</span></div>
-        </figure>
       </div>
     </section>
 
