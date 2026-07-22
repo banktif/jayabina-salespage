@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   if(menuToggle&&mobileMenu){
     menuToggle.addEventListener('click',function(){this.getAttribute('aria-expanded')==='true'?closeMenu(false):openMenu()});
-    mobileMenu.querySelectorAll('[data-mm-toggle]').forEach(function(btn){btn.addEventListener('click',function(){var section=this.closest('.mm-section');if(section){var open=section.classList.toggle('open');this.setAttribute('aria-expanded',String(open))}})});
+    mobileMenu.querySelectorAll('[data-mm-toggle]').forEach(function(btn){btn.addEventListener('click',function(){var section=this.closest('.mm-section');if(section){var wasOpen=section.classList.contains('open');document.querySelectorAll('.mm-section.open').forEach(function(s){s.classList.remove('open');var t=s.querySelector('[data-mm-toggle]');if(t)t.setAttribute('aria-expanded','false')});if(!wasOpen){section.classList.add('open');this.setAttribute('aria-expanded','true')}}})});
     mobileMenu.querySelectorAll('a').forEach(function(link){link.addEventListener('click',function(){var toggle=link.closest('.mm-section');if(!toggle){closeMenu(false)}})});
   }
   document.addEventListener('keydown',function(event){
