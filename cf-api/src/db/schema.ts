@@ -133,6 +133,22 @@ export const backupLog = sqliteTable('backup_log', {
   index('idx_backup_log_dest').on(table.destination, table.createdAt)
 ]);
 
+export const websiteTemplates = sqliteTable('website_templates', {
+  id: text('id').primaryKey(),
+  type: text('type', { enum: ['header', 'footer_desktop', 'footer_mobile'] }).notNull(),
+  slot: integer('slot').notNull(),
+  name: text('name').notNull(),
+  htmlContent: text('html_content').notNull().default(''),
+  isActive: integer('is_active').notNull().default(0),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_templates_type').on(table.type),
+  index('idx_templates_active').on(table.type, table.isActive),
+  check('templates_type_check', sql`${table.type} IN ('header','footer_desktop','footer_mobile')`),
+  check('templates_active_check', sql`${table.isActive} IN (0,1)`)
+]);
+
 export const schema = {
   profiles,
   appSettings,
@@ -142,6 +158,7 @@ export const schema = {
   slots,
   tasks,
   taskPhotos,
-  backupLog
+  backupLog,
+  websiteTemplates
 };
 

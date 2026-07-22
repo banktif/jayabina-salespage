@@ -2,8 +2,8 @@ import type { Env } from '../types';
 import { err, ok, nowISO } from '../utils/helpers';
 import { requireAdmin, requireAuth } from '../utils/middleware';
 import { createDb } from '../db/client';
-import { appSettings } from '../db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { appSettings, websiteTemplates } from '../db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 
 const REPO = 'banktif/jayaclean-salespage';
 const BRANCH = 'master';
@@ -526,6 +526,152 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     }
   }
 
+  // ═══════════════ TEMPLATES — header / footer desktop / footer mobile ═══════════════
+  if (path === '/api/website/templates' && req.method === 'GET') {
+    const type = new URL(req.url).searchParams.get('type') || '';
+    if (!['header', 'footer_desktop', 'footer_mobile'].includes(type)) return err('Type must be header, footer_desktop or footer_mobile', 400);
+    const db = createDb(env);
+    const rows = await db.select().from(websiteTemplates).where(eq(websiteTemplates.type, type as 'header' | 'footer_desktop' | 'footer_mobile')).orderBy(websiteTemplates.slot);
+    return ok({ type, templates: rows });
+  }
+
+  if (path === '/api/website/templates' && req.method === 'PUT') {
+    const body = await safeJson(req);
+    const id = typeof body.id === 'string' ? body.id : '';
+    const html = typeof body.html_content === 'string' ? body.html_content : '';
+    if (!id || !/^(header|footer_desktop|footer_mobile)-[123]$/.test(id)) return err('Template ID must be type-1, type-2 or type-3', 400);
+    if (new TextEncoder().encode(html).byteLength > MAX_CONTENT_BYTES) return err('Template HTML is too large', 413);
+    const db = createDb(env);
+    const existing = await db.select().from(websiteTemplates).where(eq(websiteTemplates.id, id)).limit(1);
+    const now = nowISO();
+    if (existing.length) {
+      await db.update(websiteTemplates).set({ htmlContent: html, updatedAt: now }).where(eq(websiteTemplates.id, id));
+    } else {
+      const [type, slotStr] = id.split('-');
+      await db.insert(websiteTemplates).values({
+        id, type: type as 'header' | 'footer_desktop' | 'footer_mobile',
+        slot: parseInt(slotStr), name: `Template ${slotStr}`,
+        htmlContent: html, isActive: 0, createdAt: now, updatedAt: now
+      });
+    }
+    return ok({ id, saved: true });
+  }
+
+  if (path.startsWith('/api/website/templates/') && path.endsWith('/activate') && req.method === 'POST') {
+    // /api/website/templates/:type/activate/:slot
+    const parts = path.replace('/api/website/templates/', '').replace('/activate', '').split('/');
+    if (parts.length !== 2) return err('Invalid path. Use /templates/header/activate/1', 400);
+    const [type, slotStr] = parts;
+    const slot = parseInt(slotStr);
+    if (!['header', 'footer_desktop', 'footer_mobile'].includes(type)) return err('Type must be header, footer_desktop or footer_mobile', 400);
+    if (![1, 2, 3].includes(slot)) return err('Slot must be 1, 2 or 3', 400);
+    const db = createDb(env);
+    const id = `${type}-${slot}`;
+    const tmpl = await db.select().from(websiteTemplates).where(eq(websiteTemplates.id, id)).limit(1);
+    if (!tmpl.length) return err(`Template ${id} not found. Save HTML first.`, 404);
+    const now = nowISO();
+    await db.update(websiteTemplates).set({ isActive: 0, updatedAt: now }).where(eq(websiteTemplates.type, type as 'header' | 'footer_desktop' | 'footer_mobile'));
+    await db.update(websiteTemplates).set({ isActive: 1, updatedAt: now }).where(eq(websiteTemplates.id, id));
+    return ok({ activated: id, type, slot });
+  }
+
+  if (path === '/api/website/templates/sync' && req.method === 'POST') {
+    if (!env.GH_PAT) return err('GitHub publishing is not configured', 503);
+    const db = createDb(env);
+    const active = await db.select().from(websiteTemplates).where(eq(websiteTemplates.isActive, 1));
+    if (!active.length) return err('No active templates. Save and activate a template first.', 400);
+    const map: Record<string, string> = {};
+    active.forEach(t => { map[t.type] = t.htmlContent; });
+
+    const files: Record<string, string> = {};
+    if (map.header) files[TEMPLATE_PATHS.header] = map.header;
+    if (map.footer_desktop) files[TEMPLATE_PATHS.footer_desktop] = map.footer_desktop;
+    if (map.footer_mobile) files[TEMPLATE_PATHS.footer_mobile] = map.footer_mobile;
+
+    if (map.footer_desktop || map.footer_mobile) {
+      const desktop = map.footer_desktop || '';
+      const mobile = map.footer_mobile || '';
+      files[TEMPLATE_PATHS.footer_combined] = [
+        '<div class="footer-desktop">',
+        desktop ? `{{ partial "footer-desktop.html" . }}` : '',
+        '</div>',
+        '<div class="footer-mobile">',
+        mobile ? `{{ partial "footer-mobile.html" . }}` : '',
+        '</div>',
+        '<style>.footer-desktop{display:none}.footer-mobile{display:block}@media(min-width:768px){.footer-desktop{display:block}.footer-mobile{display:none}}</style>'
+      ].filter(Boolean).join('\n');
+    }
+
+    try {
+      const result = await multiFileGithubCommit(env.GH_PAT, files, 'Sync website templates (header, footer) via JAYABINA Admin');
+      return ok({
+        synced: Object.keys(files),
+        commit_sha: result.commitSha,
+        commit_url: `https://github.com/${REPO}/commit/${result.commitSha}`,
+        deployment: 'GitHub deployment started automatically'
+      });
+    } catch (e: any) {
+      return err(e.message || 'Unable to sync templates', e.status || 502);
+    }
+  }
+
+  if (path === '/api/website/templates/seed' && req.method === 'POST') {
+    if (!env.GH_PAT) return err('GitHub publishing is not configured', 503);
+    const db = createDb(env);
+    const existing = await db.select({ count: sql<number>`count(*)` }).from(websiteTemplates);
+    if (Number(existing[0]?.count || 0) > 0) return err('Templates already exist. Delete them first if you want to re-seed.', 409);
+
+    const now = nowISO();
+    const inserts: Array<typeof websiteTemplates.$inferInsert> = [];
+
+    // Read current header + footer from GitHub for Template 1
+    try {
+      const headerFile = await readGithubFile(TEMPLATE_PATHS.header, env.GH_PAT);
+      // Include burger-menu partial reference if not already present
+      const headerHtml = headerFile.content.includes('burger-menu') ? headerFile.content
+        : headerFile.content.trimEnd() + '\n{{ partial "burger-menu.html" . }}';
+
+      inserts.push(
+        { id: 'header-1', type: 'header', slot: 1, name: 'Template 1 (Current)', htmlContent: headerHtml, isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'header-2', type: 'header', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'header-3', type: 'header', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now }
+      );
+    } catch (e: any) {
+      // Header file not found — seed with empty and let user fill
+      inserts.push(
+        { id: 'header-1', type: 'header', slot: 1, name: 'Template 1', htmlContent: '', isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'header-2', type: 'header', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'header-3', type: 'header', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now }
+      );
+    }
+
+    try {
+      const footerFile = await readGithubFile(TEMPLATE_PATHS.footer_combined, env.GH_PAT);
+      inserts.push(
+        { id: 'footer_desktop-1', type: 'footer_desktop', slot: 1, name: 'Template 1 (Current)', htmlContent: footerFile.content, isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'footer_desktop-2', type: 'footer_desktop', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_desktop-3', type: 'footer_desktop', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-1', type: 'footer_mobile', slot: 1, name: 'Template 1 (Current)', htmlContent: footerFile.content, isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-2', type: 'footer_mobile', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-3', type: 'footer_mobile', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now }
+      );
+    } catch (e: any) {
+      inserts.push(
+        { id: 'footer_desktop-1', type: 'footer_desktop', slot: 1, name: 'Template 1', htmlContent: '', isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'footer_desktop-2', type: 'footer_desktop', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_desktop-3', type: 'footer_desktop', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-1', type: 'footer_mobile', slot: 1, name: 'Template 1', htmlContent: '', isActive: 1, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-2', type: 'footer_mobile', slot: 2, name: 'Template 2', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now },
+        { id: 'footer_mobile-3', type: 'footer_mobile', slot: 3, name: 'Template 3', htmlContent: '', isActive: 0, createdAt: now, updatedAt: now }
+      );
+    }
+
+    for (const row of inserts) {
+      await db.insert(websiteTemplates).values(row);
+    }
+    return ok({ seeded: inserts.length, types: ['header', 'footer_desktop', 'footer_mobile'] });
+  }
+
   return err('Not found', 404);
 }
 
@@ -536,6 +682,64 @@ function pageFilePath(page: string): string | null {
     paint: 'site/layouts/partials/service-paint.html'
   };
   return map[page] || null;
+}
+
+const TEMPLATE_PATHS: Record<string, string> = {
+  header: 'site/layouts/partials/header.html',
+  footer_desktop: 'site/layouts/partials/footer-desktop.html',
+  footer_mobile: 'site/layouts/partials/footer-mobile.html',
+  footer_combined: 'site/layouts/partials/footer.html'
+};
+
+async function multiFileGithubCommit(token: string, files: Record<string, string>, message: string): Promise<{ commitSha: string }> {
+  const refResponse = await github(`/git/ref/heads/${BRANCH}`, token);
+  const refData: any = await refResponse.json();
+  if (!refResponse.ok || !refData.object?.sha) {
+    const errObj: any = new Error('Unable to read website version from GitHub');
+    errObj.status = 502;
+    throw errObj;
+  }
+  const baseCommit = refData.object.sha;
+  const commitResponse = await github(`/git/commits/${baseCommit}`, token);
+  const commitData: any = await commitResponse.json();
+  if (!commitResponse.ok || !commitData.tree?.sha) {
+    const errObj: any = new Error('Unable to read website tree');
+    errObj.status = 502;
+    throw errObj;
+  }
+
+  const tree = Object.entries(files).map(([path, content]) => ({ path, mode: '100644', type: 'blob', content }));
+
+  const treeResponse = await github('/git/trees', token, {
+    method: 'POST', body: JSON.stringify({ base_tree: commitData.tree.sha, tree })
+  });
+  const treeData: any = await treeResponse.json();
+  if (!treeResponse.ok || !treeData.sha) {
+    const errObj: any = new Error(`Unable to prepare template commit: ${treeData?.message || 'unknown error'}`);
+    errObj.status = 502;
+    throw errObj;
+  }
+
+  const newCommitResponse = await github('/git/commits', token, {
+    method: 'POST', body: JSON.stringify({ message, tree: treeData.sha, parents: [baseCommit] })
+  });
+  const newCommitData: any = await newCommitResponse.json();
+  if (!newCommitResponse.ok || !newCommitData.sha) {
+    const errObj: any = new Error(`Unable to create template commit: ${newCommitData?.message || 'unknown error'}`);
+    errObj.status = 502;
+    throw errObj;
+  }
+
+  const updateResponse = await github(`/git/refs/heads/${BRANCH}`, token, {
+    method: 'PATCH', body: JSON.stringify({ sha: newCommitData.sha, force: false })
+  });
+  const updateData: any = await updateResponse.json();
+  if (!updateResponse.ok) {
+    const errObj: any = new Error(`Unable to publish templates: ${updateData?.message || 'unknown error'}`);
+    errObj.status = 502;
+    throw errObj;
+  }
+  return { commitSha: newCommitData.sha };
 }
 
 export function parseWebsiteSettings(files: Record<string, string>): WebsiteSettings {

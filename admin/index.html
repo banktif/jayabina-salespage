@@ -421,6 +421,10 @@
     .d-sidebar-footer{border-top-color:rgba(255,255,255,.14)}
     .d-sidebar-footer button{color:rgba(255,255,255,.72)}
     .d-sidebar-footer button:hover{background:rgba(255,255,255,.09);color:#fff}
+    /* Template badges */
+    .tpl-badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.2px}
+    .tpl-badge.active{background:var(--accent-light);color:var(--accent)}
+    .tpl-badge.inactive{background:var(--bg);color:var(--text3)}
   </style>
   <link rel="stylesheet" href="/admin-modern.css?v=20260717-grapes-full1">
 </head>
@@ -1212,7 +1216,7 @@ async function resetStaffPassword(id){
 }
 
 // WEBSITE / HUGO CONTENT MANAGER
-var websiteState={files:[],path:'',sha:'',dirty:false,settings:null,settingsOriginal:null,settingsCommit:'',settingsDirty:false,tab:'settings',viewId:0};
+var websiteState={files:[],path:'',sha:'',dirty:false,settings:null,settingsOriginal:null,settingsCommit:'',settingsDirty:false,tab:'settings',viewId:0,templates:{},activeSlots:{header:0,footer_desktop:0,footer_mobile:0},templateDirty:{header:false,footer_desktop:false,footer_mobile:false}};
 async function websiteRequest(path,opts){
   opts=opts||{};var token=await authToken();var headers=opts.headers||{};headers.Authorization='Bearer '+token;
   if(opts.body!==undefined)headers['Content-Type']='application/json';
@@ -1228,7 +1232,7 @@ async function showWebsite(){
     '<div class="kpi violet"><div class="kpi-ic"><i data-lucide="sliders-horizontal"></i></div><div class="kpi-v" id="siteConfigStatus" style="font-size:1rem">Loading...</div><div class="kpi-l">Website settings</div></div>'+
     '<div class="kpi amber"><div class="kpi-ic"><i data-lucide="cloud"></i></div><div class="kpi-v" style="font-size:1rem">Cloudflare</div><div class="kpi-l">Hugo publishing</div></div>'+
     '</div><div class="site-actions"><button class="d-btn acc" onclick="window.open(\'https://www.jayabina.com\',\'_blank\',\'noopener\')"><i data-lucide="external-link"></i> Open live site</button><button class="d-btn" onclick="window.open(\'https://github.com/banktif/jayaclean-salespage/tree/master/site\',\'_blank\',\'noopener\')"><i data-lucide="git-branch"></i> View source</button><button class="d-btn don" onclick="publishWebsite()"><i data-lucide="rocket"></i> Deploy now</button><button class="d-btn" onclick="newWebsiteArticle()"><i data-lucide="file-plus-2"></i> New article</button></div>'+
-    '<div class="site-tabs" role="tablist" aria-label="Website management"><button id="siteTabSettings" class="active" onclick="switchWebsiteTab(\'settings\')"><i data-lucide="settings-2"></i><span><b>Settings</b><small>Guided configuration</small></span></button><button id="siteTabPages" onclick="switchWebsiteTab(\'pages\')"><i data-lucide="file-code-2"></i><span><b>Page HTML</b><small>Paste or upload HTML</small></span></button><button id="siteTabContent" onclick="switchWebsiteTab(\'content\')"><i data-lucide="folder-code"></i><span><b>Content &amp; code</b><small>Markdown, YAML and templates</small></span></button><button id="siteTabDesign" onclick="switchWebsiteTab(\'design\')"><i data-lucide="palette"></i><span><b>Design Spec</b><small>Tokens, sections, buttons</small></span></button></div>'+
+    '<div class="site-tabs" role="tablist" aria-label="Website management"><button id="siteTabSettings" class="active" onclick="switchWebsiteTab(\'settings\')"><i data-lucide="settings-2"></i><span><b>Settings</b><small>Guided configuration</small></span></button><button id="siteTabPages" onclick="switchWebsiteTab(\'pages\')"><i data-lucide="file-code-2"></i><span><b>Page HTML</b><small>Paste or upload HTML</small></span></button><button id="siteTabTemplates" onclick="switchWebsiteTab(\'templates\')"><i data-lucide="layout-template"></i><span><b>Templates</b><small>Header &amp; footer design</small></span></button><button id="siteTabContent" onclick="switchWebsiteTab(\'content\')"><i data-lucide="folder-code"></i><span><b>Content &amp; code</b><small>Markdown, YAML and templates</small></span></button><button id="siteTabDesign" onclick="switchWebsiteTab(\'design\')"><i data-lucide="palette"></i><span><b>Design Spec</b><small>Tokens, sections, buttons</small></span></button></div>'+
     '<div id="siteSettingsView">'+
     '<div class="sGrp" style="margin-bottom:16px"><div class="sGrpH">Water Tank Sales Page Version</div><div class="sFields" style="gap:12px">'+
       '<div style="font-size:.8rem;color:var(--text2)">Live now: <b id="hpLive" style="color:var(--accent)">'+esc(settings['active_homepage']||'v1')+'</b></div>'+
@@ -1239,6 +1243,10 @@ async function showWebsite(){
     '</div></div>'+
     '<div id="siteSettings"><div class="panel site-settings-loading"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Loading website configuration...</span></div></div></div>'+
     '<div id="sitePagesView" style="display:none"><div class="panel" style="display:grid;gap:16px"><div class="site-settings-card-head"><span><i data-lucide="file-code-2"></i></span><div><h3>Page HTML Editor</h3><p>Select a service page, paste HTML from Claude Design, or upload an HTML file.</p></div></div><div style="display:grid;gap:12px"><div><label style="font-size:.72rem;color:var(--text2);display:block;margin-bottom:4px">Select page</label><select id="pageSelect" class="mv-sel" onchange="loadPageHTML()"><option value="">-- Pilih page --</option><option value="tank">Tank Sales Page (servis/cuci-tangki-air)</option><option value="roof">Roof Service Page</option><option value="paint">Paint Service Page</option></select></div><div><label style="font-size:.72rem;color:var(--text2);display:block;margin-bottom:4px">HTML code</label><textarea id="pageHTML" class="site-code" style="min-height:400px;font-size:.82rem;font-family:monospace" spellcheck="false" placeholder="Pilih page untuk load HTML, atau paste/upload kod baru..."></textarea></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="d-btn acc" onclick="savePageHTML()"><i data-lucide="save"></i> Save &amp; Publish</button><label class="d-btn" style="cursor:pointer"><i data-lucide="upload"></i> Upload HTML file<input type="file" id="pageUpload" accept=".html,.htm" style="display:none" onchange="uploadPageHTML(event)"></label><button class="d-btn" onclick="loadPageHTML()"><i data-lucide="refresh-cw"></i> Reload from GitHub</button></div><div id="pageMsg" style="font-size:.78rem;color:var(--text3)">Select a page to get started.</div></div></div></div>'+
+    '<div id="siteTemplatesView" style="display:none">'+
+      '<div id="tplContent" style="display:grid;gap:20px"><div class="panel site-settings-loading"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Loading templates...</span></div></div>'+
+      '<div class="site-note" style="margin-top:20px"><i data-lucide="info"></i><div><b>How templates work</b><span>Each type has 3 template slots. Edit any slot, activate it to make it live. Click "Sync to Website" to push active templates to GitHub &mdash; this updates Hugo partials and triggers deployment.</span></div></div>'+
+    '</div>'+
     '<div id="siteContentView" style="display:none"><div class="site-shell"><aside class="site-browser panel"><div class="site-browser-head"><div><b>Hugo files</b><span>Safe, version-controlled editing</span></div></div><div id="siteFiles"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div></aside>'+
     '<section class="site-editor panel"><div class="site-editor-empty" id="siteEmpty"><i data-lucide="file-code-2"></i><b>Select a file to edit</b><span>Content is saved to GitHub and deployed through Cloudflare Pages.</span></div><div id="siteEditorForm" style="display:none"><div class="site-editor-head"><div><div class="site-editor-title" id="siteFileLabel">Hugo file</div><code id="siteFilePath"></code></div><span class="site-mode" id="siteFileMode">MD</span></div><textarea id="siteCode" class="site-code" spellcheck="false" aria-label="Hugo file content"></textarea><div class="site-editor-foot"><span id="siteEditorMsg">No unsaved changes.</span><div><button class="d-btn" onclick="reloadWebsiteFile()"><i data-lucide="rotate-ccw"></i> Reload</button><button class="d-btn acc" id="siteSaveBtn" onclick="saveWebsiteFile()"><i data-lucide="save"></i> Save &amp; publish</button></div></div></div></section></div>'+
     '<div id="siteDesignView" style="display:none"><div class="panel" style="max-height:calc(100vh - 280px);overflow-y:auto"><span class="site-settings-eyebrow">LOCKED DESIGN SYSTEM — DO NOT EDIT</span><h2>JAYABINA Sales Page Design Spec</h2><p style="color:var(--text2)">Reference: <code>www.jayabina.com/servis/cuci-tangki-air/</code></p><div style="display:grid;gap:8px">'+buildDesignSpec()+'</div></div></div>'+
@@ -1252,13 +1260,14 @@ async function showWebsite(){
   await loadWebsiteSettings();
 }
 function switchWebsiteTab(tab){
-  websiteState.tab=tab==='content'?'content':tab==='pages'?'pages':tab==='design'?'design':'settings';
-  var settingsView=document.getElementById('siteSettingsView'),pagesView=document.getElementById('sitePagesView'),contentView=document.getElementById('siteContentView'),designView=document.getElementById('siteDesignView');
-  var settingsTab=document.getElementById('siteTabSettings'),pagesTab=document.getElementById('siteTabPages'),contentTab=document.getElementById('siteTabContent'),designTab=document.getElementById('siteTabDesign');
-  if(!settingsView||!pagesView||!contentView||!designView||!settingsTab||!pagesTab||!contentTab||!designTab)return;
-  settingsView.style.display=websiteState.tab==='settings'?'':'none';pagesView.style.display=websiteState.tab==='pages'?'':'none';contentView.style.display=websiteState.tab==='content'?'':'none';designView.style.display=websiteState.tab==='design'?'':'none';
-  settingsTab.classList.toggle('active',websiteState.tab==='settings');pagesTab.classList.toggle('active',websiteState.tab==='pages');contentTab.classList.toggle('active',websiteState.tab==='content');designTab.classList.toggle('active',websiteState.tab==='design');
+  websiteState.tab=tab==='content'?'content':tab==='pages'?'pages':tab==='templates'?'templates':tab==='design'?'design':'settings';
+  var settingsView=document.getElementById('siteSettingsView'),pagesView=document.getElementById('sitePagesView'),templatesView=document.getElementById('siteTemplatesView'),contentView=document.getElementById('siteContentView'),designView=document.getElementById('siteDesignView');
+  var settingsTab=document.getElementById('siteTabSettings'),pagesTab=document.getElementById('siteTabPages'),templatesTab=document.getElementById('siteTabTemplates'),contentTab=document.getElementById('siteTabContent'),designTab=document.getElementById('siteTabDesign');
+  if(!settingsView||!pagesView||!templatesView||!contentView||!designView||!settingsTab||!pagesTab||!templatesTab||!contentTab||!designTab)return;
+  settingsView.style.display=websiteState.tab==='settings'?'':'none';pagesView.style.display=websiteState.tab==='pages'?'':'none';templatesView.style.display=websiteState.tab==='templates'?'':'none';contentView.style.display=websiteState.tab==='content'?'':'none';designView.style.display=websiteState.tab==='design'?'':'none';
+  settingsTab.classList.toggle('active',websiteState.tab==='settings');pagesTab.classList.toggle('active',websiteState.tab==='pages');templatesTab.classList.toggle('active',websiteState.tab==='templates');contentTab.classList.toggle('active',websiteState.tab==='content');designTab.classList.toggle('active',websiteState.tab==='design');
   if(websiteState.tab==='content'&&!websiteState.path&&websiteState.files.length)loadWebsiteFile(websiteState.files[0].path,true);
+  if(websiteState.tab==='templates')loadTemplates();
 }
 async function loadWebsiteSettings(){
   var el=document.getElementById('siteSettings'),status=document.getElementById('siteConfigStatus');if(!el)return;
@@ -1413,6 +1422,105 @@ function uploadPageHTML(event){
     msg.style.color='var(--accent)';msg.textContent='File loaded! Click "Save & Publish" to apply.';
   };
   reader.onerror=function(){msg.style.color='var(--danger)';msg.textContent='Failed to read file.'};
+  reader.readAsText(file);
+}
+
+// ═══════════════ TEMPLATE MANAGER — header / footer desktop / footer mobile ═══════════════
+var TPL_TYPES={header:{label:'Menu Header',icon:'navigation',desc:'HTML code for the website header menu. Appears on every page.'},footer_desktop:{label:'Footer Desktop View',icon:'panel-bottom',desc:'HTML code for the footer shown on desktop screens (≥768px).'},footer_mobile:{label:'Footer Mobile View',icon:'smartphone',desc:'HTML code for the footer shown on mobile screens (<768px).'}};
+
+async function loadTemplates(){
+  var el=document.getElementById('tplContent');if(!el)return;
+  el.innerHTML='<div class="panel site-settings-loading"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Loading templates...</span></div>';
+  try{
+    var types=['header','footer_desktop','footer_mobile'];
+    for(var i=0;i<types.length;i++){
+      var res=await websiteRequest('/templates?type='+types[i]),body=await res.json();
+      if(!res.ok)throw new Error(body.error||'Unable to load templates');
+      websiteState.templates[types[i]]=body.data.templates;
+      var active=body.data.templates.find(function(t){return t.is_active===1});
+      websiteState.activeSlots[types[i]]=active?active.slot:0;
+      websiteState.templateDirty[types[i]]=false;
+    }
+    renderTemplates();
+  }catch(e){el.innerHTML='<div class="panel" style="text-align:center;padding:32px"><i data-lucide="circle-alert" style="font-size:2rem;color:var(--danger);margin-bottom:8px"></i><h3>Unable to load templates</h3><p style="color:var(--text2);margin-bottom:16px">'+esc(errorMessage(e))+'</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="d-btn acc" onclick="seedTemplates()"><i data-lucide="package-plus"></i> Seed from current website</button><button class="d-btn" onclick="loadTemplates()"><i data-lucide="refresh-cw"></i> Try again</button></div></div>';relucide();}
+}
+function renderTemplates(){
+  var el=document.getElementById('tplContent');if(!el)return;
+  var types=['header','footer_desktop','footer_mobile'],h='';
+  types.forEach(function(type){
+    var info=TPL_TYPES[type],templates=websiteState.templates[type]||[],activeSlot=websiteState.activeSlots[type];
+    h+='<div class="panel" style="display:grid;gap:14px;border-left:3px solid var(--accent)"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="'+info.icon+'" style="color:var(--accent);width:20px;height:20px"></i><b style="font-size:1rem;color:var(--text)">'+info.label+'</b>'+(activeSlot?'<span class="tpl-badge active">Active: Template '+activeSlot+'</span>':'<span class="tpl-badge inactive">No active template</span>')+'</div><div style="display:flex;gap:8px;align-items:center"><select id="tplSlot_'+type+'" onchange="selectTemplateSlot(\''+type+'\')" style="font-size:.78rem;padding:6px 10px;border:1px solid var(--text3);border-radius:8px;background:var(--white);color:var(--text)">'+[1,2,3].map(function(s){return'<option value="'+s+'"'+(websiteState.activeSlots[type]===s?' selected':'')+'>Template '+s+(websiteState.activeSlots[type]===s?' (active)':'')+'</option>'}).join('')+'</select></div></div><p style="margin:0;color:var(--text2);font-size:.82rem">'+info.desc+'</p><textarea id="tplCode_'+type+'" class="site-code" style="min-height:200px;font-size:.78rem;font-family:monospace" spellcheck="false" placeholder="Edit template HTML..."></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="d-btn acc" onclick="saveTemplate(\''+type+'\')"><i data-lucide="save"></i> Save template</button><button class="d-btn" onclick="activateTemplate(\''+type+'\')" title="Set this as the active template"><i data-lucide="check-circle"></i> Make active</button><label class="d-btn" style="cursor:pointer"><i data-lucide="upload"></i> Upload HTML<input type="file" accept=".html,.htm" style="display:none" onchange="uploadTemplateFile(event,\''+type+'\')"></label></div><div id="tplMsg_'+type+'" style="font-size:.75rem;color:var(--text3)">Select a template slot to load its HTML.</div></div>';
+  });
+  h+='<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;padding-top:8px"><button class="btn-primary" style="width:auto;padding:12px 28px" onclick="syncTemplates()"><i data-lucide="rocket"></i> Sync to Website &amp; Deploy</button></div><div id="tplSyncMsg" style="text-align:center;font-size:.78rem;color:var(--text3)"></div>';
+  el.innerHTML=h;
+  relucide();
+  types.forEach(function(type){selectTemplateSlot(type)});
+}
+function selectTemplateSlot(type){
+  var slotEl=document.getElementById('tplSlot_'+type),codeEl=document.getElementById('tplCode_'+type),msgEl=document.getElementById('tplMsg_'+type);
+  if(!slotEl||!codeEl||!msgEl)return;
+  var slot=parseInt(slotEl.value),templates=websiteState.templates[type]||[],tmpl=templates.find(function(t){return t.slot===slot});
+  codeEl.value=tmpl?tmpl.html_content:'';
+  websiteState.templateDirty[type]=false;
+  msgEl.style.color='var(--text3)';
+  var isActive=websiteState.activeSlots[type]===slot;
+  msgEl.textContent=tmpl&&tmpl.html_content?(isActive?'Template '+slot+' — currently active on website.':'Template '+slot+' — '+(tmpl.updated_at?'Saved '+tmpl.updated_at:'Not yet saved')+'.'):'Template '+slot+' is empty. Paste or upload HTML and save.';
+}
+async function saveTemplate(type){
+  var slotEl=document.getElementById('tplSlot_'+type),codeEl=document.getElementById('tplCode_'+type),msgEl=document.getElementById('tplMsg_'+type);
+  if(!slotEl||!codeEl||!msgEl)return;
+  var slot=parseInt(slotEl.value),html=codeEl.value;
+  msgEl.style.color='var(--text3)';msgEl.textContent='Saving...';
+  try{
+    var res=await websiteRequest('/templates',{method:'PUT',body:{id:type+'-'+slot,html_content:html}}),body=await res.json();
+    if(!res.ok)throw new Error(body.error||'Unable to save template');
+    websiteState.templateDirty[type]=false;
+    var templates=websiteState.templates[type]||[],idx=templates.findIndex(function(t){return t.slot===slot});
+    if(idx>=0){templates[idx].html_content=html;templates[idx].updated_at=new Date().toISOString()}else{templates.push({id:type+'-'+slot,type:type,slot:slot,name:'Template '+slot,html_content:html,is_active:0,created_at:new Date().toISOString(),updated_at:new Date().toISOString()})}
+    msgEl.style.color='var(--accent)';msgEl.textContent='Template '+slot+' saved.';
+  }catch(e){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e);}
+}
+async function activateTemplate(type){
+  var slotEl=document.getElementById('tplSlot_'+type),msgEl=document.getElementById('tplMsg_'+type);
+  if(!slotEl||!msgEl)return;
+  var slot=parseInt(slotEl.value);
+  msgEl.style.color='var(--text3)';msgEl.textContent='Activating...';
+  try{
+    var res=await websiteRequest('/templates/'+type+'/activate/'+slot,{method:'POST'}),body=await res.json();
+    if(!res.ok)throw new Error(body.error||'Unable to activate template');
+    websiteState.activeSlots[type]=slot;
+    var templates=websiteState.templates[type]||[];
+    templates.forEach(function(t){t.is_active=t.slot===slot?1:0});
+    renderTemplates();
+  }catch(e){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e);}
+}
+async function syncTemplates(){
+  if(!confirm('Push all active templates to GitHub? This will update Hugo partials and trigger website deployment.'))return;
+  var msgEl=document.getElementById('tplSyncMsg');if(msgEl){msgEl.style.color='var(--text3)';msgEl.textContent='Syncing to GitHub...'}
+  try{
+    var res=await websiteRequest('/templates/sync',{method:'POST',body:{}}),body=await res.json();
+    if(!res.ok)throw new Error(body.error||'Unable to sync templates');
+    if(msgEl){msgEl.style.color='var(--accent)';msgEl.textContent='Templates synced! Website deploying (~1-3 min). Commit: '+esc((body.data.commit_sha||'').slice(0,7))}
+  }catch(e){if(msgEl){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e)}}
+}
+async function seedTemplates(){
+  if(!confirm('Seed template slots from the current website header and footer from GitHub? This will populate Template 1 for each type with the live HTML.'))return;
+  var el=document.getElementById('tplContent');if(!el)return;
+  el.innerHTML='<div class="panel site-settings-loading"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div><span>Seeding templates from current website...</span></div>';
+  try{
+    var res=await websiteRequest('/templates/seed',{method:'POST',body:{}}),body=await res.json();
+    if(!res.ok)throw new Error(body.error||'Unable to seed templates');
+    await loadTemplates();
+  }catch(e){el.innerHTML='<div class="panel" style="text-align:center;padding:24px"><p style="color:var(--danger)">'+esc(errorMessage(e))+'</p><button class="d-btn" onclick="loadTemplates()"><i data-lucide="refresh-cw"></i> Retry</button></div>';}
+}
+function uploadTemplateFile(event,type){
+  var file=event.target.files&&event.target.files[0];if(!file)return;
+  var codeEl=document.getElementById('tplCode_'+type),msgEl=document.getElementById('tplMsg_'+type);
+  if(!codeEl)return;
+  if(msgEl){msgEl.style.color='var(--text3)';msgEl.textContent='Reading file...'}
+  var reader=new FileReader();
+  reader.onload=function(){codeEl.value=reader.result;websiteState.templateDirty[type]=true;if(msgEl){msgEl.style.color='var(--accent)';msgEl.textContent='File loaded. Click "Save template" to keep it.'}};
+  reader.onerror=function(){if(msgEl){msgEl.style.color='var(--danger)';msgEl.textContent='Failed to read file.'}};
   reader.readAsText(file);
 }
 function buildDesignSpec(){
