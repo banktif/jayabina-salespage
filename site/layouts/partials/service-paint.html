@@ -22,6 +22,7 @@
   {{ with resources.Get "css/main.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
   {{ end }}
+  {{ partial "theme-colors.html" . }}
   <style>
     :root{
       --green-950:#052e22;

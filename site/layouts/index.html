@@ -19,6 +19,7 @@
   {{ with resources.Get "css/main.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
   {{ end }}
+  {{ partial "theme-colors.html" . }}
   <title>JAYABINA — Servis Tukar Atap, Cuci Tangki Air &amp; Mengecat | KL &amp; Selangor</title>
   <script>document.documentElement.className='js';window.setTimeout(function(){document.documentElement.classList.add('js-fallback')},2500);</script>
   <style>

@@ -672,6 +672,37 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     return ok({ seeded: inserts.length, types: ['header', 'footer_desktop', 'footer_mobile'] });
   }
 
+  // ═══════════════ COLOR THEME — 10 gradient presets ═══════════════
+  if (path === '/api/website/templates/theme' && req.method === 'GET') {
+    const db = createDb(env);
+    const rows = await db.select({ value: appSettings.value }).from(appSettings).where(eq(appSettings.key, 'template_color_theme')).limit(1);
+    const current = rows[0]?.value || 'green-light';
+    return ok({ theme: current, themes: THEMES });
+  }
+
+  if (path === '/api/website/templates/theme' && req.method === 'PUT') {
+    if (!env.GH_PAT) return err('GitHub publishing is not configured', 503);
+    const body = await safeJson(req);
+    const theme = typeof body.theme === 'string' ? body.theme : '';
+    if (!THEMES[theme]) return err('Invalid theme. Choose from: ' + Object.keys(THEMES).join(', '), 400);
+
+    const db = createDb(env);
+    const now = nowISO();
+    await db.insert(appSettings).values({ key: 'template_color_theme', value: theme, updatedAt: now })
+      .onConflictDoUpdate({ target: appSettings.key, set: { value: theme, updatedAt: now } });
+
+    const css = generateThemeCSS(theme);
+    try {
+      const result = await multiFileGithubCommit(env.GH_PAT,
+        { [THEME_PATH]: css },
+        `Set color theme: ${theme} via JAYABINA Admin`
+      );
+      return ok({ theme, commit_sha: result.commitSha, deployment: 'GitHub deployment started automatically' });
+    } catch (e: any) {
+      return err(e.message || 'Unable to save theme', e.status || 502);
+    }
+  }
+
   return err('Not found', 404);
 }
 
@@ -690,6 +721,59 @@ const TEMPLATE_PATHS: Record<string, string> = {
   footer_mobile: 'site/layouts/partials/footer-mobile.html',
   footer_combined: 'site/layouts/partials/footer.html'
 };
+
+const THEME_PATH = 'site/layouts/partials/theme-colors.html';
+
+type ThemeDef = { name: string; footerBg: string; headerBg: string };
+
+const THEMES: Record<string, ThemeDef> = {
+  'green-light': { name: 'JAYABINA Green (Default)',    footerBg: 'linear-gradient(135deg,#f1fbf5 0%,#e8f5ee 50%,#f4faf6 100%)', headerBg: 'rgba(255,255,255,.96)' },
+  'green-dark':  { name: 'Dark Forest',                  footerBg: 'linear-gradient(135deg,#052e22,#0d3b2e)',                            headerBg: 'linear-gradient(135deg,#052e22,#0d3b2e)' },
+  'emerald':     { name: 'Emerald',                      footerBg: 'linear-gradient(135deg,#064e3b,#047857)',                            headerBg: 'linear-gradient(135deg,#064e3b,#047857)' },
+  'teal':        { name: 'Teal Ocean',                   footerBg: 'linear-gradient(135deg,#115e59,#0d9488)',                            headerBg: 'linear-gradient(135deg,#115e59,#0d9488)' },
+  'navy':        { name: 'Navy Blue',                    footerBg: 'linear-gradient(135deg,#1e293b,#334155)',                            headerBg: 'linear-gradient(135deg,#1e293b,#334155)' },
+  'slate':       { name: 'Slate Grey',                   footerBg: 'linear-gradient(135deg,#1c1917,#44403c)',                            headerBg: 'linear-gradient(135deg,#1c1917,#44403c)' },
+  'charcoal':    { name: 'Warm Charcoal',                footerBg: 'linear-gradient(135deg,#292524,#57534e)',                            headerBg: 'linear-gradient(135deg,#292524,#57534e)' },
+  'plum':        { name: 'Deep Plum',                    footerBg: 'linear-gradient(135deg,#3b0764,#7c3aed)',                            headerBg: 'linear-gradient(135deg,#3b0764,#7c3aed)' },
+  'burgundy':    { name: 'Burgundy',                     footerBg: 'linear-gradient(135deg,#4a0e1c,#9b2c2c)',                            headerBg: 'linear-gradient(135deg,#4a0e1c,#9b2c2c)' },
+  'classic-dark':{ name: 'Classic Dark',                 footerBg: 'linear-gradient(135deg,#0a0a0a,#1a1a1a)',                            headerBg: 'linear-gradient(135deg,#0a0a0a,#1a1a1a)' },
+};
+
+function generateThemeCSS(theme: string): string {
+  const t = THEMES[theme];
+  if (!t) return '';
+  const isDark = !['green-light'].includes(theme);
+  const textColor = isDark ? '#fff' : 'var(--grey-700)';
+  const mutedColor = isDark ? '#c7d8d1' : 'var(--grey-600)';
+  const borderColor = isDark ? 'rgba(255,255,255,.14)' : 'var(--grey-200)';
+  const accBg = isDark ? 'rgba(255,255,255,.04)' : 'rgba(20,108,67,.04)';
+  const brandColor = isDark ? '#fff' : 'var(--green-950)';
+  const linkColor = isDark ? '#c7d8d1' : 'var(--grey-600)';
+  const linkHover = isDark ? '#fff' : 'var(--green-800)';
+
+  return [
+    '<style>',
+    `.site-footer{background:${t.footerBg} !important;color:${textColor}}`,
+    `.site-footer a{color:${linkColor}}`,
+    `.site-footer a:hover{color:${linkHover}}`,
+    `.footer-col1 strong{color:${brandColor}}`,
+    `.footer-col1 p{color:${mutedColor}}`,
+    `.footer-bottom{color:${isDark ? '#9fb8ae' : 'var(--grey-500)'};border-top-color:${isDark ? 'rgba(255,255,255,.12)' : 'var(--grey-200)'}}`,
+    isDark ? `.f-acc{border-color:${borderColor};background:${accBg}}` : '',
+    isDark ? `.f-acc summary{color:${brandColor}}` : '',
+    isDark ? `.f-acc summary::after{color:#9de3ba}` : '',
+    isDark ? `.f-links a{color:${linkColor}}` : '',
+    isDark ? `.f-links a:hover{color:${linkHover}}` : '',
+    isDark ? `.f-acc.static summary{color:#9de3ba}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav{background:${t.headerBg} !important;color:${brandColor}}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav .nav-links a{color:${brandColor}}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav .nav-links a:hover,.site-nav .nav-links a.active{color:${isDark ? '#9de3ba' : 'var(--green-700)'}}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav .brand{color:${brandColor}}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav .menu-toggle{border-color:${isDark ? 'rgba(255,255,255,.25)' : 'var(--grey-200)'}}` : '',
+    t.headerBg !== 'rgba(255,255,255,.96)' ? `.site-nav .menu-toggle span{background:${brandColor}}` : '',
+    '</style>',
+  ].filter(Boolean).join('\n');
+}
 
 async function multiFileGithubCommit(token: string, files: Record<string, string>, message: string): Promise<{ commitSha: string }> {
   const refResponse = await github(`/git/ref/heads/${BRANCH}`, token);

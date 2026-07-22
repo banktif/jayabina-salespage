@@ -13,6 +13,7 @@
   {{ with resources.Get "css/main.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
   {{ end }}
+  {{ partial "theme-colors.html" . }}
 </head>
 <body class="{{ if .IsHome }}has-mobile-sticky{{ else }}{{ with .Params.service }}service-page service-{{ . }} has-mobile-sticky{{ end }}{{ end }}">
   <a class="skip-link" href="#main-content">Terus ke kandungan</a>
