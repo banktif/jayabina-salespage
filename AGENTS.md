@@ -203,6 +203,42 @@ This section supersedes older Supabase architecture and deploy notes below.
 - ⛔ **WORKER SCHEDULE/CALENDAR LOCKED (owner order, 2026-07-22):** The calendar/schedule view in `worker/index.html` (`staff.jayabina.com`) must NEVER be removed, restructured, or have its behavior changed. Features: weekly view (Mon-Sun), status-colored task cards, prev/next week navigation, Today button, desktop 7-column grid / mobile stacked list. Data source: same `loadJobs()` — syncs with admin assign + customer booking. Clicking task → `openJob()` modal. Any change requires explicit owner instruction.
 - ⛔ **PERSISTENT LOGIN LOCKED (owner order, 2026-07-20):** Login session must survive page refresh indefinitely. Worker: token in localStorage + `jc_user_cache` fallback. Customer: `jc_login_phone` in localStorage with `autoLogin()`. Only explicit logout clears the session. Do NOT change this behavior.
 - ⛔ **ROOF PAGE SECTION 5-6 HEADLINE LOCKED (owner order, 2026-07-22):** `service-roof.html` sections #proses and #harga MUST have these exact CSS values — DO NOT change: headline h2 3 lines (font: clamp(1.55rem,1.35rem+.8vw,1.9rem), heading div min-width:56%, max-width:none) | subheadline p 2 lines (font: clamp(1.08rem,1rem+.3vw,1.3rem), line-height:1.55, flex:0 0 34%, -webkit-line-clamp:2). Layout: side-by-side flex, heading left, paragraph right.
+- ⛔ **3-PORTAL UNIFIED DESIGN SYSTEM LOCKED (owner order, 2026-07-22):** The following files form the UNIVERSAL portal design system shared across admin.jayabina.com, staff.jayabina.com, and akaun.jayabina.com. They must NEVER be modified, deleted, restructured, or have their design altered without explicit owner instruction. Editing `portal-shared.css` changes ALL 3 portals simultaneously — extreme caution required.
+
+  **LOCKED FILES (touch = 3 portals break simultaneously):**
+  | File | Role | Rule |
+  |------|------|------|
+  | `portal-shared.css` (root + `site/assets/css/` + `site/static/`) | Universal design system for 3 portals | NEVER edit. Single source of truth. |
+  | `admin/index.html` | Admin portal | NEVER edit design/UI. Portal-specific CSS only. |
+  | `worker/index.html` | Staff portal | NEVER edit design/UI. Portal-specific CSS only. |
+  | `customer/index.html` | Customer portal | NEVER edit design/UI. Portal-specific CSS only. |
+  | `theme.css` | Design tokens (colors, shadows, radii, fonts) | NEVER remove or alter existing variable names. |
+  | `admin-modern.css` | Admin-specific refinements (scoped `.admin-app`) | NEVER delete or disable. Admin final polish. |
+
+  **LOCKED DESIGN SPECS (any violation = visual breakage across all portals):**
+  - **Sidebar:** 272px wide, gradient `#0d3b2e → #052e22`, 12px right shadow, white text, 44px nav items
+  - **Header (desktop):** sticky 92px with `header-fade` gradient at bottom, h1 28px
+  - **Header (mobile):** `var(--nav-glass)` background, blur(18px), 56px height
+  - **Bottom nav (mobile):** `var(--nav-glass)` background, 70px min-height, blur(18px), items 64px min-width
+  - **Cards:** `var(--card-bg)` white, `var(--card-border)` border, `var(--card-shadow)` shadow, radius `var(--card-radius)`, hover lift 2px
+  - **Stats:** accent stripe top 3px (green/blue/orange per status), 44px icon box
+  - **Table:** `var(--card-muted)` header + row hover background
+  - **Modal:** 24px/70px deep shadow, `var(--card-bg)` background
+  - **Buttons:** primary green `#166534` + glow, danger red `#e5484d`, WA green `#25D366`, ghost grey outline
+  - **Badges:** unified `.badge` class, 4px/12px padding, 6px dot
+  - **Spacing:** d-main `0 40px 48px`, d-hdr `margin-bottom 24px`, stats gap 18px, stat padding 24px
+  - **Drawer:** `min(340px, 90vw)` width, dark green head on mobile, `var(--card-bg)` background
+  - **Login:** 320px centered card, gradient JB avatar, accent glow focus ring
+
+  **🔁 ONE-CLICK ROLLBACK (portal design):**
+  ```bash
+  git show 9edcfc7:site/assets/css/portal-shared.css > site/assets/css/portal-shared.css
+  cp site/assets/css/portal-shared.css site/static/portal-shared.css
+  cp site/assets/css/portal-shared.css portal-shared.css
+  git add -A && git commit -m "rollback: restore unified portal design" && git push origin master
+  ```
+  Tag `9edcfc7` is protected — never delete this tag.
+
 - ⛔ **HEADER, FOOTER & BURGER-MENU SYSTEM LOCKED (owner order, 2026-07-22):** The following files form the UNIVERSAL template-driven header/footer system. They must NEVER be modified, deleted, reformatted, or have their structure changed by any AI agent, debug session, or automated tool — ONLY the admin template system (sync button) may write to the partial files listed below. Violating any rule in this section will BREAK the ENTIRE website header/footer across ALL pages.
 
   **LOCKED FILES (touch = site-wide breakage):**
