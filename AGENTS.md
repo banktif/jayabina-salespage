@@ -219,7 +219,7 @@ This section supersedes older Supabase architecture and deploy notes below.
   - **Sidebar:** 272px wide, gradient `#0d3b2e → #052e22`, 12px right shadow, white text, 44px nav items
   - **Header (desktop):** sticky 92px with `header-fade` gradient at bottom, h1 28px
   - **Header (mobile):** 64px height, `rgba(255,255,255,.94)` solid white glass bg, blur(18px), hdr-logo 40x40, hdr-title h1 17px, hdr-title span 10px margin-top 3px, hdr-btn 44x44 radius 13px, hdr-l gap 8px, hdr-r gap 6px. Safe-area: padding-top env(safe-area-inset-top).
-  - **Bottom nav (mobile):** `var(--nav-glass)` background, 70px min-height, blur(18px), items 64px min-width
+  - **Bottom nav (mobile):** `var(--card-bg)` background, 70px min-height, items 64px min-width 52px min-height, border-radius 12px, active bg accent-light, icons 19px, labels 10px. Safe-area: padding-bottom env(safe-area-inset-bottom).
   - **Cards:** `var(--card-bg)` white, `var(--card-border)` border, `var(--card-shadow)` shadow, radius `var(--card-radius)`, hover lift 2px
   - **Stats:** accent stripe top 3px (green/blue/orange per status), 44px icon box
   - **Table:** `var(--card-muted)` header + row hover background
