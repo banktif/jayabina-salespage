@@ -452,7 +452,7 @@ body.admin-app{
   .admin-app .hdr-title h1{font-size:17px;line-height:1.15;letter-spacing:-.03em}
   .admin-app .hdr-title span{display:block;margin-top:3px;font-size:10px;color:var(--text3);letter-spacing:.08em}
   .admin-app .hdr-btn{width:44px;height:44px;border-radius:13px}
-  .admin-app .drawer{width:min(340px,90vw);background:var(--elevated);padding-top:env(safe-area-inset-top)}
+  .admin-app .drawer{width:min(240px,70vw);background:var(--elevated);padding-top:env(safe-area-inset-top)}
   .admin-app .drawer-head{padding:18px 20px!important;background:var(--jb-900);border:0!important;color:#fff}
   .admin-app .drawer-head .hdr-logo{border-color:rgba(255,255,255,.22)}
   .admin-app .drawer-head .drawer-sub{color:rgba(255,255,255,.60)!important}
