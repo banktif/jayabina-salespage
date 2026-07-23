@@ -243,34 +243,55 @@
     .toast.show{opacity:1}
 
     .schedule-page{display:none}
-    .cal-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 20px 16px}
-    .cal-nav h2{font-size:1rem;font-weight:700;margin:0;white-space:nowrap;letter-spacing:-.2px}
-    .cal-nav button{width:36px;height:36px;border:1px solid var(--border-strong);border-radius:10px;background:var(--elevated);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .15s;font-family:var(--font)}
-    .cal-nav button:active{transform:scale(.93)}
-    .cal-nav .cal-today{font-size:.7rem;font-weight:700;color:var(--accent);background:var(--accent-light);padding:6px 14px;border-radius:20px;cursor:pointer;border:none;width:auto;height:auto}
-    .cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-    .cal-day{border-radius:var(--radius-lg);border:1px solid var(--border);background:var(--elevated);padding:10px 8px;min-height:120px;transition:all .15s}
-    .cal-day:hover{border-color:var(--accent)}
-    .cal-day.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
-    .cal-day .cdd{font-size:.68rem;font-weight:700;color:var(--text3);margin-bottom:6px}
-    .cal-day.today .cdd{color:var(--accent)}
-    .cal-day .cddn{font-size:.66rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
-    .cal-task{display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:7px;margin-bottom:3px;font-size:.65rem;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cal-task:active{transform:scale(.97)}
-    .cal-task .cts{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-    .cal-task.assigned{background:var(--accent2-light);color:var(--accent2)}.cal-task.assigned .cts{background:var(--accent2)}
-    .cal-task.in_progress{background:var(--warning-light);color:var(--warning)}.cal-task.in_progress .cts{background:var(--warning)}
-    .cal-task.awaiting_review{background:var(--warning-light);color:var(--warning)}.cal-task.awaiting_review .cts{background:var(--warning)}
-    .cal-task.completed{background:var(--accent-light);color:var(--accent)}.cal-task.completed .cts{background:var(--accent)}
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px 20px}
+    .cal-nav-head{display:flex;align-items:center;gap:10px}
+    .cal-nav-head h2{font-size:1.1rem;font-weight:800;margin:0;letter-spacing:-.3px;line-height:1}
+    .cal-nav-head span{font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+    .cal-nav-arrows{display:flex;gap:4px}
+    .cal-nav-arrows button{width:38px;height:38px;border:1px solid var(--border-strong);border-radius:11px;background:var(--elevated);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .2s;font-family:var(--font);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .cal-nav-arrows button:hover{border-color:var(--accent);color:var(--accent)}
+    .cal-nav-arrows button:active{transform:scale(.93)}
+    .cal-today-btn{padding:8px 16px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap}
+    .cal-today-btn:hover{background:var(--accent);color:#fff}
+    .cal-today-btn:active{transform:scale(.96)}
+    .cal-week-header{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:0 20px 10px}
+    .cal-wh{text-align:center;font-size:.62rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:4px 0}
+    @media(max-width:1023px){.cal-week-header{display:none}}
+    .cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:0 20px}
+    .cal-day{border:1px solid var(--border);border-radius:14px;background:var(--elevated);padding:12px 10px;min-height:130px;transition:all .2s;position:relative;overflow:hidden}
+    .cal-day:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-1px)}
+    .cal-day.today{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-light) 0%,var(--elevated) 28px)}
+    .cal-day.today::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:0 0 2px 2px}
+    .cal-day.other-month{opacity:.4}
+    .cal-day .cd-num{font-size:.82rem;font-weight:800;color:var(--text2);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;margin-bottom:8px;transition:all .15s}
+    .cal-day.today .cd-num{background:var(--accent);color:#fff}
+    .cal-day .cd-tasks{display:flex;flex-direction:column;gap:3px}
+    .cal-task{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;font-size:.68rem;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.2;position:relative;overflow:hidden}
+    .cal-task:hover{filter:brightness(.96);transform:translateX(2px)}
+    .cal-task:active{transform:scale(.975)}
+    .cal-task .ct-avatar{width:24px;height:24px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;flex-shrink:0;letter-spacing:-.2px}
+    .cal-task .ct-info{flex:1;min-width:0;overflow:hidden}
+    .cal-task .ct-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-task .ct-time{font-size:.6rem;font-weight:500;opacity:.75}
+    .cal-task.assigned{border-left:3px solid var(--accent2);background:var(--accent2-light);color:var(--accent2)}.cal-task.assigned .ct-avatar{background:var(--accent2);color:#fff}
+    .cal-task.in_progress{border-left:3px solid var(--warning);background:var(--warning-light);color:var(--warning)}.cal-task.in_progress .ct-avatar{background:var(--warning);color:#fff}
+    .cal-task.awaiting_review{border-left:3px solid var(--warning);background:var(--warning-light);color:var(--warning)}.cal-task.awaiting_review .ct-avatar{background:var(--warning);color:#fff}
+    .cal-task.completed{border-left:3px solid var(--accent);background:var(--accent-light);color:var(--accent)}.cal-task.completed .ct-avatar{background:var(--accent);color:#fff}
+    .cal-more{font-size:.62rem;color:var(--text3);text-align:center;padding:3px 0;cursor:pointer;font-weight:600}
     @media(max-width:1023px){
-      .cal-week{grid-template-columns:1fr;gap:8px;padding:0 16px}
-      .cal-day{min-height:auto;padding:14px}
-      .cal-day .cdd{font-size:.8rem;margin-bottom:8px}
-      .cal-day .cddn{display:none}
-      .cal-nav{padding:0 16px 14px}
+      .cal-nav{padding:0 16px 12px;flex-wrap:wrap;gap:10px}
+      .cal-nav-head h2{font-size:.98rem}
+      .cal-week{grid-template-columns:1fr;gap:10px;padding:0 16px}
+      .cal-day{min-height:auto;padding:14px 16px;border-radius:16px}
+      .cal-day .cd-num{font-size:.9rem}
+      .cal-day .cd-tasks{gap:5px}
+      .cal-task{padding:9px 12px;font-size:.72rem}
+      .cal-task .ct-avatar{width:28px;height:28px;border-radius:8px;font-size:.64rem}
+      .cal-task .ct-time{font-size:.66rem}
     }
     @media(min-width:1024px){
-      .cal-nav{padding:0 0 20px}
+      .cal-nav{padding:0 0 24px}
+      .cal-week-header{padding:0 0 12px}
       .cal-week{gap:10px}
     }
   </style>
@@ -344,9 +365,10 @@
 <!-- MAIN (Schedule View) -->
 <div class="d-main schedule-page" id="dMainSchedule">
   <div class="d-hdr">
-    <div><h1 id="dCalTitle">Schedule</h1><p>Visual job planner across your assigned dates</p></div>
+    <div><h1 id="dCalTitle">Schedule</h1><p>Visual job planner — tap any task to manage</p></div>
   </div>
   <div class="cal-nav" id="calNav"></div>
+  <div class="cal-week-header" id="calWeekHeader"></div>
   <div class="cal-week" id="calWeek"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div>
 </div>
 
@@ -764,15 +786,21 @@ function goToday(){
 }
 
 function renderCalendar(){
-  var el=document.getElementById('calWeek'),nav=document.getElementById('calNav');
+  var el=document.getElementById('calWeek'),nav=document.getElementById('calNav'),wh=document.getElementById('calWeekHeader');
   var monday=getMonday(new Date(calWeekStart));
   calWeekStart=monday;
   var sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
 
-  nav.innerHTML='<button onclick="navigateWeek(-1)">\u2039</button><h2>'+formatRange(monday,sunday)+'</h2><div style="display:flex;gap:6px"><button class="cal-today" onclick="goToday()">Today</button><button onclick="navigateWeek(1)">\u203a</button></div>';
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var ms=months[monday.getMonth()],me=months[sunday.getMonth()];
+  var title=monday.getMonth()===sunday.getMonth()?ms+' '+monday.getFullYear():ms+' \u2013 '+me+' '+sunday.getFullYear();
+
+  nav.innerHTML='<div class="cal-nav-head"><h2>'+title+'</h2><span>'+monday.getDate()+' \u2013 '+sunday.getDate()+'</span></div><div style="display:flex;align-items:center;gap:8px"><button class="cal-today-btn" onclick="goToday()">Today</button><div class="cal-nav-arrows"><button onclick="navigateWeek(-1)" aria-label="Previous week">\u2039</button><button onclick="navigateWeek(1)" aria-label="Next week">\u203a</button></div></div>';
+
+  var dayNames=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  wh.innerHTML=dayNames.map(function(d){return'<div class="cal-wh">'+d+'</div>'}).join('');
 
   var t=today();
-  var dayNames=['MON','TUE','WED','THU','FRI','SAT','SUN'];
   var byDate={};
   jobs.forEach(function(x){var d=x.b.booking_date;if(!byDate[d])byDate[d]=[];byDate[d].push(x)});
 
@@ -782,14 +810,15 @@ function renderCalendar(){
     var ds=day.getFullYear()+'-'+String(day.getMonth()+1).padStart(2,'0')+'-'+String(day.getDate()).padStart(2,'0');
     var isToday=ds===t;
     h+='<div class="cal-day'+(isToday?' today':'')+'">';
-    h+='<div class="cdd">'+day.getDate()+(i===0||day.getDate()===1?' '+day.toLocaleDateString('en-GB',{month:'short'}):'')+'</div>';
-    h+='<div class="cddn">'+dayNames[i]+'</div>';
+    h+='<div class="cd-num">'+day.getDate()+'</div>';
     var dayJobs=(byDate[ds]||[]).slice().sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
+    h+='<div class="cd-tasks">';
     dayJobs.forEach(function(x){
-      var tn=x.b.customer_name.split(' ')[0];
-      h+='<div class="cal-task '+x.t.status+'" onclick="openJob(\''+x.t.id+'\')"><span class="cts"></span>'+ft(x.b.booking_time)+' '+esc(tn)+'</div>';
+      var nm=x.b.customer_name.split(' ');var init=(nm[0]?nm[0][0]:'')+(nm.length>1?nm[nm.length-1][0]:'').toUpperCase();
+      h+='<div class="cal-task '+x.t.status+'" onclick="openJob(\''+x.t.id+'\')"><div class="ct-avatar">'+init+'</div><div class="ct-info"><div class="ct-name">'+esc(x.b.customer_name)+'</div><div class="ct-time">'+ft(x.b.booking_time)+'</div></div></div>';
     });
-    h+='</div>';
+    if(dayJobs.length>3){h+='<div class="cal-more" onclick="goToday();setFilter(\'today\')">+ '+(dayJobs.length-3)+' more</div>'}
+    h+='</div></div>';
   }
   el.innerHTML=h;relucide();
 }
