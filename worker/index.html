@@ -263,6 +263,39 @@
     .cal-day.today{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-light) 0%,var(--elevated) 28px)}
     .cal-day.today::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:0 0 2px 2px}
     .cal-day.other-month{opacity:.4}
+    .cal-day.selected{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent);background:var(--accent-light)}
+    .cal-day.selected .cd-num{background:var(--accent);color:#fff}
+    .cal-tasklist{margin-top:28px;padding:0 20px}
+    .ctl-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+    .ctl-head h3{font-size:.85rem;font-weight:800;letter-spacing:-.2px;margin:0}
+    .ctl-head span{font-size:.66rem;color:var(--text3)}
+    .ctl-empty{text-align:center;padding:28px 20px;color:var(--text3)}
+    .ctl-empty .ei{font-size:2rem;margin-bottom:8px;opacity:.6}
+    .ctl-empty p{font-size:.78rem;margin:0}
+    .ctl-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:8px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+    .ctl-card:hover{border-color:var(--accent);transform:translateX(3px)}
+    .ctl-card:active{transform:scale(.985)}
+    .ctl-card .ctl-av{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;letter-spacing:-.2px}
+    .ctl-card .ctl-body{flex:1;min-width:0}
+    .ctl-card .ctl-name{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.1px}
+    .ctl-card .ctl-addr{font-size:.7rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+    .ctl-card .ctl-meta{display:flex;align-items:center;gap:8px;margin-top:5px}
+    .ctl-card .ctl-meta .ctl-slot{font-size:.68rem;font-weight:700;color:var(--accent);background:var(--accent-light);padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .ctl-card .ctl-meta .ctl-date{font-size:.68rem;color:var(--text3)}
+    .ctl-card .ctl-arrow{font-size:.9rem;color:var(--text3);flex-shrink:0}
+    .ctl-card.assigned .ctl-av{background:var(--accent2-light);color:var(--accent2)}
+    .ctl-card.in_progress .ctl-av{background:var(--warning-light);color:var(--warning)}
+    .ctl-card.awaiting_review .ctl-av{background:var(--warning-light);color:var(--warning)}
+    .ctl-card.completed .ctl-av{background:var(--accent-light);color:var(--accent)}
+    @media(max-width:1023px){
+      .cal-tasklist{margin-top:24px;padding:0 16px}
+      .ctl-card{padding:16px;border-radius:16px;gap:12px}
+      .ctl-card .ctl-av{width:48px;height:48px;border-radius:14px;font-size:.9rem}
+      .ctl-card .ctl-name{font-size:.92rem}
+    }
+    @media(min-width:1024px){
+      .cal-tasklist{padding:0}
+    }
     .cal-day .cd-num{font-size:.82rem;font-weight:800;color:var(--text2);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;margin-bottom:8px;transition:all .15s}
     .cal-day.today .cd-num{background:var(--accent);color:#fff}
     .cal-day .cd-tasks{display:flex;flex-direction:column;gap:3px}
@@ -370,6 +403,7 @@
   <div class="cal-nav" id="calNav"></div>
   <div class="cal-week-header" id="calWeekHeader"></div>
   <div class="cal-week" id="calWeek"><div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div></div>
+  <div class="cal-tasklist" id="calTaskList"></div>
 </div>
 
 <!-- MOBILE HEADER -->
@@ -484,7 +518,7 @@ function switchView(v){
   }else if(v==='schedule'){
     if(sc)sc.style.display='block';if(mh)mh.textContent='Schedule';
     document.getElementById('navSched').classList.add('active');
-    renderCalendar();
+    renderCalendar();renderTaskList();
   }else{
     jobs.style.display='block';if(mh)mh.textContent='My Jobs';renderJobs();
   }
@@ -546,7 +580,7 @@ async function loadJobs(){
     var tids=tasks.map(function(t){return t.id});photos={};
     for(var i=0;i<tids.length;i++){try{var pq=await SB.from('task_photos').select('*').eq('task_id',tids[i]);if(pq.data){(photos[tids[i]]=photos[tids[i]]||[]).push.apply(photos[tids[i]],Array.isArray(pq.data)?pq.data:[pq.data])}}catch(e){}}
     renderJobs();
-    renderCalendar();
+    if(currentView==='schedule'){renderCalendar();renderTaskList()}
   }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>'}
 }
 
@@ -772,17 +806,21 @@ async function doChangePassword(){
 }
 
 var calWeekStart=new Date();
+var calSelectedDate=today();
 function getMonday(d){var day=d.getDay();var diff=d.getDate()-day+(day===0?-6:1);var m=new Date(d);m.setDate(diff);m.setHours(0,0,0,0);return m}
 function formatDate(d){return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+
+function selectDay(ds){calSelectedDate=ds;renderCalendar();renderTaskList()}
 function formatRange(s,e){var sm=s.toLocaleDateString('en-GB',{month:'short'});var em=e.toLocaleDateString('en-GB',{month:'short',year:'numeric'});return s.getDate()+(sm!==em?' '+sm:'')+' \u2013 '+e.getDate()+' '+em}
 
 function navigateWeek(dir){
   calWeekStart.setDate(calWeekStart.getDate()+dir*7);
-  renderCalendar();
+  renderCalendar();renderTaskList();
 }
 function goToday(){
   calWeekStart=getMonday(new Date());
-  renderCalendar();
+  calSelectedDate=today();
+  renderCalendar();renderTaskList();
 }
 
 function renderCalendar(){
@@ -809,7 +847,7 @@ function renderCalendar(){
     var day=new Date(monday);day.setDate(monday.getDate()+i);
     var ds=day.getFullYear()+'-'+String(day.getMonth()+1).padStart(2,'0')+'-'+String(day.getDate()).padStart(2,'0');
     var isToday=ds===t;
-    h+='<div class="cal-day'+(isToday?' today':'')+'">';
+    h+='<div class="cal-day'+(isToday?' today':'')+(ds===calSelectedDate?' selected':'')+'" onclick="selectDay(\''+ds+'\')">';
     h+='<div class="cd-num">'+day.getDate()+'</div>';
     var dayJobs=(byDate[ds]||[]).slice().sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
     h+='<div class="cd-tasks">';
@@ -819,6 +857,31 @@ function renderCalendar(){
     });
     if(dayJobs.length>3){h+='<div class="cal-more" onclick="goToday();setFilter(\'today\')">+ '+(dayJobs.length-3)+' more</div>'}
     h+='</div></div>';
+  }
+  el.innerHTML=h;relucide();
+}
+
+function renderTaskList(){
+  var el=document.getElementById('calTaskList');if(!el)return;
+  var parts=calSelectedDate.split('-');
+  var dateLabel=parts[2]+'/'+parts[1]+'/'+parts[0];
+  var dayJobs=(jobs||[]).filter(function(x){return x.b.booking_date===calSelectedDate}).sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
+
+  var h='<div class="ctl-head"><h3>'+dateLabel+'</h3><span>'+dayJobs.length+' job'+(dayJobs.length!==1?'s':'')+'</span></div>';
+  if(!dayJobs.length){
+    h+='<div class="ctl-empty"><div class="ei"><i data-lucide="calendar-off"></i></div><p>No jobs on this day</p></div>';
+  }else{
+    dayJobs.forEach(function(x){
+      var b=x.b,t2=x.t;
+      var nm=b.customer_name.split(' ');var init=(nm[0]?nm[0][0]:'')+(nm.length>1?nm[nm.length-1][0]:'').toUpperCase();
+      h+='<div class="ctl-card '+t2.status+'" onclick="openJob(\''+t2.id+'\')">';
+      h+='<div class="ctl-av">'+init+'</div>';
+      h+='<div class="ctl-body"><div class="ctl-name">'+esc(b.customer_name)+'</div>';
+      h+='<div class="ctl-addr">'+esc(b.customer_address)+'</div>';
+      h+='<div class="ctl-meta"><span class="ctl-slot">'+ft(b.booking_time)+'</span>'+badge(t2.status)+'</div></div>';
+      h+='<div class="ctl-arrow"><i data-lucide="chevron-right"></i></div>';
+      h+='</div>';
+    });
   }
   el.innerHTML=h;relucide();
 }
