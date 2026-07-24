@@ -105,7 +105,18 @@ import this same file instead of needing a separate copy.
 
 # JAYABINA — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
-# Last updated: 2026-07-20
+# Last updated: 2026-07-24
+
+### ⚡ AUTONOMOUS-PLAN.md — MASTER PLAN (READ FIRST)
+**`AUTONOMOUS-PLAN.md`** is the master plan for the 100% autonomous system
+upgrade (100 job/hari). All agents MUST read this file at the start of every
+session. It contains: 7-layer architecture, 3-mode distribution engine,
+9-step staff workflow wizard, quotation/invoice/receipt pipeline, WhatsApp
+chatbot, AI photo verify, 24 notification triggers, implementation phases,
+file map, LOC estimates, and all locked decisions.
+
+**Current status:** PLAN LOCKED — Owner Approved. Phase 1 not yet started.
+**Plan checkpoint tag:** `autonomous-plan-v1` (create this tag before starting).
 # ⚠️ Site refactored to CLEAN URLS — real apps live in folders: admin/index.html,
 #    worker/index.html (staff), customer/index.html. Root *.html are redirect stubs.
 #    Hosted on Cloudflare Pages (migrated from GitHub Pages). See section 13 for
