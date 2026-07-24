@@ -129,6 +129,65 @@ This section supersedes older Supabase architecture and deploy notes below.
 - ⛔ **WWW SITE LOCKED (owner order, 2026-07-20):** `www.jayabina.com` (Pages project `jayabina`, `site/` Hugo source) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session. GrapesJS editor `protectReason()` guards `site/content/` — do NOT disable it.
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
 - ⛔ **DUAL MENU SYNC LOCKED (owner order, 2026-07-24):** EVERY menu change MUST update ALL THREE menu locations simultaneously — (1) desktop sidebar `.d-sidebar`, (2) mobile drawer `.drawer-menu`, AND (3) mobile bottom nav `.bnav`. Do NOT add/edit a navigation item in one location and forget the others. If a new tab/view is added, its nav item MUST appear in all three, and its `showXxx()` function must be registered in `refreshView()`, `checkAccess()` hash router, and `clearNav()`/`setNav()` calls. Any violation = broken mobile navigation.
+
+- ⛔ **DRAWER MOBILE MENU LOCKED (owner order, 2026-07-24):** The mobile drawer menu HTML, CSS, and JS across ALL 3 portals (admin, worker/staff, customer/akaun) must NEVER be modified, restructured, or have their design altered without explicit owner instruction. The drawer is the PRIMARY mobile navigation for all portals — touching it breaks mobile UX on ALL 3 simultaneously.
+
+  **COVERED FILES (touch any = drawer breakage):**
+  | File | Role | Rule |
+  |------|------|------|
+  | `portal-shared.css` (root + `site/assets/css/` + `site/static/`) | Shared drawer CSS for ALL 3 portals | NEVER edit `.drawer-overlay`, `.drawer`, `.drawer-menu`, `.drawer-item`, `.drawer-head`, `.drawer-sub` rules or their mobile `@media(max-width:1023px)` overrides |
+  | `admin/index.html` | Admin drawer HTML (accordion sections) + inline `.dr-section/*` CSS + `toggleDrawer()`/`toggleDrSection()` JS | NEVER restructure accordion sections, change chevron behavior, or modify focus-trap logic |
+  | `worker/index.html` | Worker drawer HTML (flat list) + `toggleDrawer()` JS | NEVER add accordion sections or change flat-list layout |
+  | `customer/index.html` | Customer drawer HTML (flat list) + `toggleDrawer()` JS | NEVER add accordion sections or change flat-list layout |
+  | `admin-modern.css` | Admin drawer scrollbar restoration (`.admin-app .drawer`) | NEVER remove/disable — admin needs visible scrollbar |
+  | `theme.css` | Global scrollbar hide + hover reveal for `.drawer` | NEVER remove hover scrollbar reveal rules |
+
+  **LOCKED CSS RULES (portal-shared.css):**
+  1. `.drawer-overlay` — fixed fullscreen backdrop, `rgba(0,0,0,.4)`, z-index 55, transition opacity .25s
+  2. `.drawer` — right-side sliding panel, width `min(240px,70vw)` mobile / `240px` base, z-index 60, `background:var(--card-bg)`, transform `translateX(100%)→translateX(0)`, cubic-bezier(.16,1,.3,1) transition, `overflow-y:auto` with thin scrollbar
+  3. `.drawer-menu` — `padding:8px` for item grouping
+  4. `.drawer-item` — flex row, gap 10px, padding 12px 14px, border-radius 10px, font-size .8rem, font-weight 600, color `var(--text2)`, hover bg `var(--bg)` color `var(--text)`, icon span 24px width center-aligned
+  5. `.drawer-head` — padding 16px 20px, border-bottom `1px solid var(--border)`, logo 40x40, "JAYABINA" title 800 .95rem, subtitle .68rem `var(--text3)`
+  6. Desktop hide (`@media(min-width:1024px)`): `.drawer,.drawer-overlay{display:none!important}`
+  7. Mobile override (`@media(max-width:1023px)`): `.drawer-head` dark green bg (`var(--jb-900,#0d3b2e)`), white text, logo border `rgba(255,255,255,.22)`, subtitle `rgba(255,255,255,.6)`; `.drawer-item` min-height 48px, font-size 14px, padding `0 14px`
+
+  **LOCKED JS BEHAVIOR:**
+  1. `toggleDrawer()` MUST toggle `.open` on BOTH `#drawer` AND `#drawerOverlay` simultaneously
+  2. `#burgerBtn` MUST update `aria-expanded="true/false"` on toggle
+  3. Admin variant: MUST lock body scroll (`overflow:hidden`) when open + focus trap (save/restore `document.activeElement`, focus first button on open)
+  4. Admin variant: Escape key closes drawer (keydown listener)
+  5. Admin `toggleDrSection(id)`: accordion auto-close — only ONE `.dr-section.open` at a time; updates `aria-expanded` on `.dr-trigger`
+
+  **LOCKED DRAWER HTML PER PORTAL:**
+
+  **Admin** (`admin/index.html`):
+  - Drawer head: JB logo 40x40 + "JAYABINA" + "Operations Portal" subtitle
+  - 4 accordion sections (`.dr-section`): Operations (`drOps`), Biz (`drBiz`), Team & Analytics (`drTeam`), System (`drSys`)
+  - Each section: `.dr-trigger` with icon + label + `.dr-chevron` (▾ rotated 180deg when open), `.dr-body` with nested `.drawer-item` (padding-left:38px indent)
+  - Bottom group (border-top separator): Refresh data, Theme, Log out (danger red)
+  - Dr-section CSS: `.dr-trigger` matches `.drawer-item` sizing; `.dr-chevron` margin-left:auto, font-size:.6rem, opacity:.5
+
+  **Worker** (`worker/index.html`):
+  - Drawer head: JB logo + "JAYABINA" + "Worker Portal" subtitle
+  - Top group (flat, NO accordion): Active Jobs, Today, All Jobs, Completed, Schedule
+  - Bottom group (border-top separator): Profile, Theme, Log out (danger red)
+
+  **Customer** (`customer/index.html`):
+  - Drawer head: JB logo + "JAYABINA" + "Customer Portal" subtitle
+  - Top group (flat, NO accordion): All Bookings, Active, Completed, Quotations, Invoices, Receipts
+  - Bottom group (border-top separator): Theme, Switch account (danger red)
+
+  **LOCKED SCROLLBAR TRIPLE-LAYER:**
+  1. `theme.css`: ALL scrollbars hidden by default; `.drawer:hover` reveals thin scrollbar (5px, border-radius 20px, thumb `var(--border-strong)`) — DO NOT remove
+  2. `admin-modern.css`: `.admin-app .drawer` restores ALWAYS-visible scrollbar (6px, border-radius 999px) — ONLY for admin, DO NOT remove
+  3. `portal-shared.css`: `.drawer` base `scrollbar-width:thin`, `scrollbar-color:var(--border-strong) transparent`, 4px webkit scrollbar — DO NOT remove
+
+  **🔁 ROLLBACK:**
+  ```bash
+  git reset --hard drawer-menu-locked
+  git push origin master --force
+  ```
+  Tag `drawer-menu-locked` (commit `20cc15b`) is protected — never delete this tag.
 - ⛔ **CUCI TANGKI PAGE FULL LOCK (owner order, 2026-07-22):** The ENTIRE cuci tangki page (`site/layouts/partials/service-tank.html`) is FULLY LOCKED. This is the PRIMARY booking funnel and main revenue page. NO AI agent, debug session, or automated tool may modify ANY part of this file — HTML structure, inline CSS, inline JS, booking form logic, section layouts, copy text, button colors, spacing, image references, ANYTHING — without explicit owner instruction in the current session. This lock supersedes ALL other task instructions. Violating this lock = site revenue at risk.
 
   **COVERED SECTIONS (locked individually + collectively):**
