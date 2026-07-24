@@ -61,6 +61,22 @@ export async function handleQuotations(req: Request, env: Env, path: string): Pr
       });
       await db.update(quotations).set({ status: 'accepted', convertedBookingId: bId, updatedAt: nowISO() })
         .where(eq(quotations.id, qid));
+
+      // Notify admin about accepted quotation
+      const adminPhone = await getSetting(db, 'wa_business_number');
+      if (adminPhone && env.WA_PHONE_NUMBER_ID && env.WA_ACCESS_TOKEN) {
+        try {
+          let digits = adminPhone.replace(/\D/g, '');
+          if (digits.startsWith('0')) digits = '6' + digits;
+          await fetch(`https://graph.facebook.com/v22.0/${env.WA_PHONE_NUMBER_ID}/messages`, {
+            method: 'POST', headers: { 'Authorization': `Bearer ${env.WA_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messaging_product: 'whatsapp', to: digits, type: 'text',
+              text: { body: `*Quotation Accepted*\n\n${q.customerName} accepted quotation ${q.number || q.id.substring(0,8)} for ${q.serviceType}\nAmount: RM${q.amount}\nBooking created: ${bId}` }
+            })
+          });
+        } catch {}
+      }
+
       return ok({ accepted: true, booking_id: bId });
     } catch (e: any) { return err(e.msg || 'Error', e.status || 400); }
   }

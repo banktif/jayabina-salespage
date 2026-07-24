@@ -268,6 +268,39 @@ async function openDetail(id){
 
   document.getElementById('mBody').innerHTML=h;
 
+  // Fetch linked documents for this booking
+  try{
+    var ir=await fetch(API_URL+'/api/invoices/customer?phone='+encodeURIComponent(myPhone));
+    var idata=await ir.json();var invs=(idata.data||idata)||[];
+    var myInv=invs.find(function(i){return i.booking_id===id});
+    if(myInv){
+      var invHtml='<div style="margin-top:16px"><div style="font-weight:700;margin-bottom:8px;font-size:.78rem">Invoice</div>'+
+        '<div style="background:#f8faf9;padding:12px;border-radius:8px;font-size:.76rem">'+
+        '<strong>'+esc(myInv.number)+'</strong> &mdash; RM'+(myInv.subtotal||0)+' '+
+        '<span class="badge '+myInv.status+'"><span class="bd"></span>'+myInv.status+'</span> '+
+        '<a href="'+API_URL+'/api/invoices/'+myInv.id+'/pdf" target="_blank" style="color:var(--accent);margin-left:8px">PDF</a>'+
+        '</div></div>';
+      h+=invHtml;
+      document.getElementById('mBody').innerHTML=h;
+
+      var rr=await fetch(API_URL+'/api/receipts/customer?phone='+encodeURIComponent(myPhone));
+      var rdata=await rr.json();var rcpts=(rdata.data||rdata)||[];
+      var myRcpts=rcpts.filter(function(r){return r.booking_id===id});
+      if(myRcpts.length){
+        var rHtml='<div style="margin-top:8px"><div style="font-weight:700;margin-bottom:8px;font-size:.78rem">Receipts</div>';
+        myRcpts.forEach(function(r){
+          rHtml+='<div style="background:#f0fdf4;padding:10px 12px;border-radius:8px;font-size:.76rem;margin-bottom:4px">'+
+            '<strong>'+esc(r.number)+'</strong> &mdash; RM'+(r.amount||0)+' &middot; '+esc(r.payment_type)+' '+
+            '<a href="'+API_URL+'/api/receipts/'+r.id+'/pdf" target="_blank" style="color:var(--accent);margin-left:8px">PDF</a>'+
+            '</div>';
+        });
+        rHtml+='</div>';
+        h+=rHtml;
+        document.getElementById('mBody').innerHTML=h;
+      }
+    }
+  }catch(e){}
+
   var a='<button class="m-btn wa" onclick="window.open(\'https://wa.me/'+waNum(myPhone)+'?text=Salam JAYABINA, booking ref '+b.id.substring(0,8)+'\',\'_blank\')"><i data-lucide="message-circle"></i> WhatsApp</button>';
   if(b.status==='completed'&&b.payment_status==='paid'){
     a+='<button class="m-btn accept" id="payBalanceBtn" onclick="payBalance(\''+b.id+'\')"><i data-lucide="credit-card"></i> Pay Balance</button>';

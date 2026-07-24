@@ -25,6 +25,7 @@ import { handleSubscriptions } from './routes/subscriptions';
 import { handleAbandon } from './routes/analytics';
 import { handleTracking } from './routes/tracking';
 import { handleRefund } from './routes/payments';
+import { handleChain, handleReports } from './routes/reports';
 import { processNotifications, sendScheduledReminders } from './queue/notification-processor';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
@@ -221,6 +222,18 @@ app.all('/api/tracking', (c) => handleTracking(c.req.raw, c.env));
 app.all('/api/tracking/*', (c) => handleTracking(c.req.raw, c.env));
 
 app.all('/api/payments/refund', (c) => handleRefund(c.req.raw, c.env));
+
+const handleChainRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleChain(req, env, path);
+};
+app.all('/api/chain/*', (c) => handleChainRoute(c.req.raw, c.env));
+
+const handleReportsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleReports(req, env, path);
+};
+app.all('/api/reports/*', (c) => handleReportsRoute(c.req.raw, c.env));
 
 app.notFound(() => err('Not found', 404));
 

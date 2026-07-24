@@ -1995,6 +1995,7 @@ async function showInvoices(){
     var h='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+
       '<div class="pf-field" style="flex:1;min-width:200px"><input id="invBid" class="sInp" placeholder="Booking ID to generate invoice"></div>'+
       '<button class="btn-primary" onclick="generateInvoice()">Generate Invoice</button>'+
+      '<button class="d-btn" onclick="exportInvoices()">Export CSV</button>'+
       '<span id="invMsg" style="font-size:.72rem;align-self:center"></span></div>';
 
     if(!rows.length){
@@ -2003,6 +2004,7 @@ async function showInvoices(){
       h+='<div class="d-card"><table><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Deposit</th><th>Balance</th><th>Status</th><th></th></tr></thead><tbody>';
       rows.forEach(function(r){
         var acts='<a href="'+API_URL+'/api/invoices/'+r.id+'/pdf" target="_blank" class="d-btn" style="padding:2px 6px;font-size:.68rem;text-decoration:none" title="View PDF">&#128196;</a>';
+        if(r.booking_id)acts+='<button class="d-btn" style="padding:2px 6px;font-size:.68rem" onclick="viewChain(\''+r.booking_id+'\')" title="View Chain">&#128279;</button>';
         if(r.status==='pending')acts+='<button class="d-btn acc" style="padding:2px 6px;font-size:.68rem" onclick="sendInvoice(\''+r.id+'\')">Send</button>';
         if(r.status!=='paid')acts+='<button class="d-btn don" style="padding:2px 6px;font-size:.68rem" onclick="markInvoicePaid(\''+r.id+'\')">Paid</button>';
         h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.customer_name)+'</td><td>RM'+(r.subtotal||0)+'</td><td>RM'+(r.deposit_paid||0)+'</td><td>RM'+(r.balance_due||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td><td><div style="display:flex;gap:3px">'+acts+'</div></td></tr>';
@@ -2029,6 +2031,45 @@ async function markInvoicePaid(id){
     var res=await SB.from('invoices').update({status:'paid'}).eq('id',id);
     if(res.error)throw res.error;
     showInvoices();
+  }catch(e){alert('Error: '+(e.message||e))}
+}
+function exportInvoices(){
+  window.open(API_URL+'/api/reports/export?from=2026-01-01&to='+new Date().toISOString().split('T')[0],'_blank');
+}
+async function viewChain(bid){
+  var token=localStorage.getItem('jc_token');
+  try{
+    var res=await fetch(API_URL+'/api/chain/'+bid,{headers:{'Authorization':'Bearer '+token}});
+    var d=await res.json();
+    var data=d.data||{};
+    var h='<div style="display:flex;flex-direction:column;gap:12px;padding:8px 0">';
+    if(data.quotation){
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8faf9;border-radius:8px;border-left:3px solid #166534">'+
+        '<div style="font-size:.7rem;font-weight:700;color:#166534;text-transform:uppercase">Quotation</div>'+
+        '<div style="flex:1;font-size:.82rem"><strong>'+esc(data.quotation.number||'')+'</strong> &mdash; RM'+(data.quotation.amount||0)+' &mdash; '+esc(data.quotation.status)+'</div></div>';
+    }
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8faf9;border-radius:8px;border-left:3px solid #3b82f6">'+
+      '<div style="font-size:.7rem;font-weight:700;color:#3b82f6;text-transform:uppercase">Booking</div>'+
+      '<div style="flex:1;font-size:.82rem"><strong>'+esc(data.booking.customer_name)+'</strong> &mdash; '+esc(data.booking.status)+'</div></div>';
+    if(data.invoice){
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8faf9;border-radius:8px;border-left:3px solid #f59e0b">'+
+        '<div style="font-size:.7rem;font-weight:700;color:#f59e0b;text-transform:uppercase">Invoice</div>'+
+        '<div style="flex:1;font-size:.82rem"><strong>'+esc(data.invoice.number)+'</strong> &mdash; RM'+(data.invoice.subtotal||0)+' &mdash; '+esc(data.invoice.status)+'</div></div>';
+    }
+    if(data.receipts&&data.receipts.length){
+      data.receipts.forEach(function(r){
+        h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #10b981">'+
+          '<div style="font-size:.7rem;font-weight:700;color:#10b981;text-transform:uppercase">Receipt</div>'+
+          '<div style="flex:1;font-size:.82rem"><strong>'+esc(r.number)+'</strong> &mdash; RM'+(r.amount||0)+' &mdash; '+esc(r.payment_type)+'</div></div>';
+      });
+    }
+    if(!data.quotation&&!data.invoice&&!data.receipts.length){
+      h+='<p style="color:var(--text3);text-align:center">No linked documents found.</p>';
+    }
+    h+='</div>';
+    document.getElementById('mTitle').textContent='Document Chain';document.getElementById('mBody').innerHTML=h;
+    document.getElementById('mActs').innerHTML='<button class="d-btn" onclick="closeModal()">Close</button>';
+    openModal();
   }catch(e){alert('Error: '+(e.message||e))}
 }
 async function generateInvoice(){
