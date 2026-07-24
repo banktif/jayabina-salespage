@@ -41,6 +41,15 @@
       .qact-btn.accept{color:var(--accent);border-color:var(--accent)}.qact-btn.accept:active,.qact-btn.accept:hover{background:var(--accent);color:#fff}
       .qact-btn.done{color:var(--accent2);border-color:var(--accent2)}.qact-btn.done:active,.qact-btn.done:hover{background:var(--accent2);color:#fff}
       .qact-btn.decline{color:var(--danger);border-color:var(--danger)}.qact-btn.decline:active,.qact-btn.decline:hover{background:var(--danger);color:#fff}
+
+    /* Sidebar accordion sections */
+    .d-nav-section{overflow:hidden;transition:max-height .25s ease}
+    .d-nav-section.collapsed{max-height:0!important}
+    .d-nav-section .d-nav-label{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+    .d-nav-section .d-nav-label::after{content:'▾';font-size:.6rem;transition:transform .2s;opacity:.5}
+    .d-nav-section.collapsed .d-nav-label::after{transform:rotate(-90deg)}
+    .d-nav-section.collapsed .d-nav-label{margin-bottom:0}
+    .d-sidebar{overflow-y:auto}
     }
 
     /* Phone-specific styles */
@@ -303,26 +312,38 @@
   </div>
   <div class="d-nav-label">Overview</div>
   <button class="d-nav-item active" id="dsDash" onclick="showDashboard()"><span class="dni"><i data-lucide="layout-dashboard"></i></span> Dashboard</button>
-  <div class="d-nav-label">Operations</div>
-  <button class="d-nav-item" id="dsAll" onclick="showBookings()"><span class="dni"><i data-lucide="layout-grid"></i></span> Bookings</button>
-  <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni"><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
-  <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni"><i data-lucide="check"></i></span> Confirmed</button>
-  <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
-  <button class="d-nav-item" id="dsSchedule" onclick="showSchedule()"><span class="dni"><i data-lucide="calendar"></i></span> Schedule</button>
-  <button class="d-nav-item" id="dsCustomers" onclick="showCustomers()"><span class="dni"><i data-lucide="contact"></i></span> Customers</button>
-  <div class="d-nav-label">Biz</div>
-  <button class="d-nav-item" id="dsQuotations" onclick="showQuotations()"><span class="dni"><i data-lucide="file-text"></i></span> Quotations</button>
-  <button class="d-nav-item" id="dsInvoices" onclick="showInvoices()"><span class="dni"><i data-lucide="receipt"></i></span> Invoices</button>
-  <button class="d-nav-item" id="dsReceipts" onclick="showReceipts()"><span class="dni"><i data-lucide="file-check"></i></span> Receipts</button>
-  <div class="d-nav-label">Team &amp; Analytics</div>
-  <button class="d-nav-item" id="dsAutopilot" onclick="showAutopilot()"><span class="dni"><i data-lucide="bot"></i></span> Autopilot</button>
-  <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
-  <button class="d-nav-item" id="dsStaffPriority" onclick="showStaffPriority()"><span class="dni"><i data-lucide="list-ordered"></i></span> Priority</button>
-  <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Reports</button>
-  <div class="d-nav-label">System</div>
-  <button class="d-nav-item" id="dsWebsite" onclick="showWebsite()"><span class="dni"><i data-lucide="globe-2"></i></span> Website</button>
-  <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Settings</button>
-  <button class="d-nav-item" id="dsBackup" onclick="showBackup()"><span class="dni"><i data-lucide="database-backup"></i></span> Backup</button>
+
+  <div class="d-nav-section" id="secOps">
+    <div class="d-nav-label" onclick="toggleSection('secOps')">Operations ▸</div>
+    <button class="d-nav-item" id="dsAll" onclick="showBookings()"><span class="dni"><i data-lucide="layout-grid"></i></span> Bookings</button>
+    <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni"><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
+    <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni"><i data-lucide="check"></i></span> Confirmed</button>
+    <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
+    <button class="d-nav-item" id="dsSchedule" onclick="showSchedule()"><span class="dni"><i data-lucide="calendar"></i></span> Schedule</button>
+    <button class="d-nav-item" id="dsCustomers" onclick="showCustomers()"><span class="dni"><i data-lucide="contact"></i></span> Customers</button>
+  </div>
+
+  <div class="d-nav-section" id="secBiz">
+    <div class="d-nav-label" onclick="toggleSection('secBiz')">Biz ▸</div>
+    <button class="d-nav-item" id="dsQuotations" onclick="showQuotations()"><span class="dni"><i data-lucide="file-text"></i></span> Quotations</button>
+    <button class="d-nav-item" id="dsInvoices" onclick="showInvoices()"><span class="dni"><i data-lucide="receipt"></i></span> Invoices</button>
+    <button class="d-nav-item" id="dsReceipts" onclick="showReceipts()"><span class="dni"><i data-lucide="file-check"></i></span> Receipts</button>
+  </div>
+
+  <div class="d-nav-section" id="secTeam">
+    <div class="d-nav-label" onclick="toggleSection('secTeam')">Team &amp; Analytics ▸</div>
+    <button class="d-nav-item" id="dsAutopilot" onclick="showAutopilot()"><span class="dni"><i data-lucide="bot"></i></span> Autopilot</button>
+    <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
+    <button class="d-nav-item" id="dsStaffPriority" onclick="showStaffPriority()"><span class="dni"><i data-lucide="list-ordered"></i></span> Priority</button>
+    <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Reports</button>
+  </div>
+
+  <div class="d-nav-section" id="secSys">
+    <div class="d-nav-label" onclick="toggleSection('secSys')">System ▸</div>
+    <button class="d-nav-item" id="dsWebsite" onclick="showWebsite()"><span class="dni"><i data-lucide="globe-2"></i></span> Website</button>
+    <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Settings</button>
+    <button class="d-nav-item" id="dsBackup" onclick="showBackup()"><span class="dni"><i data-lucide="database-backup"></i></span> Backup</button>
+  </div>
   <div class="d-sidebar-footer">
     <button onclick="refreshView()"><i data-lucide="refresh-cw"></i> Refresh data</button>
     <button onclick="toggleTheme()"><i data-lucide="sun-moon"></i> Theme</button>
@@ -555,6 +576,7 @@ async function quickUpdate(id,s){if(!confirmStatus(s))return;try{var r=await SB.
 
 // ═══════════ VIEW SWITCHING ═══════════
 function esc(s){return(s===null||s===undefined?'':s).toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+function toggleSection(id){var s=document.getElementById(id);if(s)s.classList.toggle('collapsed');}
 function errorMessage(e){return e&&e.message?e.message:(typeof e==='string'?e:'Request failed. Please try again.')}
 function localDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function moneyValue(v){var n=Number(v);return Number.isFinite(n)?n:0}
