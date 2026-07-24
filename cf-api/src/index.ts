@@ -20,6 +20,9 @@ import { handleWorkflow, handleWorkflowPhoto } from './routes/workflow';
 import { handleEmail } from './routes/email';
 import { handleWAWebhook } from './routes/wa-bot';
 import { handleAIVerify } from './routes/ai-verify';
+import { handlePartners } from './routes/partners';
+import { handleSubscriptions } from './routes/subscriptions';
+import { handleAbandon } from './routes/analytics';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
 
@@ -194,6 +197,22 @@ const handleAIVerifyRoute = (req: Request, env: Env) => {
 };
 app.all('/api/ai/verify', (c) => handleAIVerifyRoute(c.req.raw, c.env));
 app.all('/api/ai/verify/*', (c) => handleAIVerifyRoute(c.req.raw, c.env));
+
+const handlePartnersRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handlePartners(req, env, path);
+};
+app.all('/api/partners', (c) => handlePartnersRoute(c.req.raw, c.env));
+app.all('/api/partners/*', (c) => handlePartnersRoute(c.req.raw, c.env));
+
+const handleSubscriptionsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleSubscriptions(req, env, path);
+};
+app.all('/api/subscriptions', (c) => handleSubscriptionsRoute(c.req.raw, c.env));
+app.all('/api/subscriptions/*', (c) => handleSubscriptionsRoute(c.req.raw, c.env));
+
+app.all('/api/analytics/abandon', (c) => handleAbandon(c.req.raw, c.env));
 
 app.notFound(() => err('Not found', 404));
 
