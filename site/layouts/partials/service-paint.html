@@ -244,9 +244,11 @@
     @media(max-width:1023px){
       .container{width:min(calc(100% - 40px),var(--container))}      .hero{min-height:auto;padding:116px 0 72px}
       .hero-grid{grid-template-columns:1fr;row-gap:20px}
-      .hero-copy{max-width:760px;display:contents}
-      .hero-visual{max-width:680px;order:1}
+      .hero-grid>.hero-copy,.hero-grid>.hero-visual{grid-column:auto;grid-row:auto}
+      .hero-copy{max-width:760px;text-align:center;display:contents}
+      .hero-copy h1,.hero-copy .lead{text-align:center}
       .hero-actions{order:2}
+      .hero-visual{max-width:680px;order:1}
       .emotion-grid{display:flex;flex-direction:column}
       .emotion-copy{max-width:760px;display:contents;order:1}
       .emotion-visual{max-width:900px;order:2}

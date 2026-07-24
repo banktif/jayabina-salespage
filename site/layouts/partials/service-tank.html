@@ -293,9 +293,10 @@
       .hero::before{width:450px;height:450px;right:-240px;top:-280px}
       .hero-grid{grid-template-columns:1fr;row-gap:20px}
       .hero-grid>.hero-copy,.hero-grid>.hero-visual{grid-column:auto;grid-row:auto}
-      .hero-copy{max-width:760px;text-align:center}
+      .hero-copy{max-width:760px;text-align:center;display:contents}
       .hero-copy h1,.hero-copy .lead{text-align:center}
-      .hero-visual{max-width:680px}
+      .hero-actions{order:2}
+      .hero-visual{max-width:680px;order:1}
       .hero-visual-badge{left:20px;bottom:20px;font-size:.76rem}
       .trust-grid{grid-template-columns:1fr 1fr}
       .trust-item:nth-child(2){border-right:0}
