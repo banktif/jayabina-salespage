@@ -18,6 +18,8 @@ import { handleInvoices } from './routes/invoices';
 import { handleReceipts } from './routes/receipts';
 import { handleWorkflow, handleWorkflowPhoto } from './routes/workflow';
 import { handleEmail } from './routes/email';
+import { handleWAWebhook } from './routes/wa-bot';
+import { handleAIVerify } from './routes/ai-verify';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
 
@@ -183,6 +185,15 @@ const handleEmailRoute = (req: Request, env: Env) => {
 };
 app.all('/api/email', (c) => handleEmailRoute(c.req.raw, c.env));
 app.all('/api/email/*', (c) => handleEmailRoute(c.req.raw, c.env));
+
+app.all('/api/wa/webhook', (c) => { const p = new URL(c.req.raw.url).pathname; return handleWAWebhook(c.req.raw, c.env, p); });
+
+const handleAIVerifyRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleAIVerify(req, env, path);
+};
+app.all('/api/ai/verify', (c) => handleAIVerifyRoute(c.req.raw, c.env));
+app.all('/api/ai/verify/*', (c) => handleAIVerifyRoute(c.req.raw, c.env));
 
 app.notFound(() => err('Not found', 404));
 

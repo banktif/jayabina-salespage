@@ -94,6 +94,7 @@ export interface JWTPayload {
 export interface Env {
   DB: D1Database;
   BACKUP_R2?: R2Bucket;
+  AI?: any;
   JWT_SECRET: string;
   BAYARCASH_PAT: string;
   BAYARCASH_API_SECRET: string;
