@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ⛔ HERO DESIGN LOCKED (owner order 2026-07-20): Mobile layout = center text → image → buttons. Do NOT modify hero section. See AGENTS.md section 14. -->
 <html lang="ms" class="js">
 <head>
   <meta charset="UTF-8">
@@ -18,6 +19,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Servis Cuci Tangki Air Rumah KL &amp; Selangor | JAYABINA</title>
   <script>document.documentElement.className='js';window.setTimeout(function(){document.documentElement.classList.add('js-fallback')},2500);</script>
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
+  {{ partial "theme-colors.html" . }}
   <style>
     :root{
       --green-950:#052e22;
@@ -96,45 +101,23 @@
     .btn-wa{background:var(--wa);color:var(--white);box-shadow:0 10px 24px rgba(18,140,126,.2)}
     .btn-wa:hover{background:#0b5f59}
     :focus-visible{outline:3px solid var(--white);outline-offset:2px;box-shadow:0 0 0 5px #16a36a}
-
-    .site-nav{position:fixed;inset:0 0 auto;z-index:100;height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow-sm)}
-    .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .brand{display:flex;align-items:center;gap:11px;font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:800;color:var(--green-950);letter-spacing:-.02em}
-    .brand-mark{width:38px;height:38px;display:block;border-radius:11px;box-shadow:0 5px 14px rgba(13,59,46,.16)}
-    .nav-links{display:flex;align-items:center;gap:28px;list-style:none;margin:0;padding:0}
-    .nav-links a{color:var(--grey-700);font-size:.94rem;font-weight:600}
-    .nav-links a:hover,.nav-links a.active{color:var(--green-700)}
-    .nav-actions{display:flex;align-items:center;gap:12px}
-    .nav-actions .btn{min-height:44px;padding:10px 18px;font-size:.93rem}
-    .nav-right{display:flex;align-items:center;gap:10px}
-    .menu-toggle{display:block;width:46px;height:46px;padding:0;border:1px solid var(--grey-200);border-radius:12px;background:var(--white);cursor:pointer}
-    .menu-toggle span{display:block;width:21px;height:2px;margin:4px auto;background:var(--green-950);border-radius:99px;transition:transform .2s ease,opacity .2s ease}
-    .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
-    .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-    .mobile-menu{display:none;position:fixed;z-index:99;top:72px;right:max(16px,calc((100vw - var(--container)) / 2));width:min(340px,calc(100vw - 32px));max-height:calc(100dvh - 92px);overflow-y:auto;padding:16px 18px 20px;background:var(--white);border:1px solid var(--grey-200);border-radius:18px;box-shadow:var(--shadow)}
-    .mobile-menu.open{display:grid;gap:6px}
-    .mobile-menu a{min-height:44px;display:flex;align-items:center;padding:6px 8px;border-radius:10px;color:var(--grey-700);font-weight:600}
-    .mobile-menu a:hover{background:var(--green-50);color:var(--green-800)}
-    .mobile-menu .btn{margin-top:10px;color:var(--white);padding-inline:18px}
-    .mm-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--grey-500);text-transform:uppercase;margin:10px 8px 2px}
-    .mm-sections{display:grid;gap:6px}
-    @media(min-width:1024px){.mobile-menu{top:80px}.mm-sections{display:none}}
-
-    .hero{min-height:760px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
-    .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
-    .hero-grid{position:relative;display:grid;grid-template-columns:1fr 1.5fr;gap:56px;align-items:center}
+    .hero{min-height:700px;padding:160px 0 90px;background:linear-gradient(135deg,#051f15 0%,#0d3b2e 35%,#145c3d 70%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background-image:radial-gradient(circle at 80% 20%,rgba(74,222,128,.08) 0%,transparent 50%),radial-gradient(circle at 20% 80%,rgba(72,199,142,.06) 0%,transparent 50%);pointer-events:none}
+    .hero::before{content:'';position:absolute;width:720px;height:720px;border:1px solid rgba(255,255,255,.06);border-radius:50%;right:-280px;top:-320px;box-shadow:0 0 0 100px rgba(74,222,128,.03),0 0 0 200px rgba(74,222,128,.02)}
     .hero h1{color:var(--white)}
     .hero h1 span{color:#9de3ba}
-    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px}
-    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em}
-    .pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 5px rgba(74,222,128,.13)}
-    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-    .hero-note{display:flex;align-items:center;gap:9px;margin:0;color:#c7d8d1;font-size:.92rem}
-    .hero-note::before{content:'✓';width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:rgba(157,227,186,.13);color:#9de3ba;font-weight:700}
-    .hero-visual{position:relative;margin:0;padding:10px;border:1px solid rgba(255,255,255,.18);border-radius:28px;background:rgba(255,255,255,.06);box-shadow:0 32px 80px rgba(0,0,0,.24)}
-    .hero-visual img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:20px}
-    .hero-visual-badge{position:absolute;left:24px;bottom:24px;padding:9px 14px;border-radius:999px;background:rgba(5,46,34,.9);border:1px solid rgba(255,255,255,.25);color:var(--white);font-size:.82rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+    .hero-copy>.lead{color:#c7d8d1;max-width:56ch;margin-bottom:24px;font-size:clamp(1.1rem,1.05rem + .2vw,1.25rem);line-height:1.6}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;padding:6px 14px;border:1px solid rgba(157,227,186,.25);border-radius:999px;background:rgba(157,227,186,.08);color:#9de3ba;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:lowercase}
+    .hero-badge::before{content:'';width:7px;height:7px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 4px rgba(74,222,128,.2);flex-shrink:0}
+    .pulse{width:7px;height:7px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 4px rgba(74,222,128,.2)}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .hero-visual{position:relative;margin:0;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:24px;background:rgba(255,255,255,.04);backdrop-filter:blur(10px);box-shadow:0 32px 80px rgba(0,0,0,.3)}
+    .hero-visual img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:16px}
+    .hero-visual-badge{position:absolute;left:26px;bottom:26px;padding:10px 16px;border-radius:999px;background:rgba(5,46,34,.92);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.82rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.3);backdrop-filter:blur(6px)}
+
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:64px;row-gap:20px;align-items:center}
+    .hero-grid .hero-copy{grid-column:1;grid-row:1}
+    .hero-grid>.hero-visual{grid-column:2;grid-row:1 / 3}
 
     .trust-strip{background:var(--white);border-bottom:1px solid var(--grey-200)}
     .trust-grid{display:grid;grid-template-columns:repeat(4,1fr)}
@@ -144,32 +127,33 @@
     .trust-item strong{display:block;margin-bottom:3px;color:var(--green-900);font-size:1.02rem}
     .trust-item span{display:block;color:var(--grey-600);font-size:.9rem;line-height:1.45}
 
-    .emotion-section{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f4faf6 100%)}
-    .emotion-section::before{content:'';position:absolute;width:440px;height:440px;left:-220px;bottom:-270px;border-radius:50%;background:rgba(72,199,142,.1)}
-    .emotion-grid{position:relative;display:grid;grid-template-columns:.78fr 1.22fr;gap:58px;align-items:center}
-    .emotion-copy h2{max-width:13ch}
-    .emotion-copy .lead{color:var(--green-950)}
+    .emotion-section{position:relative;overflow:hidden;background:var(--green-50)}
+    .emotion-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+    .emotion-copy h2{max-width:14ch}
+    .emotion-copy .lead{color:#1a4031}
     .emotion-copy p:not(.lead){color:var(--grey-600)}
-    .emotion-quote{margin:26px 0;padding:20px 22px;border-left:4px solid var(--green-700);border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--white);box-shadow:var(--shadow-sm);color:var(--green-950);font-weight:700}
-    .emotion-visual{position:relative;margin:0;padding:10px;border:1px solid #bfddca;border-radius:28px;background:var(--white);box-shadow:var(--shadow)}
-    .emotion-visual img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:20px}
-    .emotion-labels{position:absolute;left:26px;right:26px;bottom:26px;display:flex;justify-content:space-between;gap:16px;pointer-events:none}
-    .emotion-label{max-width:190px;padding:10px 13px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(5,46,34,.88);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:.82rem;font-weight:700;line-height:1.35}
+    .emotion-quote{margin:26px 0;padding:22px 24px;border-left:4px solid var(--green-600);border-radius:0 14px 14px 0;background:var(--white);box-shadow:0 4px 20px rgba(5,46,34,.06);color:#0d3b2e;font-weight:700;font-size:.95rem}
+    .emotion-visual{position:relative;margin:0;padding:8px;border:1px solid #d5e8dc;border-radius:24px;background:var(--white);box-shadow:0 20px 50px rgba(5,46,34,.1)}
+    .emotion-visual img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:18px}
+    .emotion-labels{position:absolute;left:22px;right:22px;bottom:22px;display:flex;gap:12px;pointer-events:none}
+    .emotion-label{flex:1;max-width:220px;padding:10px 14px;border:1px solid rgba(255,255,255,.3);border-radius:12px;background:rgba(5,46,34,.85);color:var(--white);box-shadow:0 6px 20px rgba(0,0,0,.2);font-size:.8rem;font-weight:600;line-height:1.4;backdrop-filter:blur(4px)}
     .emotion-label:last-child{text-align:right}
     .emotion-caption{margin:11px 6px 2px;color:var(--grey-600);font-size:.875rem;line-height:1.5}
     .emotion-ph{aspect-ratio:3/2;border-radius:20px;background:var(--green-100);display:grid;place-items:center;color:var(--green-800);font-weight:700;font-size:.88rem;text-align:center;padding:18px;line-height:1.6}
+    .emotion-ph-img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/2;border-radius:20px;display:block}
 
-    .signs-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:start}
-    .sign-intro{position:sticky;top:112px}
+    .signs-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:start}
+    .sign-intro{position:sticky;top:110px}
     .sign-intro p{color:var(--grey-600)}
-    .signs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .sign-card,.benefit-card,.process-card{background:var(--white);border:1px solid var(--grey-200);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
-    .sign-card{padding:24px}
+    .signs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .sign-card,.benefit-card,.process-card{background:var(--white);border:1px solid var(--grey-200);border-radius:18px;box-shadow:0 2px 12px rgba(5,46,34,.04);transition:transform .2s ease,box-shadow .2s ease}
+    .sign-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(5,46,34,.1)}
+    .sign-card{padding:28px}
     .sign-card:last-child{grid-column:1/-1}
     .sign-card h3,.benefit-card h3{font-size:clamp(1.12rem,1.05rem + .24vw,1.32rem);margin-bottom:8px}
-    .card-index{width:38px;height:38px;display:grid;place-items:center;margin-bottom:18px;border-radius:11px;background:var(--green-100);color:var(--green-800);font-size:.8rem;font-weight:800}
+    .card-index{width:42px;height:42px;display:grid;place-items:center;margin-bottom:16px;border-radius:12px;background:linear-gradient(135deg,#dff5e8,#c3e6d1);color:var(--green-800);font-size:.82rem;font-weight:800}
     .sign-card p,.benefit-card p,.process-card p{margin:0;color:var(--grey-600);font-size:var(--font-small);line-height:1.6}
-    .check-callout{margin-top:28px;padding:20px 22px;border-left:4px solid var(--green-600);border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--green-50);color:var(--green-950);font-weight:600}
+    .check-callout{margin-top:28px;padding:22px 24px;border-left:4px solid var(--green-600);border-radius:0 14px 14px 0;background:linear-gradient(135deg,#f1fbf5,#e8f5ee);color:#0d3b2e;font-weight:600;font-size:.92rem}
 
     .proof-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center}
     .proof-frame{overflow:hidden;border:1px solid var(--grey-200);border-radius:26px;background:var(--white);box-shadow:var(--shadow)}
@@ -297,33 +281,7 @@
     .faq-answer{padding:0 52px 20px 0;color:var(--grey-600);font-size:var(--font-small)}
     .faq-answer p{margin-bottom:0}
 
-    .final-cta{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white)}
-    .final-inner{display:flex;align-items:center;justify-content:space-between;gap:50px}
-    .final-cta h2{color:var(--white);margin-bottom:14px}
-    .final-cta p{margin-bottom:0;color:#d7e8e1}
-    .final-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
-    .site-footer{padding:42px 0 30px;background:var(--green-950);color:#c7d8d1;font-size:.9rem}
-    .footer-grid{display:grid;gap:18px}
-    @media(min-width:768px){.footer-grid{grid-template-columns:1.25fr 1fr 1fr 1fr;gap:26px;align-items:start}}
-    .footer-col1 strong{display:block;color:var(--white);font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;margin-bottom:8px}
-    .footer-col1 p{margin:0;color:#c7d8d1;font-size:.88rem;line-height:1.6;max-width:32ch}
-    .f-wa{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:9px 15px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:var(--white);font-size:.85rem;font-weight:700;transition:background .2s ease}
-    .f-wa:hover{background:rgba(255,255,255,.08)}
-    .f-acc{border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04)}
-    .f-acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:var(--white);font-weight:700;font-size:.95rem}
-    .f-acc summary::-webkit-details-marker{display:none}
-    .f-acc summary::after{content:'+';font-size:1.15rem;color:#9de3ba;transition:transform .2s ease}
-    .f-acc[open] summary::after{transform:rotate(45deg)}
-    .f-links{display:grid;gap:2px;padding:0 16px 12px}
-    .f-links a{padding:8px 0;color:#c7d8d1;font-size:.9rem}
-    .f-links a:hover{color:var(--white)}
-    .f-acc.static{border:0;background:transparent}
-    .f-acc.static summary{pointer-events:none;cursor:default;padding:0 0 10px;color:#9de3ba;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
-    .f-acc.static summary::after{display:none}
-    .f-acc.static .f-links{padding:0}
-    .footer-bottom{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:center;text-align:center;gap:16px;flex-wrap:wrap;font-size:.82rem;color:#9fb8ae}
-
-    .desktop-wa{position:fixed;right:22px;bottom:22px;z-index:50;min-height:50px;padding:13px 18px;border-radius:999px;background:var(--wa);color:var(--white);box-shadow:0 14px 32px rgba(0,0,0,.2);font-size:.92rem;font-weight:700;transition:opacity .2s ease,transform .2s ease}
+    .desktop-wa{position:fixed;right:22px;bottom:22px;z-index:50;min-height:50px;padding:13px 18px;border-radius:999px;background:var(--green-700);color:var(--white);box-shadow:0 14px 32px rgba(0,0,0,.2);font-size:.92rem;font-weight:700;transition:opacity .2s ease,transform .2s ease}
     .desktop-wa.is-hidden{opacity:0;transform:translateY(14px);pointer-events:none}
     .mobile-sticky{display:none}
 
@@ -331,32 +289,36 @@
     .js .reveal.visible,.js.js-fallback .reveal{opacity:1;transform:none}
 
     @media(max-width:1023px){
-      .container{width:min(calc(100% - 40px),var(--container))}
-      .site-nav{height:64px}
-      .nav-links,.nav-actions{display:none}
-      .hero{min-height:auto;padding:116px 0 72px}
-      .hero-grid{grid-template-columns:1fr;gap:44px}
-      .hero-copy{max-width:760px}
-      .hero-visual{max-width:680px}
+      .container{width:min(calc(100% - 40px),var(--container))}      .hero{min-height:auto;padding:130px 0 80px}
+      .hero::before{width:450px;height:450px;right:-240px;top:-280px}
+      .hero-grid{grid-template-columns:1fr;row-gap:20px}
+      .hero-grid>.hero-copy,.hero-grid>.hero-visual{grid-column:auto;grid-row:auto}
+      .hero-copy{max-width:760px;text-align:center;display:contents}
+      .hero-copy h1,.hero-copy .lead{text-align:center}
+      .hero-actions{order:2}
+      .hero-visual{max-width:680px;order:1}
+      .hero-visual-badge{left:20px;bottom:20px;font-size:.76rem}
       .trust-grid{grid-template-columns:1fr 1fr}
       .trust-item:nth-child(2){border-right:0}
       .trust-item:nth-child(-n+2){border-bottom:1px solid var(--grey-200)}
       .trust-item:nth-child(3){padding-left:0}
       .signs-layout,.proof-layout,.price-layout,.booking-layout,.faq-layout,.emotion-grid{grid-template-columns:1fr;gap:44px}
+      .signs-layout{gap:16px}
+      .proof-layout{gap:16px}
       .sign-intro,.booking-copy{position:static}
       .proof-frame{max-width:760px}
-      .emotion-copy{max-width:760px}
-      .emotion-visual{max-width:900px}
+      .emotion-copy{max-width:760px;order:1}
+      .emotion-copy .btn{display:none}
+      .emotion-visual{max-width:900px;order:2;margin-top:16px}
+      .emotion-grid{gap:16px}
       .process-grid{grid-template-columns:1fr 1fr}
       .process-card:nth-child(2)::after{display:none}
       .booking-copy{max-width:680px}
       .booking-card{max-width:760px}
-      .final-inner{align-items:flex-start;flex-direction:column;gap:28px}
-      .final-actions{justify-content:flex-start}
       .desktop-wa{display:none}
       body{padding-bottom:78px}
       .mobile-sticky{position:fixed;left:0;right:0;bottom:0;z-index:90;display:block;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--grey-200);box-shadow:0 -8px 24px rgba(17,24,39,.08)}
-      .mobile-sticky .btn{width:100%;min-height:52px}
+      .mobile-sticky .btn{width:100%;min-height:52px;background:var(--green-700)}
       .mobile-sticky.is-hidden{display:none}
     }
 
@@ -373,7 +335,6 @@
       .hero-grid{gap:34px}
       .hero-badge{font-size:.82rem}
       .hero-actions{display:grid}
-      .hero-note{align-items:flex-start;font-size:.87rem}
       .hero-visual{padding:8px;border-radius:22px}
       .hero-visual-badge{left:16px;bottom:16px;font-size:.76rem}
       .emotion-visual img{aspect-ratio:auto;object-fit:contain}
@@ -388,6 +349,7 @@
       .process-card::after{display:none}
       .proof-layout{gap:32px}
       .proof-media-labels{inset:12px 12px auto}
+      .proof-frame{max-width:none!important;border-radius:0!important;border-left:0!important;border-right:0!important;margin-left:-16px!important;margin-right:-16px!important;width:calc(100% + 32px)!important}
       .proof-panel{padding:20px}
       .proof-slot strong{font-size:1.05rem}
       .proof-slot span{font-size:.84rem}
@@ -405,9 +367,7 @@
       .calendar-grid{gap:4px}
       .calendar-day,.calendar-empty{min-height:42px}
       .calendar-day-name{font-size:.75rem}
-      .faq-answer{padding-right:0}
-      .footer-bottom{flex-direction:column;gap:6px;align-items:center}
-    }
+      .faq-answer{padding-right:0}    }
 
     @media(max-width:380px){
       .container{width:min(calc(100% - 28px),var(--container))}
@@ -423,81 +383,48 @@
       *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
       .js .reveal{opacity:1;transform:none}
     }
+    #proses .section-head h2{max-width:30ch}
+    #harga .section-head h2{max-width:none}
+    #harga .section-head p{max-width:none}
   </style>
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
-  <nav class="site-nav" aria-label="Navigasi utama">
-    <div class="container nav-inner">
-      <a class="brand" href="#hero" aria-label="JAYABINA - kembali ke utama"><img class="brand-mark" src="/favicon.png" width="38" height="38" alt=""><span>JAYABINA</span></a>
-      <ul class="nav-links">
-        <li><a href="#tanda">Tanda</a></li>
-        <li><a href="#bukti">Visual</a></li>
-        <li><a href="#proses">Proses</a></li>
-        <li><a href="#harga">Harga</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-right">
-        <div class="nav-actions"><a class="btn btn-primary" href="#tempah">Semak Slot &amp; Harga</a></div>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mm-sections">
-      <div class="mm-label">Seksyen page ini</div>
-      <a href="#tanda">Tanda tangki perlu diperiksa</a>
-      <a href="#bukti">Visual perbandingan</a>
-      <a href="#proses">Cara kami bekerja</a>
-      <a href="#harga">Harga &amp; skop</a>
-      <a href="#faq">Soalan lazim</a>
-    </div>
-    <div class="mm-label">Halaman utama</div>
-    <a href="/">Utama</a>
-    <a href="/servis/">Semua Servis</a>
-    <a href="/tentang-kami/">Tentang Kami</a>
-    <a href="/blog/">Blog</a>
-    <a href="/hubungi-kami/">Hubungi</a>
-    <div class="mm-label">Portal</div>
-    <a href="https://akaun.jayabina.com/">Akaun Pelanggan</a>
-    <a href="https://staff.jayabina.com/">Portal Staff</a>
-    <a class="btn btn-primary" href="#tempah">Semak Slot &amp; Harga</a>
-  </div>
+  {{ partial "header.html" . }}
 
   <main>
     <section class="hero" id="hero">
+      <div class="hero-bg"></div>
       <div class="container hero-grid">
-        <div class="hero-copy">
-          <div class="hero-badge"><span class="pulse"></span>Servis cuci tangki air rumah · KL &amp; Selangor</div>
-          <h1>Tangki dah lama tak dicuci? <span>Kami buka, cuci &amp; tunjuk keadaannya.</span></h1>
-          <p class="lead">Tak perlu meneka keadaan tangki rumah anda. Kami tunjuk keadaan awal, jelaskan kerja yang diperlukan, kemudian hantar foto hasil cucian terus ke WhatsApp.</p>
+        <div class="hero-copy reveal">
+          <div class="hero-badge">Servis Cuci Tangki Air · KL &amp; Selangor</div>
+          <h1>Dah lama tak cuci tangki air ? <span>Biar kami cuci sampai bersih...</span></h1>
+          <p class="lead">Jika anda masih mandi dan kumur mulut guna air kotor, kesihatan anda dan anak-anak mungkin dalam bahaya...</p>
           <div class="hero-actions">
             <a class="btn btn-light" href="#tempah">Semak Slot &amp; Harga</a>
             <a class="btn btn-hero-ghost" href="#bukti">Lihat Visual Proses</a>
           </div>
-          <p class="hero-note">Tanya dahulu pun boleh · Deposit RM150 sahkan slot, baki selepas servis selesai.</p>
         </div>
         <figure class="hero-visual reveal" aria-label="Gambaran keadaan tangki air rumah">
           <img src="/images/tank/tank-emotional-1200.webp" width="1200" height="800" loading="eager" decoding="async" alt="Ilustrasi seorang pakcik mengambil wuduk dengan air paip yang kelihatan jernih, bersebelahan keadaan dalaman tangki yang mempunyai mendapan">
-          <span class="hero-visual-badge">Tempah online · Deposit RM150 sahkan slot</span>
+          <span class="hero-visual-badge">Bayangkan ibu bapa anda ambil wudu guna air dari tangki kotor</span>
         </figure>
       </div>
     </section>
 
     <section class="section emotion-section" id="kenapa-perlu-periksa">
       <div class="container emotion-grid">
-        <div class="emotion-copy reveal">
-          <span class="section-kicker">Yang penting ialah keadaan sebenar</span>
-          <h2>Air boleh nampak jernih walaupun dasar tangki belum diperiksa.</h2>
-          <p class="lead">Setiap hari kita guna air untuk berwuduk, berkumur, mandi dan menguruskan anak kecil.</p>
-          <p>Mendapan boleh terkumpul selepas lama digunakan. Cara paling jujur untuk tahu ialah buka, lihat dan nilai keadaan sebenar—tanpa menakut-nakutkan.</p>
-          <a class="btn btn-primary" href="#tanda">Lihat Tanda Yang Perlu Diperiksa</a>
-        </div>
         <figure class="emotion-visual reveal">
-          <div class="emotion-ph">[GAMBAR: keadaan dalam tangki air sebelum &amp; selepas dicuci —<br>foto sebenar akan dimuat naik]</div>
-          <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Apa yang kita nampak: air jernih di paip</span><span class="emotion-label">Apa yang mungkin tersembunyi: mendapan di dasar tangki</span></div>
-          <figcaption class="emotion-caption">Ruang gambar disediakan — foto sebenar akan dimuat naik kemudian.</figcaption>
+          <img class="emotion-ph-img" src="/images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp" srcset="/images/tank/tank-air-jernih-vs-dalam-kotor-480.webp 480w, /images/tank/tank-air-jernih-vs-dalam-kotor-800.webp 800w, /images/tank/tank-air-jernih-vs-dalam-kotor-1200.webp 1200w" sizes="(max-width:767px) calc(100vw - 48px), 50vw" width="1200" height="800" loading="lazy" decoding="async" alt="Perbandingan air jernih di paip dan mendapan tersembunyi di dasar tangki air rumah">
+          <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Apa yang kita nampak: air jernih di paip</span><span class="emotion-label">Apa yang tersembunyi: Air kotor di dasar tangki</span></div>
         </figure>
+        <div class="emotion-copy reveal">
+          <span class="section-kicker">Tengok Gambar Ni Betul-Betul</span>
+          <h2>Air yang dia tuang atas kepala tu — sama dengan air dalam tangki.</h2>
+          <p class="lead">Setiap hari anda guna air untuk berwuduk, berkumur, dan mandikan anak kecil.</p>
+          <p>Nampak tak bezanya? Air kat paip jernih macam biasa, budak mandi macam biasa, semua nampak normal. Tapi sebelah kanan tu — itu realiti air dalam tangki yang jarang dibuka. Air yang sama tu jugak yang masuk dalam mulut bila berkumur dan basuh muka.</p>
+          <a class="btn btn-primary" href="#tanda">Lihat Tanda Tangki Perlu Dicuci</a>
+        </div>
       </div>
     </section>
 
@@ -505,7 +432,7 @@
       <div class="container signs-layout">
         <div class="sign-intro reveal">
           <span class="section-kicker">Periksa dahulu</span>
-          <h2>Tak pasti tangki perlu dicuci?</h2>
+          <h2>5 Tanda tangki air harus dicuci.</h2>
           <p class="lead">Air nampak jernih di paip tidak semestinya bermakna dasar tangki bebas mendapan.</p>
           <p>Selepas lama digunakan, pasir, kelodak dan kesan karat boleh terkumpul. Kami buka dan tunjuk keadaan sebenar—anda tak perlu meneka.</p>
           <div class="check-callout">Jika satu atau lebih tanda ini berlaku, elok periksa dahulu keadaan tangki.</div>
@@ -634,7 +561,7 @@
             <div class="form-step"><span>3</span>Butiran anda</div>
             <div class="form-grid">
               <div class="field"><label for="customerName">Nama penuh</label><input id="customerName" name="name" type="text" autocomplete="name" placeholder="Contoh: Ahmad Firdaus" aria-describedby="nameError" aria-invalid="false"><span class="error" id="nameError">Sila isi nama penuh.</span></div>
-              <div class="field"><label for="customerEmail">Emel <span class="field-optional">(pilihan)</span></label><input id="customerEmail" name="email" type="email" autocomplete="email" placeholder="emel@contoh.com" aria-invalid="false"><span class="error" id="emailError">Sila isi emel yang sah.</span></div>
+              <div class="field"><label for="customerEmail">Emel</label><input id="customerEmail" name="email" type="email" autocomplete="email" placeholder="emel@contoh.com" required aria-describedby="emailError" aria-invalid="false"><span class="error" id="emailError">Sila isi emel yang sah.</span></div>
               <div class="field"><label for="customerPhone">Nombor telefon</label><input id="customerPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Contoh: 0123456789" aria-describedby="phoneError" aria-invalid="false"><span class="error" id="phoneError">Masukkan nombor Malaysia yang sah.</span></div>
               <div class="field full"><label for="customerAddress">Alamat &amp; poskod</label><textarea id="customerAddress" name="address" autocomplete="street-address" placeholder="No. rumah, jalan, taman dan poskod" aria-describedby="addressError" aria-invalid="false"></textarea><span class="error" id="addressError">Sila masukkan alamat lengkap dan poskod.</span></div>
             </div>
@@ -669,56 +596,17 @@
         </div>
       </div>
     </section>
-
-    <section class="final-cta">
-      <div class="container final-inner reveal">
-        <div><h2>Buka, lihat, kemudian buat keputusan dengan yakin.</h2><p>Beritahu poskod dan jenis rumah. Kami semak liputan, skop dan harga sebelum sebarang bayaran.</p></div>
-        <div class="final-actions"><a class="btn btn-light" href="#tempah">Semak Slot &amp; Harga</a><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Tanya di WhatsApp</a></div>
-      </div>
-    </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-col1">
-          <strong>JAYABINA</strong>
-          <p>Servis cuci tangki air, tukar atap &amp; mengecat rumah dan ofis. Kuala Lumpur &amp; Selangor.</p>
-          <a class="f-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp Kami</a>
-        </div>
-        <details class="f-acc">
-          <summary>Servis</summary>
-          <div class="f-links">
-            <a href="/servis-tukar-atap/">Tukar Atap Baharu</a>
-            <a href="/servis-cuci-tangki-air/">Cuci Tangki Air</a>
-            <a href="/servis-mengecat/">Mengecat Rumah &amp; Ofis</a>
-          </div>
-        </details>
-        <details class="f-acc">
-          <summary>Tentang</summary>
-          <div class="f-links">
-            <a href="/">Utama</a>
-            <a href="/tentang-kami/">Tentang Kami</a>
-            <a href="/hubungi-kami/">Hubungi Kami</a>
-          </div>
-        </details>
-        <details class="f-acc">
-          <summary>Informasi</summary>
-          <div class="f-links">
-            <a href="/terma-perkhidmatan/">Terma Perkhidmatan</a>
-            <a href="/dasar-privasi/">Dasar Privasi</a>
-            <a href="/blog/">Blog</a>
-          </div>
-        </details>
-      </div>
-      <div class="footer-bottom"><span>© 2026 Primex Jaya Bina Solutions. Hak cipta terpelihara.</span><span>www.jayabina.com</span></div>
-    </div>
-  </footer>
+  {{ partial "footer.html" . }}
 
   <a class="desktop-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Tanya di WhatsApp</a>
   <div class="mobile-sticky" id="mobileSticky"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Semak Slot &amp; Harga</a></div>
 
   <script src="/jc-api.js" defer></script>
+  {{ with resources.Get "js/main.js" | minify | fingerprint }}
+    <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+  {{ end }}
   <script>
     window.addEventListener('DOMContentLoaded',function(){
       var WHATSAPP_NUMBER='60139373275';
@@ -726,17 +614,6 @@
         var message=link.getAttribute('data-message')||'';
         link.href='https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(message);
       });
-
-      var menuToggle=document.getElementById('menuToggle');
-      var mobileMenu=document.getElementById('mobileMenu');
-      function closeMenu(returnFocus){menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Buka menu');mobileMenu.classList.remove('open');mobileMenu.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');if(returnFocus)menuToggle.focus()}
-      function openMenu(){menuToggle.setAttribute('aria-expanded','true');menuToggle.setAttribute('aria-label','Tutup menu');mobileMenu.classList.add('open');mobileMenu.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');var first=mobileMenu.querySelector('a');if(first)first.focus()}
-      menuToggle.addEventListener('click',function(){this.getAttribute('aria-expanded')==='true'?closeMenu(false):openMenu()});
-      mobileMenu.querySelectorAll('a').forEach(function(link){link.addEventListener('click',function(){closeMenu(false)})});
-      document.addEventListener('keydown',function(event){if(event.key==='Escape'&&mobileMenu.classList.contains('open'))closeMenu(true);if(event.key==='Tab'&&mobileMenu.classList.contains('open')){var focusable=Array.from(mobileMenu.querySelectorAll('a[href]'));if(!focusable.length)return;var first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
-      document.addEventListener('click',function(event){if(!mobileMenu.contains(event.target)&&!menuToggle.contains(event.target)&&mobileMenu.classList.contains('open'))closeMenu()});
-
-      document.querySelectorAll('a[href^="#"]').forEach(function(link){link.addEventListener('click',function(event){var target=document.querySelector(this.getAttribute('href'));if(target){event.preventDefault();var distance=Math.abs(target.getBoundingClientRect().top);var instant=window.matchMedia('(prefers-reduced-motion: reduce)').matches||distance>2200;if(instant){var oldBehavior=document.documentElement.style.scrollBehavior;document.documentElement.style.scrollBehavior='auto';target.scrollIntoView({behavior:'auto',block:'start'});window.setTimeout(function(){document.documentElement.style.scrollBehavior=oldBehavior},0)}else{target.scrollIntoView({behavior:'smooth',block:'start'})}}})});
 
       var navLinks=document.querySelectorAll('.nav-links a');
       var sections=document.querySelectorAll('main section[id]');
@@ -769,6 +646,7 @@
 
       function footerAcc(){var isDesktop=window.matchMedia('(min-width:768px)').matches;document.querySelectorAll('.f-acc').forEach(function(acc){acc.open=isDesktop;acc.classList.toggle('static',isDesktop)})}
       footerAcc();window.addEventListener('resize',footerAcc);
+      document.querySelectorAll('.f-acc').forEach(function(d){d.addEventListener('toggle',function(){if(window.matchMedia('(min-width:768px)').matches)return;if(this.open){document.querySelectorAll('.f-acc').forEach(function(o){if(o!==this)o.open=false},this)}})})
 
       var API_URL=localStorage.getItem('jc_api_url')||'https://api.jayabina.com';
       var SB=window.JCApi?JCApi.create(API_URL):null;
@@ -836,7 +714,7 @@
         var address=document.getElementById('customerAddress').value.trim();
         var valid=true;
         showError('nameError','customerName',!name);if(!name)valid=false;
-        showError('emailError','customerEmail',!!(emailVal&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)));if(emailVal&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal))valid=false;
+        showError('emailError','customerEmail',!emailVal||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal));if(!emailVal||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal))valid=false;
         showError('phoneError','customerPhone',!/^01\d{8,9}$/.test(phone));if(!/^01\d{8,9}$/.test(phone))valid=false;
         showError('addressError','customerAddress',address.length<10);if(address.length<10)valid=false;
         if(!selectedDate){document.getElementById('selectedDate').textContent='Sila pilih tarikh.';document.getElementById('selectedDate').style.color='var(--error)';valid=false}else{document.getElementById('selectedDate').style.color=''}
