@@ -41,6 +41,11 @@
   <button class="d-nav-item active" id="dsAll" onclick="filterTab('all')"><span class="dni"><i data-lucide="layout-grid"></i></span> All Bookings</button>
   <button class="d-nav-item" id="dsActive" onclick="filterTab('active')"><span class="dni"><i data-lucide="clock"></i></span> Active</button>
   <button class="d-nav-item" id="dsDone" onclick="filterTab('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
+  <div class="d-nav-label">Records</div>
+  <button class="d-nav-item" id="dsInvoices" onclick="showInvoices()"><span class="dni"><i data-lucide="receipt"></i></span> Invoices</button>
+  <button class="d-nav-item" id="dsReceipts" onclick="showReceipts()"><span class="dni"><i data-lucide="file-check"></i></span> Receipts</button>
+  <div class="d-nav-label">Account</div>
+  <button class="d-nav-item" id="dsProfile" onclick="showProfile()"><span class="dni"><i data-lucide="user"></i></span> Profile</button>
   <div class="d-sidebar-footer">
     <button onclick="toggleTheme()"><i data-lucide="sun-moon"></i> Theme</button>
     <button onclick="logout()" style="color:#fca5a5"><i data-lucide="log-out"></i> Switch account</button>
@@ -304,6 +309,80 @@ async function autoLogin(){
   renderList();
   relucide();
 }
+
+// INVOICES & RECEIPTS
+async function showInvoices(){
+  currentView='invoices';var l=document.getElementById('list');
+  document.getElementById('dTitle').textContent='Invoices';document.getElementById('dSub').textContent='Your invoices & receipts';
+  clearNav();setNav('dsInvoices');document.getElementById('secTitle').textContent='Invoices';
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  var h='<div class="empty"><div class="eicon"><i data-lucide="receipt"></i></div><h2>Invoices</h2><p>Invoices are generated when a job is completed.</p></div>';
+  try{
+    var res=await SB.from('invoices').select('*').eq('customer_phone',myPhone).order('created_at',{ascending:false});
+    var rows=res.data||[];
+    if(rows.length){
+      h='<div class="d-card"><table><thead><tr><th>#</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        h+='<tr><td>'+esc(r.number)+'</td><td>RM'+(r.subtotal||0)+'</td><td>RM'+(r.deposit_paid||0)+'</td><td>RM'+(r.balance_due||0)+'</td><td><span class="badge '+r.status+'"><span class="bd"></span>'+r.status+'</span></td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
+  }catch(e){}
+  l.innerHTML=h;relucide();
+}
+async function showReceipts(){
+  currentView='receipts';var l=document.getElementById('list');
+  document.getElementById('dTitle').textContent='Receipts';document.getElementById('dSub').textContent='Payment receipts';
+  clearNav();setNav('dsReceipts');document.getElementById('secTitle').textContent='Receipts';
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  var h='<div class="empty"><div class="eicon"><i data-lucide="file-check"></i></div><h2>Receipts</h2><p>Receipts are issued when payments are received.</p></div>';
+  try{
+    var res=await SB.from('receipts').select('*').eq('customer_phone',myPhone).order('created_at',{ascending:false});
+    var rows=res.data||[];
+    if(rows.length){
+      h='<div class="d-card"><table><thead><tr><th>#</th><th>Type</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.payment_type)+'</td><td>RM'+(r.amount||0)+'</td><td>'+fd(r.created_at||'')+'</td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
+  }catch(e){}
+  l.innerHTML=h;relucide();
+}
+// PROFILE
+async function showProfile(){
+  currentView='profile';var l=document.getElementById('list');
+  document.getElementById('dTitle').textContent='Profile';document.getElementById('dSub').textContent='Your account';
+  clearNav();setNav('dsProfile');document.getElementById('secTitle').textContent='Profile';
+  try{
+    var r=await SB.from('customers').select('*').eq('phone',myPhone).single();
+    var cust=r.data||{name:'',email:'',address:'',total_bookings:0};
+    var h='<div class="panel"><div style="display:flex;flex-direction:column;gap:12px">';
+    h+='<div class="pf-field"><label>Name</label><input type="text" id="pfName" value="'+esc(cust.name)+'" class="sInp"></div>';
+    h+='<div class="pf-field"><label>Phone</label><input type="text" value="'+esc(myPhone)+'" class="sInp" disabled></div>';
+    h+='<div class="pf-field"><label>Email</label><input type="email" id="pfEmail" value="'+esc(cust.email)+'" class="sInp"></div>';
+    h+='<div class="pf-field"><label>Address</label><textarea id="pfAddr" class="sInp" style="min-height:60px;resize:none">'+esc(cust.address)+'</textarea></div>';
+    h+='<button class="btn-primary" onclick="saveProfile()">Save Profile</button>';
+    h+='</div></div>';
+    h+='<div class="panel" style="margin-top:16px"><h3>Stats</h3><p>Total bookings: '+(cust.total_bookings||0)+'</p></div>';
+    l.innerHTML=h;
+  }catch(e){l.innerHTML='<div class="empty"><p>Error: '+esc(e.message)+'</p></div>'}
+  relucide();
+}
+async function saveProfile(){
+  try{
+    await SB.from('customers').upsert({
+      phone:myPhone,
+      name:document.getElementById('pfName').value.trim(),
+      email:document.getElementById('pfEmail').value.trim(),
+      address:document.getElementById('pfAddr').value.trim()
+    });
+    alert('Profile saved');
+  }catch(e){alert('Error: '+e.message)}
+}
+function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(function(n){n.classList.remove('active')})}
+function setNav(id){var el=document.getElementById(id);if(el){el.classList.add('active');el.setAttribute('aria-current','page')}}
+var currentView='bookings';
 
 autoLogin();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
