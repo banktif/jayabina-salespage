@@ -244,9 +244,15 @@
     @media(max-width:1023px){
       .container{width:min(calc(100% - 40px),var(--container))}      .hero{min-height:auto;padding:116px 0 72px}
       .hero-grid{grid-template-columns:1fr;row-gap:20px}
-      .hero-copy{max-width:760px}
-      .hero-visual{max-width:680px}
-      .signs-layout,.proof-layout,.price-layout,.booking-layout,.faq-layout,.emotion-grid{grid-template-columns:1fr;gap:44px}
+      .hero-copy{max-width:760px;display:contents}
+      .hero-visual{max-width:680px;order:1}
+      .hero-actions{order:2}
+      .emotion-grid{display:flex;flex-direction:column}
+      .emotion-copy{max-width:760px;display:contents;order:1}
+      .emotion-visual{max-width:900px;order:2}
+      .emotion-copy .emotion-quote{order:3}
+      .emotion-copy .btn{order:4}
+      .signs-layout,.proof-layout,.price-layout,.booking-layout,.faq-layout{grid-template-columns:1fr;gap:44px}
       .sign-intro,.booking-copy{position:static}
       .proof-frame{max-width:760px}
       .emotion-copy{max-width:760px}
